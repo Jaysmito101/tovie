@@ -1,0 +1,9 @@
+**.exe
+**.obj
+**.pdb
+
+*.tovie
+*.toviec
+
+bin
+.vscode
