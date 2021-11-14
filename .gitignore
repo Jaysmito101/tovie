@@ -2,8 +2,8 @@
 **.obj
 **.pdb
 
-*.tovie
-*.toviec
+test.tovie
+a.toviec
 
 bin
 .vscode
