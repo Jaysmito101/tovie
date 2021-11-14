@@ -20,7 +20,7 @@ Small toy programming language.
     9 proceed
     "ODD"
     3 puts
-    1 7 proceed
+    true 7 proceed
     "EVEN"
     4 puts
     exit
