@@ -1,0 +1,14 @@
+proc_215
+	"Hello"
+	5 puts
+	45 call
+proc_end
+
+proc_0
+        215 call
+proc_end
+
+proc_45
+	32 "World!"
+	7 putsln
+proc_end

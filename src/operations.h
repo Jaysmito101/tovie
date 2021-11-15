@@ -10,6 +10,7 @@ enum OperationType
     MOD,
     POW,
     EQ,
+    NEQ,
     GE,
     LE,
     GT,
@@ -37,6 +38,14 @@ enum OperationType
     BEGIN,
     END,
     EXIT,
+    PROC,
+    CALL,
+    MALLOC,
+    MEMSET,
+    MEMGET,
+    RET,
+    IF,
+    WHILE,
     OPERATION_COUNT
 };
 

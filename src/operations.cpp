@@ -14,6 +14,8 @@ std::string to_string(OperationType type){
             return "MOD";
         case POW:
             return "POW";
+        case NEQ:
+            return "NEQ";
         case EQ:
             return "EQ";
         case GE:
@@ -70,6 +72,22 @@ std::string to_string(OperationType type){
             return "END";
         case EXIT:
             return "EXIT";
+        case PROC:
+            return "PROC";
+        case CALL:
+            return "CALL";
+        case MALLOC:
+            return "MALLOC";
+        case MEMSET:
+            return "MEMSET";
+        case MEMGET:
+            return "MEMGET";
+        case RET:
+            return "RET";
+        case IF:
+            return "IF";
+        case WHILE:
+            return "WHILE";
         default:
             return "UNKNOWN";
     }

@@ -1,3 +1,5 @@
-"Hello" 32 "World!"
-13
-puts
+proc_0
+	"Hello" 32 "World!"
+	12
+	puts
+proc_end

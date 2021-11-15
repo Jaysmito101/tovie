@@ -1,0 +1,27 @@
+proc_0
+	1 call
+	2 call
+proc_end
+
+
+// PROC FOR TAKING INPUT
+
+proc_1
+	"Enter" 32 "N:" 32
+	9 puts
+	inputi
+proc_end
+
+// MAIN PRINTING PROC
+
+proc_2
+	memset_0
+	0 0
+	true
+	while
+		pop
+		1 +
+		println
+		memget_0 -
+	end_while
+proc_end

@@ -1,7 +1,29 @@
 #include "tovies.h"
 #include <iostream>
 #include <stack>
+#include <unordered_map>
 
+struct ProcAddr
+{
+    int procId;
+    unsigned long bAddr, eAddr;
+
+    ProcAddr()
+    {
+        procId = -1;
+        bAddr = eAddr = 0;
+    }
+
+    ProcAddr(int procId, unsigned long bAddr, unsigned long eAddr)
+    {
+        this->procId = procId;
+        this->bAddr = bAddr;
+        this->eAddr = eAddr;
+    }
+};
+
+// The `#if 1` is just to use code folding in the Editor.
+#if 1
 void print(std::vector<int> vec){
     std::cout << "[ ";
     for (int i: vec)
@@ -17,7 +39,7 @@ void push(std::vector<int> &s, Operation op, bool debug = false) {
 
 void pop(std::vector<int> &s, Operation op, bool debug = false) {
     if(debug)
-        std::cout << " pop " << std::endl;
+        std::cout << " [DEBUG]\t pop " << std::endl;
     s.pop_back();
 }
 
@@ -26,8 +48,8 @@ void add(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(a);
     s.push_back(b);
+    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " + " << a << std::endl;
     s.push_back(b + a);
@@ -38,8 +60,8 @@ void sub(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(a);
     s.push_back(b);
+    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " - " << a << std::endl;
     s.push_back(b - a);
@@ -50,8 +72,8 @@ void mul(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(a);
     s.push_back(b);
+    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " * " << a << std::endl;
     s.push_back(b * a);
@@ -62,8 +84,8 @@ void div(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(a);
     s.push_back(b);
+    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " / " << a << std::endl;
     s.push_back(b / a);
@@ -74,8 +96,8 @@ void mod(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(a);
     s.push_back(b);
+    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " % " << a << std::endl;
     s.push_back(b % a);
@@ -88,12 +110,12 @@ void dump(std::vector<int> &s, Operation op, bool debug = false) {
 
 void dumps(std::vector<int> &s, Operation op, bool debug = false) {
     int a = s.back();
-    std::cout << a << std::endl;
+    std::cout << (char)a << std::endl;
 }
 
 void dumpns(std::vector<int> &s, Operation op, bool debug = false) {
     int a = s[(int)s.size() - 1 - s.back()];
-    std::cout << a << std::endl;
+    std::cout << (char)a << std::endl;
 }
 
 void dumpn(std::vector<int> &s, Operation op, bool debug = false) {
@@ -103,7 +125,7 @@ void dumpn(std::vector<int> &s, Operation op, bool debug = false) {
 
 void println(std::vector<int> &s, Operation op, bool debug = false) {
     int a = s.back();
-    std::cout << (char)a << std::endl;
+    std::cout << a << std::endl;
 }
 
 void printlns(std::vector<int> &s, Operation op, bool debug = false) {
@@ -118,7 +140,7 @@ void printlnns(std::vector<int> &s, Operation op, bool debug = false) {
 
 void printlnn(std::vector<int> &s, Operation op, bool debug = false) {
     int a = s[(int)s.size() - 1 - s.back()];
-    std::cout << (char)a << std::endl;
+    std::cout << a << std::endl;
 }
 
 void pow(std::vector<int> &s, Operation op, bool debug = false) {
@@ -126,8 +148,8 @@ void pow(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(a);
     s.push_back(b);
+    s.push_back(a);
     int r = 1;
     for(int i=0;i<a;i++) {
         r *= b;
@@ -139,7 +161,7 @@ void pow(std::vector<int> &s, Operation op, bool debug = false) {
 
 void print(std::vector<int> &s, Operation op, bool debug = false) {
     int a = s.back();
-    std::cout << (char)a;
+    std::cout << a;
 }
 
 void prints(std::vector<int> &s, Operation op, bool debug = false) {
@@ -154,30 +176,32 @@ void printns(std::vector<int> &s, Operation op, bool debug = false) {
 
 void printn(std::vector<int> &s, Operation op, bool debug = false) {
     int a = s[(int)s.size() - 1 - s.back()];
-    std::cout << (char)a;
+    std::cout << a;
 }
 
 void puts(std::vector<int> &s, Operation op, bool debug = false) {
     int l = s.back();
-    int i = s.size() - l - 2;
+    s.pop_back();
+    int i = s.size() - l;
     if(debug){
         std::cout << " [DEBUG]\t puts" << std::endl;
         std::cout << " [DEBUG]\t\t" << " length : " << l << std::endl;
         std::cout << " [DEBUG]\t\t" << " begin : " << i << std::endl;
     }
-    for(int j=i+1;j<s.size() -1;j++)
+    for(int j=i;j<s.size();j++)
         std::cout << (char)s[j];
 }
 
 void putsln(std::vector<int> &s, Operation op, bool debug = false) {
     int l = s.back();
-    int i = s.size() - l - 2;
+    s.pop_back();
+    int i = s.size() - l;
     if(debug){
-        std::cout << " [DEBUG]\t puts" << std::endl;
+        std::cout << " [DEBUG]\t putsln" << std::endl;
         std::cout << " [DEBUG]\t\t" << " length : " << l << std::endl;
         std::cout << " [DEBUG]\t\t" << " begin : " << i << std::endl;
     }
-    for(int j=i+1;j<s.size() -1;j++)
+    for(int j=i;j<s.size();j++)
         std::cout << (char)s[j];
     std::cout << std::endl;
 }
@@ -187,8 +211,8 @@ void gt(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(a);
     s.push_back(b);
+    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " > " << a << std::endl;
     s.push_back(b > a);
@@ -199,8 +223,8 @@ void lt(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(a);
     s.push_back(b);
+    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " < " << a << std::endl;
     s.push_back(b < a);
@@ -211,8 +235,8 @@ void ge(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(a);
     s.push_back(b);
+    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " >= " << a << std::endl;
     s.push_back(b >= a);
@@ -223,8 +247,8 @@ void le(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(a);
     s.push_back(b);
+    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " <= " << a << std::endl;
     s.push_back(b <= a);
@@ -235,11 +259,23 @@ void eq(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(a);
     s.push_back(b);
+    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << a << " == " << b << std::endl;
     s.push_back(a == b);
+}
+
+void neq(std::vector<int> &s, Operation op, bool debug = false) {
+    int a = s.back();
+    s.pop_back();
+    int b = s.back();
+    s.pop_back();
+    s.push_back(b);
+    s.push_back(a);
+    if(debug)
+        std::cout << " [DEBUG]\t" << a << " != " << b << std::endl;
+    s.push_back(a != b);
 }
 
 void inputi(std::vector<int> &s, Operation op, bool debug = false){
@@ -259,16 +295,67 @@ void inputs(std::vector<int> &s, Operation op, bool debug = false){
         s.push_back(ss[i]);
     s.push_back(ss.size());
 }
+#endif
 
-void simulate(std::vector<Operation> ops, bool debug){
-    std::vector<int> progStack;
+static std::unordered_map<int, ProcAddr> procAddresses;
+
+void loadProcs(std::vector<Operation> ops){
+    procAddresses.clear();
+    ProcAddr pAddr;
+    bool inProc = false;
     for(int i=0;i<ops.size();i++){
+        if(inProc && ops[i].op == OperationType::PROC){
+            if(ops[i].arg == -1){
+                pAddr.eAddr = i;
+                inProc = false;
+                procAddresses[pAddr.procId] = pAddr;
+            }
+            else{
+                throw std::runtime_error("proc" + std::to_string(pAddr.procId) + " begin inside another proc error!");
+            }
+        }
+        else if(ops[i].op == OperationType::PROC){
+            if(ops[i].arg > -1){
+                pAddr.procId = ops[i].arg;
+                pAddr.bAddr = i;
+                inProc = true;
+            }
+            else{
+                throw std::runtime_error("proc end without begin error!");
+            }
+        }
+    }
+}
+
+int find_next_end(std::vector<Operation> ops, int i, OperationType type){
+    for(int j=i;j<ops.size();j++){
+        if(ops[j].op == type && ops[j].arg == 1){
+            return j;
+        }
+    }
+    return ops.size();
+}
+
+int find_prev_begin(std::vector<Operation> ops, int i, OperationType type){
+    for(int j=i;j>=0;j--){
+        if(ops[j].op == type && ops[j].arg == 0){
+            return j;
+        }
+    }
+    return ops.size();
+}
+
+void simulate_proc(std::vector<int>& progStack, std::vector<Operation> ops, ProcAddr pAddr, bool debug){
+    int* memory = new int[1024];
+    int endIdToSkip = 0;
+    for(unsigned long i = pAddr.bAddr + 1 ; i < pAddr.eAddr ; i++){
         Operation op = ops[i];
         if(debug && false) // TMP
             std::cout << " [DEBUG]\t" << op.op << "\t\t" << op.arg << std::endl;
         if(debug){
             std::cout  << " [DEBUG] STACK :";
             print(progStack);
+            std::cout  << " [DEBUG] OP ID :" << i << std::endl;
         }
         switch(op.op){
             case OperationType::PUSH:
@@ -358,6 +445,21 @@ void simulate(std::vector<Operation> ops, bool debug){
             case OperationType::EQ:
                 eq(progStack, op, debug);
                 break;
+            case OperationType::NEQ:
+                neq(progStack, op, debug);
+                break;
+            case OperationType::CALL:
+            {
+                int procId = progStack.back();
+                progStack.pop_back();
+                if(debug)
+                    std::cout << " [DEBUG]\tcall proc_" << procId << std::endl;
+                if(procAddresses.find(procId) == procAddresses.end()){
+                    throw std::runtime_error("proc_" + std::to_string(procId) + " not found!");
+                }
+                simulate_proc(progStack, ops, procAddresses[procId], debug);
+                break;
+            }
             case OperationType::RECEED:
             {
                 int count = progStack.back();
@@ -366,7 +468,6 @@ void simulate(std::vector<Operation> ops, bool debug){
                     i -= count + 2;
                 if(debug && progStack.back())
                     std::cout << " [DEBUG]\t receed " << count << std::endl;
-                progStack.push_back(count);
                 break;
             }
             case OperationType::PROCEED:
@@ -377,11 +478,133 @@ void simulate(std::vector<Operation> ops, bool debug){
                     i += count-1;
                 if(debug && progStack.back())
                     std::cout << " [DEBUG]\t porceed " << count << std::endl;
-                progStack.push_back(count);
+                break;
+            }
+            case OperationType::MALLOC:
+            {
+                int count = progStack.back();
+                progStack.pop_back();
+                if(debug)
+                    std::cout << " [DEBUG]\t malloc " << count << std::endl;
+                if(memory != nullptr)
+                    delete[] memory;
+                memory = new int[count];
+                break;
+            }
+            case OperationType::MEMGET:
+            {
+                if(op.arg == -1){
+                    int addr = progStack.back();
+                    progStack.pop_back();
+                    int size = progStack.back();
+                    progStack.pop_back();
+                    if(debug)
+                        std::cout << " [DEBUG]\t memget " << addr << size << std::endl;
+                    for(int k = addr ; k < size ; k++)
+                        progStack.push_back(memory[k]);
+                }
+                else{
+                    int addr = op.arg;
+                    if(debug)
+                        std::cout << " [DEBUG]\t memget " << addr << std::endl;
+                    progStack.push_back(memory[addr]);
+                }
+                break;
+            }
+            case OperationType::MEMSET:
+            {
+                if(op.arg == -1){
+                    int addr = progStack.back();
+                    progStack.pop_back();
+                    int size = progStack.back();
+                    progStack.pop_back();
+                    if(debug)
+                        std::cout << " [DEBUG]\t memset " << addr << size << std::endl;
+                    for(int k = addr ; k < size ; k++){
+                        memory[k] = progStack.back();
+                        progStack.pop_back();
+                    }
+                }
+                else{
+                    int addr = op.arg;
+                    if(debug)
+                        std::cout << " [DEBUG]\t memset " << addr << std::endl;
+                    memory[addr] = progStack.back();
+                }
+                break;
+            }
+            case OperationType::IF:
+            {
+                if(op.arg == 0){
+                    int condition = progStack.back();
+                    progStack.pop_back();
+                    if(debug)
+                        std::cout << " [DEBUG]\t if " << condition << std::endl;
+                    if(condition)
+                    {
+                        // For future use
+                    }
+                    else{
+                        i = find_next_end(ops, i, OperationType::IF);
+                        if(debug)
+                            std::cout << " [DEBUG]\t skipping to op " << (i+1) << std::endl;
+                    }
+                }
+                else if(op.arg == 1){
+                    // For future use
+                }
+                break;
+            }
+            case OperationType::WHILE:
+            {
+                if(op.arg == 0){
+                    int condition = progStack.back();
+                    progStack.pop_back();
+                    if(condition){
+                       // For future use 
+                       if(debug)
+                            std::cout << " [DEBUG]\t while " << condition << std::endl;
+                    }
+                    else{
+                        if(debug)
+                            std::cout << " [DEBUG]\t skipping to op " << (i+1) << std::endl;
+                        i = find_next_end(ops, i, OperationType::WHILE);
+                    }
+                }
+                else if(op.arg == 1){
+                    i = find_prev_begin(ops, i, OperationType::WHILE) - 1;
+                    if(debug){
+                        std::cout << " [DEBUG]\t moving to op " << (i+1) << std::endl;
+                    }
+                }
                 break;
             }
             case OperationType::EXIT:
+            {
+                if(debug)
+                    std::cout << " [DEBUG]\texit " << progStack.back() << std::endl;
+                if(memory != nullptr)
+                    delete[] memory;
+                exit(progStack.back());
+            }
+            case OperationType::RET:
+            {
+                if(debug)
+                    std::cout << " [DEBUG]\treturn" << std::endl;
                 return;
+            }
         }
     }
+    if(memory)
+        delete[] memory;
+}
+
+void simulate(std::vector<Operation> ops, bool debug){
+    loadProcs(ops);
+    std::vector<int> progStack;
+    progStack.push_back(0);
+    if(procAddresses.find(0) == procAddresses.end()){
+        throw std::runtime_error("no main proc!");
+    }
+    simulate_proc(progStack, ops, procAddresses[0], debug);
 }

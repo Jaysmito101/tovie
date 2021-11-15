@@ -1,0 +1,7 @@
+proc_0
+	0 "olleH"
+	prints
+	pop
+	2
+	receed
+proc_end
