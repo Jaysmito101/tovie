@@ -299,7 +299,7 @@ void inputs(std::vector<int> &s, Operation op, bool debug = false){
 
 static std::unordered_map<int, ProcAddr> procAddresses;
 
-void loadProcs(std::vector<Operation> ops){
+static void loadProcs(std::vector<Operation> ops){
     procAddresses.clear();
     ProcAddr pAddr;
     bool inProc = false;
@@ -327,37 +327,35 @@ void loadProcs(std::vector<Operation> ops){
     }
 }
 
-int find_next_end(std::vector<Operation> ops, int i, OperationType type){
+static int find_next_end(std::vector<Operation> ops, int i, OperationType type, int endArg = 1){
     for(int j=i;j<ops.size();j++){
-        if(ops[j].op == type && ops[j].arg == 1){
+        if(ops[j].op == type && ops[j].arg == endArg){
             return j;
         }
     }
     return ops.size();
 }
 
-int find_prev_begin(std::vector<Operation> ops, int i, OperationType type){
+static int find_prev_begin(std::vector<Operation> ops, int i, OperationType type, int begArg = 0){
     for(int j=i;j>=0;j--){
-        if(ops[j].op == type && ops[j].arg == 0){
+        if(ops[j].op == type && ops[j].arg == begArg){
             return j;
         }
     }
     return ops.size();
 }
 
-void simulate_proc(std::vector<int>& progStack, std::vector<Operation> ops, ProcAddr pAddr, bool debug){
-    int* memory = new int[1024];
-    int endIdToSkip = 0;
-    for(unsigned long i = pAddr.bAddr + 1 ; i < pAddr.eAddr ; i++){
-        Operation op = ops[i];
-        if(debug && false) // TMP
-            std::cout << " [DEBUG]\t" << op.op << "\t\t" << op.arg << std::endl;
-        if(debug){
-            std::cout  << " [DEBUG] STACK :";
-            print(progStack);
-            std::cout  << " [DEBUG] OP ID :" << i << std::endl;
-        }
-        switch(op.op){
+static void simulate_proc(std::vector<int>& progStack, std::vector<Operation> ops, ProcAddr pAddr, bool debug);
+
+static void simulate_op(std::vector<int> &progStack, Operation op, unsigned long* i, int* memory, std::vector<Operation>& ops,bool debug = false){
+    if(debug && false) // TMP
+        std::cout << " [DEBUG]\t" << op.op << "\t\t" << op.arg << std::endl;
+    if(debug){
+        std::cout  << " [DEBUG] STACK :";
+        print(progStack);
+        std::cout  << " [DEBUG] OP ID :" << *i << std::endl;
+    }
+     switch(op.op){
             case OperationType::PUSH:
                 push(progStack, op, debug);
                 break;
@@ -465,7 +463,7 @@ void simulate_proc(std::vector<int>& progStack, std::vector<Operation> ops, Proc
                 int count = progStack.back();
                 progStack.pop_back();
                 if(progStack.back())
-                    i -= count + 2;
+                    *i -= count + 2;
                 if(debug && progStack.back())
                     std::cout << " [DEBUG]\t receed " << count << std::endl;
                 break;
@@ -475,7 +473,7 @@ void simulate_proc(std::vector<int>& progStack, std::vector<Operation> ops, Proc
                 int count = progStack.back();
                 progStack.pop_back();
                 if(progStack.back())
-                    i += count-1;
+                    *i += count-1;
                 if(debug && progStack.back())
                     std::cout << " [DEBUG]\t porceed " << count << std::endl;
                 break;
@@ -545,7 +543,7 @@ void simulate_proc(std::vector<int>& progStack, std::vector<Operation> ops, Proc
                         // For future use
                     }
                     else{
-                        i = find_next_end(ops, i, OperationType::IF);
+                        *i = find_next_end(ops, *i, OperationType::IF);
                         if(debug)
                             std::cout << " [DEBUG]\t skipping to op " << (i+1) << std::endl;
                     }
@@ -568,15 +566,40 @@ void simulate_proc(std::vector<int>& progStack, std::vector<Operation> ops, Proc
                     else{
                         if(debug)
                             std::cout << " [DEBUG]\t skipping to op " << (i+1) << std::endl;
-                        i = find_next_end(ops, i, OperationType::WHILE);
+                        *i = find_next_end(ops, *i, OperationType::WHILE);
                     }
                 }
                 else if(op.arg == 1){
-                    i = find_prev_begin(ops, i, OperationType::WHILE) - 1;
+                    *i = find_prev_begin(ops, *i, OperationType::WHILE) - 1;
                     if(debug){
                         std::cout << " [DEBUG]\t moving to op " << (i+1) << std::endl;
                     }
                 }
+                break;
+            }
+            case OperationType::FOR:
+            {
+                if(op.arg != -1 || op.arg == -2){
+                    int end = find_next_end(ops, *i, OperationType::FOR, -1);
+                    int count = 0;
+                    if(op.arg == -1)
+                        count = op.arg;
+                    else if(op.arg == -2){
+                        count = progStack.back();
+                        progStack.pop_back();
+                    }
+                    if(debug){
+                        std::cout << " [DEBUG]\t for " << count << " times from " << *i << " to " << end << std::endl;
+                    }
+                    for(int k = 0 ; k < count ; k++){
+                        if(debug)
+                            std::cout << " [DEBUG]\t for " << k+1 << "/" << count << std::endl;
+                        for(unsigned long p=*i+1; p<end && p >= *i; p++)
+                            simulate_op(progStack, ops[p], &p, memory, ops, debug);
+                    }
+                    *i = end;
+                }
+
                 break;
             }
             case OperationType::EXIT:
@@ -594,6 +617,14 @@ void simulate_proc(std::vector<int>& progStack, std::vector<Operation> ops, Proc
                 return;
             }
         }
+}
+
+static void simulate_proc(std::vector<int>& progStack, std::vector<Operation> ops, ProcAddr pAddr, bool debug){
+    int* memory = new int[1024];
+    int endIdToSkip = 0;
+    for(unsigned long i = pAddr.bAddr + 1 ; i < pAddr.eAddr ; i++){
+        Operation op = ops[i];
+        simulate_op(progStack, op, &i, memory, ops, debug);
     }
     if(memory)
         delete[] memory;

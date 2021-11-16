@@ -162,13 +162,26 @@ std::vector<Operation> parse(std::string& input) {
         else if(token == "if"){
             operations.push_back(Operation(OperationType::IF, 0));
         }
-        else if(token == "end_if"){
+        else if(token == "end_if" || token == "if_end"){
             operations.push_back(Operation(OperationType::IF, 1));
+        }
+        else if(token == "end_for" || token == "for_end"){
+            operations.push_back(Operation(OperationType::FOR, -1));
+        }
+        else if(starts_with(token, "for_")){
+            operations.push_back(Operation(OperationType::FOR, std::stoi(token.substr(7))));
+        }
+        else if(starts_with(token, "for")){
+            operations.push_back(Operation(OperationType::FOR, -2));
+        }
+        else if(token == "do"){
+            operations.push_back(Operation(OperationType::PUSH, true));
+            operations.push_back(Operation(OperationType::WHILE, 0));
         }
         else if(token == "while"){
             operations.push_back(Operation(OperationType::WHILE, 0));
         }
-        else if(token == "end_while" || token == "while_end"){
+        else if(token == "end_while" || token == "while_end" || token == "do_end" || token == "end_do"){
             operations.push_back(Operation(OperationType::WHILE, 1));
         }
         else if(token[0] == '\"' && token[token.size() - 1] == '\"'){

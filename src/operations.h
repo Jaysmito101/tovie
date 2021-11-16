@@ -46,6 +46,7 @@ enum OperationType
     RET,
     IF,
     WHILE,
+    FOR,
     OPERATION_COUNT
 };
 

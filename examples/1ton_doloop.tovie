@@ -17,11 +17,10 @@ proc_end
 proc_2
 	memset_0
 	0 0
-	true
-	while
+	do
 		pop
 		1 +
 		println
 		memget_0 -
-	end_while
+	while_end
 proc_end

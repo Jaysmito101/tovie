@@ -2,6 +2,7 @@ import sys
 import os
 
 TARGET_NAME = "tovie"
+DEFINES = ["TOVIE"]
 
 def get_files_in_dir(dir):
     files = []
@@ -13,8 +14,12 @@ def get_files_in_dir(dir):
     return files
 
 def compile_file(file):
+    global DEFINES
+    def_str = ""
+    for dfstr in DEFINES:
+        def_str += dfstr + " "
     print("Compiling " + file + "...")
-    os.system("g++ -c -std=c++11 -o ./bin/o/" + file.split(".")[0] + ".o ./src/" + file)
+    os.system("g++ -c -std=c++11 -D " + def_str + " -o ./bin/o/" + file.split(".")[0] + ".o ./src/" + file)
     
 
 def compile_files(files):
@@ -26,11 +31,12 @@ def compile_files(files):
     
 
 def main(args):
-    if len(args) == 0:
-        if(not os.path.isdir("./bin")):
-            os.mkdir("./bin")
-        compile_files(get_files_in_dir("./src"))
-        print("Done!")
+    global DEFINES
+    DEFINES.extend(sys.argv)
+    if(not os.path.isdir("./bin")):
+        os.mkdir("./bin")
+    compile_files(get_files_in_dir("./src"))
+    print("Done!")
 
 if __name__ == "__main__":
     main(sys.argv[1:])

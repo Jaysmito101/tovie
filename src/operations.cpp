@@ -88,6 +88,8 @@ std::string to_string(OperationType type){
             return "IF";
         case WHILE:
             return "WHILE";
+        case FOR:
+            return "FOR";
         default:
             return "UNKNOWN";
     }

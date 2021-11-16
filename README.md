@@ -1,6 +1,26 @@
+<br/>
+<p align="center">
+    <img src="https://raw.githubusercontent.com/Jaysmito101/tovie/master/resources/ReadmeHeader.png" border="0"></
+</p>
+
+<br/>
+<p align="center">
+  <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/Jaysmito101/tovie?style=for-the-badge">
+  <img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/Jaysmito101/tovie?style=for-the-badge">
+  <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/w/Jaysmito101/tovie?style=for-the-badge">
+    <br>
+    <img alt="Maintenance" src="https://img.shields.io/maintenance/yes/2021?style=for-the-badge">
+    <a href="https://patreon.com/jaysmito101"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Djaysmito101%26type%3Dpledges&style=for-the-badge" alt="Support me on Patreon" /></a>
+</p>
+<br/>
+
+
 # Tovie Lang
 
 Small toy programming language.
+
+# Docs : 
+### https://github.com/Jaysmito101/tovie/wiki
 
 ## Examples :
 
@@ -69,3 +89,17 @@ Small toy programming language.
     		memget_0 -
     	end_while
     proc_end
+
+
+# Support
+
+Any support would be highly appretiated!
+
+For example you could add a feature and contribute via pull requests or you could even report any issues with the program!
+
+And the best thing you could do to support this project is spread word about this so that more people who might be interested in this may use this!
+
+Please considering tweeting about this! 
+
+
+<img alt="Visitors" src="https://visitor-badge.glitch.me/badge?page_id=Jaysmito101.tovie&left_color=gray&right_color=green&style=for-the-badge">

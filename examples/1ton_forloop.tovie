@@ -1,0 +1,8 @@
+proc_0
+	"Enter" 32 "N:" 8 puts
+	0
+	inputi for
+		1 +
+		println
+	repeat_end
+proc_end
