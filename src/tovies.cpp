@@ -580,12 +580,10 @@ static void simulate_op(std::vector<int> &progStack, Operation op, unsigned long
             }
             case OperationType::FOR:
             {
-                if(op.arg != -1 || op.arg == -2){
+                if(op.arg != -1){
                     int end = find_next_end(ops, *i, OperationType::FOR, -1);
-                    int count = 0;
-                    if(op.arg == -1)
-                        count = op.arg;
-                    else if(op.arg == -2){
+                    int count = op.arg;
+                    if(op.arg == -2){
                         count = progStack.back();
                         progStack.pop_back();
                     }

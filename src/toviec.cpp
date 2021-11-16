@@ -3,8 +3,20 @@
 #define LEXPP_IMPLEMENTATION
 #include "include/lexpp.hpp"
 #include <string>
+#include <fstream>
+#include <sstream>
 #include <vector>
+#include <unordered_map>
 #include <stdexcept>
+
+
+
+#if defined(WIN32) || defined(_WIN32) 
+#define PATH_SEPARATOR "\\" 
+#else 
+#define PATH_SEPARATOR "/" 
+#endif
+
 bool is_number(const std::string& s) {
     return !s.empty() && std::find_if(s.begin(), s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
 }
@@ -17,12 +29,72 @@ bool ends_with(const std::string& s, const std::string& suffix) {
     return s.substr(s.size() - suffix.size(), suffix.size()) == suffix;
 }
 
-std::vector<Operation> parse(std::string& input) {
+static void process_defs(std::string& token, std::unordered_map<std::string, std::string>& defs){
+    // iterate over the keys of defs
+    for (auto& kv : defs) {
+        // if the token starts with the key
+        if (token.find(kv.first) != std::string::npos) {
+            // replace the key from the string to value
+            token.replace(token.find(kv.first), kv.first.size(), kv.second);
+            return;
+        }
+    }
+}
+
+static std::string read_lib(const std::string& lib_name, std::vector<std::string>& includePaths, bool* success) {
+    for(std::string& includePath : includePaths){
+        std::string path = includePath + PATH_SEPARATOR + lib_name;
+        std::ifstream file(path);
+        if(file.is_open()){
+            std::stringstream buffer;
+            buffer << file.rdbuf();
+            *success = true;
+            return buffer.str();
+        }
+        *success = false;
+    }
+}
+
+std::vector<Operation> parse(std::string& input, std::string& includePath, std::vector<Operation>& ioperations, std::unordered_map<std::string, std::string>& idefs, bool isInclude) {
+    std::vector<std::string> includePaths = lexpp::lex(includePath, ";");
     std::vector<Operation> operations;
+    std::unordered_map<std::string, std::string> defs;
     std::vector<std::string> tokens = lexpp::lex(input, " \t\r\n");
-    operations.push_back(Operation(OperationType::BEGIN));
-    for (std::string& token : tokens) {
-        if(is_number(token)) {
+    if(isInclude){
+        defs = idefs;
+        operations = ioperations;
+    }
+    else{
+        defs["main"] = "0";
+        operations.push_back(Operation(OperationType::BEGIN));
+    }
+    for (int l=0;l<tokens.size();l++) {
+        std::string& token = tokens[l];
+        if(token.size() == 0){
+            continue;
+        }   
+        if(starts_with(token, "include<\"")){
+            while(!ends_with(token, "\">")){
+                l++;
+                token += " " + tokens[l];
+            }
+            bool isIncludeOK = false;
+            std::string libSrc = read_lib(token.substr(9, token.size()-2), includePaths, &isIncludeOK);
+            if(isIncludeOK){
+                parse(libSrc, includePath, operations, defs, true);
+            }else{
+                throw std::runtime_error("include " + token.substr(9, token.size()-2) + " error");
+            }
+        }
+        else if(starts_with(token, "def<")){
+            std::string name = token.substr(4);
+            token = "";
+            while(token[token.size()-1] != '>'){
+                token += " " + tokens[++l];
+            }
+            defs[name] = token.substr(0, token.size()-1);
+        }
+        else if(is_number(token)) {
             operations.push_back(Operation(OperationType::PUSH, std::stoi(token)));
         }
         else if(token == "true"){
@@ -139,6 +211,7 @@ std::vector<Operation> parse(std::string& input) {
             operations.push_back(Operation(OperationType::PROC, -1));
         }
         else if(starts_with(token, "proc_")){
+            process_defs(token, defs);
             operations.push_back(Operation(OperationType::PROC, std::stoi(token.substr(5))));
         }
         else if(token == "call"){
@@ -154,9 +227,11 @@ std::vector<Operation> parse(std::string& input) {
             operations.push_back(Operation(OperationType::MEMGET));
         }
         else if(starts_with(token, "memset_")){
+            process_defs(token, defs);
             operations.push_back(Operation(OperationType::MEMSET, std::stoi(token.substr(7))));
         }
         else if(starts_with(token, "memget_")){
+            process_defs(token, defs);
             operations.push_back(Operation(OperationType::MEMGET, std::stoi(token.substr(7))));
         }
         else if(token == "if"){
@@ -169,7 +244,8 @@ std::vector<Operation> parse(std::string& input) {
             operations.push_back(Operation(OperationType::FOR, -1));
         }
         else if(starts_with(token, "for_")){
-            operations.push_back(Operation(OperationType::FOR, std::stoi(token.substr(7))));
+            process_defs(token, defs);
+            operations.push_back(Operation(OperationType::FOR, std::stoi(token.substr(4))));
         }
         else if(starts_with(token, "for")){
             operations.push_back(Operation(OperationType::FOR, -2));
@@ -184,7 +260,13 @@ std::vector<Operation> parse(std::string& input) {
         else if(token == "end_while" || token == "while_end" || token == "do_end" || token == "end_do"){
             operations.push_back(Operation(OperationType::WHILE, 1));
         }
-        else if(token[0] == '\"' && token[token.size() - 1] == '\"'){
+        else if(token[0] == '\"'){
+            if(token[token.size() - 1] != '\"'){
+                while(token[token.size() - 1] != '\"'){
+                    token += " " + tokens[++l];
+                }
+            }
+            operations.push_back(Operation(OperationType::PUSH, -1));
             bool isBkslash = false;
             for(int i=1;i<token.size() -1;i++){
                 if(token[i] == '\\'){
@@ -225,8 +307,12 @@ std::vector<Operation> parse(std::string& input) {
                     operations.push_back(Operation(OperationType::PUSH, (int)token[i]));
                 }
             }
+
         }
     }
-    operations.push_back(Operation(OperationType::END));
+    if(!isInclude)
+        operations.push_back(Operation(OperationType::END));
+    ioperations = operations;
+    idefs = defs;
     return operations;
 }

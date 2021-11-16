@@ -72,6 +72,7 @@ int main(int argc, char** argv){
     std::string filePath = "";
     std::string ofilePath = "a.toviec";
     std::string mode = "com";
+    std::string includePath = ".";
     if(argc == 3)
     {
         mode = argv[1];
@@ -93,7 +94,7 @@ int main(int argc, char** argv){
     {
         fileData = read_file(filePath);
         std::cout << "Compiling..." << std::endl;
-        std::vector<Operation> operations = parse(fileData);
+        std::vector<Operation> operations = parse(fileData, includePath);
         save(operations, ofilePath);
     }
     else if(mode == "sis")
@@ -101,14 +102,14 @@ int main(int argc, char** argv){
         fileData = read_file(filePath);
         std::cout << "Simulating..." << std::endl;
         std::cout << std::endl;
-        simulate(parse(fileData));
+        simulate(parse(fileData, includePath));
     }
     else if(mode == "ssd")
     {
         fileData = read_file(filePath);
         std::cout << "Simulating..." << std::endl;
         std::cout << std::endl;
-        simulate(parse(fileData), true);
+        simulate(parse(fileData, includePath), true);
     }
     else if(mode == "sib")
     {
@@ -128,7 +129,7 @@ int main(int argc, char** argv){
     {
         std::cout << "Generating OP table..." << std::endl;
         std::string data = read_file(filePath);
-        std::vector<Operation> operations = parse(data);
+        std::vector<Operation> operations = parse(data, includePath);
         write_file(generate_op_table(operations), filePath + ".tovieopt");
     }
     else if(mode == "gtb")

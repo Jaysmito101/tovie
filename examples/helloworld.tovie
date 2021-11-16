@@ -1,5 +1,5 @@
 proc_0
-	"Hello" 32 "World!"
+	"Hello World!"
 	12
 	puts
 proc_end
