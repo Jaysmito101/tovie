@@ -66,7 +66,7 @@ Small toy programming language.
 	inputi for
 	    1 +
 	    println
-	repeat_end
+	for_end
     proc_end
 
 ### 5. Print 1 to N While Loop
