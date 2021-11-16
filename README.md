@@ -32,17 +32,31 @@ Small toy programming language.
 	    puts
     proc_end
 
-### 2. Hello World Again
+### 2. English Like Hello World
+
+    Lets start with proc_0 as the main function. Then i push 2 into the stack to call procedure 2.
+    Lastly I end this proc by end_proc .
+    As far as proc_2 is concerned, first i push the string "Hello!" of size 6 in the stack. 
+    Then just puts in on screen! Lastly proc_end .
+
+### 3. Fibonacii Sequence
 
     proc_0
-    	0 "olleH"
-    	prints
-    	pop
-    	2 receed
+        1 call
+        0 1
+        inputi for
+            print
+            +
+            32 prints pop // PRINTING THE SPACE
+        for_end
     proc_end
-    
 
-### 3. Even/Odd Checker
+    proc_1
+        "Enter" 32 "N" 32 ":" 32
+        10 puts
+    proc_end
+
+### 4. Even/Odd Checker
 
     proc_0
     	"Enter" 32 "a" 32 "Number" 32 ":" 32
@@ -58,7 +72,7 @@ Small toy programming language.
     	3 puts
     proc_end
 
-### 4. Print 1 to N For Loop
+### 5. Print 1 to N For Loop
 
     proc_0
         "Enter" 32 "N:" 8 puts
@@ -69,7 +83,7 @@ Small toy programming language.
         for_end
     proc_end
 
-### 5. Print 1 to N While Loop
+### 6. Print 1 to N While Loop
 
     proc_0
     	1 call
