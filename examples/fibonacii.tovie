@@ -1,0 +1,14 @@
+proc_0
+    1 call
+    0 1
+    10 for
+        print
+        +
+        32 prints pop // PRINTING THE SPACE
+    for_end
+proc_end
+
+proc_1
+    "Enter" 32 "N" 32 ":" 32
+    10 puts
+proc_end

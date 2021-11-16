@@ -528,6 +528,7 @@ static void simulate_op(std::vector<int> &progStack, Operation op, unsigned long
                     if(debug)
                         std::cout << " [DEBUG]\t memset " << addr << std::endl;
                     memory[addr] = progStack.back();
+                    progStack.pop_back();
                 }
                 break;
             }
