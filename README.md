@@ -1,6 +1,6 @@
 <br/>
 <p align="center">
-    <img src="https://raw.githubusercontent.com/Jaysmito101/tovie/master/resources/ReadmeHeader.png" border="0"></
+    <img src="https://github.com/Jaysmito101/tovie/blob/master/recources/ReadmeHeader.png?raw=true" border="0"></
 </p>
 
 <br/>
@@ -38,8 +38,7 @@ Small toy programming language.
     	0 "olleH"
     	prints
     	pop
-    	2
-    	receed
+    	2 receed
     proc_end
     
 
@@ -50,8 +49,7 @@ Small toy programming language.
     	17
     	puts
     	inputi
-    	2 % 0 ==
-    	if
+    	2 % 0 == if
     		"EVEN"
     		4 puts
     		6 proceed
@@ -60,7 +58,18 @@ Small toy programming language.
     	3 puts
     proc_end
 
-### 4. Print 1 to N
+### 4. Print 1 to N For Loop
+
+    proc_0
+        "Enter" 32 "N:" 8 puts
+        0
+        inputi for
+            1 +
+            println
+        for_end
+    proc_end
+
+### 5. Print 1 to N While Loop
 
     proc_0
     	1 call
