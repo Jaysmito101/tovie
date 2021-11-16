@@ -1,6 +1,6 @@
 <br/>
 <p align="center">
-    <img src="https://raw.githubusercontent.com/Jaysmito101/tovie/master/resources/ReadmeHeader.png" border="0"></
+    <img src="https://github.com/Jaysmito101/tovie/blob/master/recources/ReadmeHeader.png?raw=true" border="0"></
 </p>
 
 <br/>
