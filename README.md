@@ -62,11 +62,11 @@ Small toy programming language.
 
     proc_0
         "Enter" 32 "N:" 8 puts
-	0
-	inputi for
-	    1 +
-	    println
-	for_end
+        0
+        inputi for
+            1 +
+            println
+        for_end
     proc_end
 
 ### 5. Print 1 to N While Loop
