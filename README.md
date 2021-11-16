@@ -32,14 +32,12 @@ Small toy programming language.
 	    puts
     proc_end
 
-### 2. Hello World Again
+### 2. English Like Hello World
 
-    proc_0
-    	0 "olleH"
-    	prints
-    	pop
-    	2 receed
-    proc_end
+    Lets start with proc_0 as the main function. Then i push 2 into the stack to call procedure 2.
+    Lastly I end this proc by end_proc .
+    As far as proc_2 is concerned, first i push the string "Hello!" of size 6 in the stack. 
+    Then just puts in on screen! Lastly proc_end .
 
 ### 3. Fibonacii Sequence
 
