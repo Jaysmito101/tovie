@@ -94,6 +94,8 @@ std::string to_string(OperationType type){
             return "WHILE";
         case FOR:
             return "FOR";
+        case LOADLIB:
+            return "LOADLIB";
         default:
             return "UNKNOWN";
     }

@@ -1,7 +1,10 @@
 #include "tovies.h"
 #include <iostream>
+#include <functional>
 #include <stack>
 #include <unordered_map>
+
+#include "tovie_runtimelib.h"
 
 struct ProcAddr
 {
@@ -317,6 +320,7 @@ void inputs(std::vector<int> &s, Operation op, bool debug = false){
         std::cout << " [DEBUG]\tinput string" << std::endl;
     std::string ss = "";
     std::cin >> ss;
+    s.push_back(-1);
     for(int i=0;i<ss.size();i++)
         s.push_back(ss[i]);
     s.push_back(ss.size());
@@ -324,6 +328,21 @@ void inputs(std::vector<int> &s, Operation op, bool debug = false){
 #endif
 
 static std::unordered_map<int, ProcAddr> procAddresses;
+static void* runtimeLib = nullptr;
+static std::unordered_map<int, std::function<void(std::vector<int>&)>> libProcs;
+
+static void loadLibProc(std::vector<int>& progStack, Operation op, bool debug){
+    std::string libPath = "";
+    int back = 0;
+    while(back != -1){
+        back = progStack.back();
+        progStack.pop_back();
+        libPath += (char)back;
+    }
+    if(runtimeLib)
+        close_runtime_lib(runtimeLib);
+    runtimeLib = open_runtime_lib(libPath.c_str());
+}
 
 static void loadProcs(std::vector<Operation> ops){
     procAddresses.clear();
@@ -435,6 +454,9 @@ static void simulate_op(std::vector<int> &progStack, Operation op, unsigned long
                 break;
             case OperationType::DUMP:
                 dump(progStack, op, debug);
+                break;
+            case OperationType::LOADLIB:
+                loadLibProc(progStack, op, debug);
                 break;
             case OperationType::DUMPS:
                 dumps(progStack, op, debug);
@@ -668,6 +690,7 @@ static void simulate_proc(std::vector<int>& progStack, std::vector<Operation> op
 
 void simulate(std::vector<Operation> ops, bool debug){
     loadProcs(ops);
+    runtimeLib = nullptr;
     std::vector<int> progStack;
     progStack.push_back(0);
     if(procAddresses.find(0) == procAddresses.end()){

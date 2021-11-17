@@ -72,7 +72,8 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
         std::string& token = tokens[l];
         if(token.size() == 0){
             continue;
-        }   
+        }
+        // Preprocessor tokens
         if(starts_with(token, "include<\"")){
             while(!ends_with(token, "\">")){
                 l++;
@@ -94,8 +95,16 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
             }
             defs[name] = token.substr(0, token.size()-1);
         }
-        else if(is_number(token)) {
-            operations.push_back(Operation(OperationType::PUSH, std::stoi(token)));
+
+        process_defs(token, defs);
+
+        // Operation tokens
+        if(is_number(token)) {
+            try{
+                operations.push_back(Operation(OperationType::PUSH, std::stoi(token)));
+            }catch(...){
+                throw std::runtime_error(token + " - too big integer error!");
+            }
         }
         else if(token == "true"){
             operations.push_back(Operation(OperationType::PUSH, true));
@@ -128,15 +137,7 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
             operations.push_back(Operation(OperationType::LT));
         }
         else if(token == "=="){
-            if(operations.back().op == OperationType::GT){
-                operations.back().op = OperationType::GE;
-            }
-            else if(operations.back().op == OperationType::LT){
-                operations.back().op = OperationType::LE;
-            }
-            else{
-                operations.push_back(Operation(OperationType::EQ));
-            }
+            operations.push_back(Operation(OperationType::EQ));
         }
         else if(token == "<="){
             operations.push_back(Operation(OperationType::LE));
@@ -204,6 +205,9 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
         else if(token == "pop"){
             operations.push_back(Operation(OperationType::POP));
         }
+        else if(token == "loadlib"){
+            operations.push_back(Operation(OperationType::LOADLIB));
+        }
         else if(token == "^"){
             operations.push_back(Operation(OperationType::POW));
         }
@@ -217,7 +221,6 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
             operations.push_back(Operation(OperationType::PROC, -1));
         }
         else if(starts_with(token, "proc_")){
-            process_defs(token, defs);
             operations.push_back(Operation(OperationType::PROC, std::stoi(token.substr(5))));
         }
         else if(token == "call"){
@@ -233,11 +236,9 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
             operations.push_back(Operation(OperationType::MEMGET));
         }
         else if(starts_with(token, "memset_")){
-            process_defs(token, defs);
             operations.push_back(Operation(OperationType::MEMSET, std::stoi(token.substr(7))));
         }
         else if(starts_with(token, "memget_")){
-            process_defs(token, defs);
             operations.push_back(Operation(OperationType::MEMGET, std::stoi(token.substr(7))));
         }
         else if(token == "if"){
@@ -250,7 +251,6 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
             operations.push_back(Operation(OperationType::FOR, -1));
         }
         else if(starts_with(token, "for_")){
-            process_defs(token, defs);
             operations.push_back(Operation(OperationType::FOR, std::stoi(token.substr(4))));
         }
         else if(starts_with(token, "for")){
@@ -266,9 +266,9 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
         else if(token == "end_while" || token == "while_end" || token == "do_end" || token == "end_do"){
             operations.push_back(Operation(OperationType::WHILE, 1));
         }
-	else if(token == "ret"){
-            operations.push_back(Operation(OperationType::RET));	
-	}
+	    else if(token == "ret"){
+                operations.push_back(Operation(OperationType::RET));	
+	    }
         else if(token[0] == '\"'){
             if(token[token.size() - 1] != '\"'){
                 while(token[token.size() - 1] != '\"'){

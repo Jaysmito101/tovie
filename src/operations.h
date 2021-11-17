@@ -49,6 +49,7 @@ enum OperationType
     IF,
     WHILE,
     FOR,
+    LOADLIB,
     OPERATION_COUNT
 };
 
