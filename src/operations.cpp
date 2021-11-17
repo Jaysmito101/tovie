@@ -80,6 +80,8 @@ std::string to_string(OperationType type){
             return "PROC";
         case CALL:
             return "CALL";
+        case NCALL:
+            return "NCALL";
         case MALLOC:
             return "MALLOC";
         case MEMSET:

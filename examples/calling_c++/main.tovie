@@ -1,0 +1,6 @@
+proc_0
+	"Hello World From Tovie!"
+	23 putsln
+	"test.dll" loadlib
+	"test_function" ncall
+proc_end

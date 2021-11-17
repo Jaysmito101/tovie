@@ -226,6 +226,9 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
         else if(token == "call"){
             operations.push_back(Operation(OperationType::CALL));
         }
+        else if(token == "ncall"){
+            operations.push_back(Operation(OperationType::NCALL));
+        }
         else if(token == "malloc"){
             operations.push_back(Operation(OperationType::MALLOC));
         }

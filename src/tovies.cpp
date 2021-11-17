@@ -3,6 +3,7 @@
 #include <functional>
 #include <stack>
 #include <unordered_map>
+#include <algorithm>
 
 #include "tovie_runtimelib.h"
 
@@ -327,21 +328,53 @@ void inputs(std::vector<int> &s, Operation op, bool debug = false){
 }
 #endif
 
+// reverse string
+static void reverse(std::string& str){
+    std::reverse(str.begin(), str.end());
+}
+
 static std::unordered_map<int, ProcAddr> procAddresses;
 static void* runtimeLib = nullptr;
-static std::unordered_map<int, std::function<void(std::vector<int>&)>> libProcs;
+static std::unordered_map<std::string, std::function<void(std::vector<int>&)>> libProcs;
 
 static void loadLibProc(std::vector<int>& progStack, Operation op, bool debug){
     std::string libPath = "";
     int back = 0;
-    while(back != -1){
+    while(true){
         back = progStack.back();
         progStack.pop_back();
+        if(back == -1)
+            break;
         libPath += (char)back;
     }
+    reverse(libPath);
+    if(debug)
+        std::cout << " [DEBUG]\t load library : " << libPath << std::endl;
     if(runtimeLib)
         close_runtime_lib(runtimeLib);
+    libProcs.clear();
     runtimeLib = open_runtime_lib(libPath.c_str());
+}
+
+
+static void callLibProc(std::vector<int>& progStack, Operation op, bool debug = false){
+    std::string libProcName = "";
+    int back = 0;
+    while(true){
+        back = progStack.back();
+        progStack.pop_back();
+        if(back == -1)
+            break;
+        libProcName += (char)back;
+    }
+    reverse(libProcName);
+    if(debug)
+        std::cout << " [DEBUG]\t call library procedure : " << libProcName << std::endl;
+    // Find Key libProcName exists in libProcs or not
+    if(libProcs.find(libProcName) == libProcs.end()){
+        libProcs[libProcName] = get_runtimelib_proc(runtimeLib, libProcName.c_str());
+    }
+    libProcs[libProcName](progStack);
 }
 
 static void loadProcs(std::vector<Operation> ops){
@@ -371,6 +404,7 @@ static void loadProcs(std::vector<Operation> ops){
         }
     }
 }
+
 
 static int find_next_end(std::vector<Operation> ops, int i, OperationType type, int endArg = 1){
     for(int j=i;j<ops.size();j++){
@@ -510,6 +544,11 @@ static void simulate_op(std::vector<int> &progStack, Operation op, unsigned long
                     throw std::runtime_error("proc_" + std::to_string(procId) + " not found!");
                 }
                 simulate_proc(progStack, ops, procAddresses[procId], debug);
+                break;
+            }
+            case OperationType::NCALL:
+            {
+                callLibProc(progStack, op, debug);
                 break;
             }
             case OperationType::RECEED:

@@ -42,6 +42,7 @@ enum OperationType
     EXIT,
     PROC,
     CALL,
+    NCALL,
     MALLOC,
     MEMSET,
     MEMGET,
