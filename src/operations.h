@@ -9,6 +9,8 @@ enum OperationType
     DIV,
     MOD,
     POW,
+    AND,
+    OR,
     EQ,
     NEQ,
     GE,

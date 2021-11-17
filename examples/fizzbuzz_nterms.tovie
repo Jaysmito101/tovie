@@ -1,0 +1,50 @@
+proc_main
+	0 1 call
+	for
+		1 +
+		2 call
+	for_end
+proc_end
+
+proc_2
+	3 % 0 == memset_0
+	pop pop pop
+	5 % 0 == memset_1
+	pop pop pop
+	memget_0 memget_1 && memset_2
+	pop pop
+	memget_2 if
+		5 call
+		ret
+	if_end
+	memget_1 if
+		4 call
+		ret
+	if_end
+	memget_0 if
+		3 call
+		ret
+	if_end
+	println
+proc_end
+
+proc_3
+	"Fizz" 4 putsln
+	for_5 pop for_end
+proc_end
+
+proc_4
+	"Buzz" 4 putsln
+	for_5 pop for_end
+proc_end
+
+proc_5
+	"FizzBuzz" 8 putsln
+	for_9 pop for_end
+proc_end
+
+proc_1
+	"Enter N (Upto which to go FizzBuzzing) : " 41 puts
+	for_42 pop for_end
+	inputi
+proc_end

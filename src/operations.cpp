@@ -14,6 +14,10 @@ std::string to_string(OperationType type){
             return "MOD";
         case POW:
             return "POW";
+        case AND:
+            return "AND";
+        case OR:
+            return "OR";
         case NEQ:
             return "NEQ";
         case EQ:

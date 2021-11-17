@@ -115,6 +115,12 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
         else if(token == "/"){
             operations.push_back(Operation(OperationType::DIV));
         }
+        else if(token == "&&"){
+            operations.push_back(Operation(OperationType::AND));
+        }
+        else if(token == "||"){
+            operations.push_back(Operation(OperationType::OR));
+        }
         else if(token == ">"){
             operations.push_back(Operation(OperationType::GT));
         }
@@ -260,6 +266,9 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
         else if(token == "end_while" || token == "while_end" || token == "do_end" || token == "end_do"){
             operations.push_back(Operation(OperationType::WHILE, 1));
         }
+	else if(token == "ret"){
+            operations.push_back(Operation(OperationType::RET));	
+	}
         else if(token[0] == '\"'){
             if(token[token.size() - 1] != '\"'){
                 while(token[token.size() - 1] != '\"'){

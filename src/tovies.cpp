@@ -43,6 +43,32 @@ void pop(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
 }
 
+
+void andop(std::vector<int> &s, Operation op, bool debug = false) {
+    int a = s.back();
+    s.pop_back();
+    int b = s.back();
+    s.pop_back();
+    s.push_back(b);
+    s.push_back(a);
+    if(debug)
+        std::cout << " [DEBUG]\t" << b << " && " << a << std::endl;
+    s.push_back(b && a);
+}
+
+void orop(std::vector<int> &s, Operation op, bool debug = false) {
+    int a = s.back();
+    s.pop_back();
+    int b = s.back();
+    s.pop_back();
+    s.push_back(b);
+    s.push_back(a);
+    if(debug)
+        std::cout << " [DEBUG]\t" << b << " || " << a << std::endl;
+    s.push_back(b || a);
+}
+
+
 void add(std::vector<int> &s, Operation op, bool debug = false) {
     int a = s.back();
     s.pop_back();
@@ -359,6 +385,12 @@ static void simulate_op(std::vector<int> &progStack, Operation op, unsigned long
             case OperationType::PUSH:
                 push(progStack, op, debug);
                 break;
+            case OperationType::AND:
+                andop(progStack, op, debug);
+                break;
+            case OperationType::OR:
+                orop(progStack, op, debug);
+                break;
             case OperationType::POP:
                 pop(progStack, op, debug);
                 break;
@@ -623,6 +655,11 @@ static void simulate_proc(std::vector<int>& progStack, std::vector<Operation> op
     int endIdToSkip = 0;
     for(unsigned long i = pAddr.bAddr + 1 ; i < pAddr.eAddr ; i++){
         Operation op = ops[i];
+	if(op.op == OperationType::RET){
+		if(debug)
+                	std::cout << " [DEBUG]\treturn" << std::endl;
+                return;
+	}
         simulate_op(progStack, op, &i, memory, ops, debug);
     }
     if(memory)
