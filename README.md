@@ -22,6 +22,17 @@ Small toy programming language.
 # Docs : 
 ### https://github.com/Jaysmito101/tovie/wiki
 
+# What can it do?
+
+* All Arithmetic operations
+* Dynamic Memory Allocation
+* Call Native Functions By Loading DLL or SO
+* String management
+* Library System
+* While, Do, For loops
+* If statements
+* User Input, ...
+
 ## Examples :
 
 ### 1. Hello World
