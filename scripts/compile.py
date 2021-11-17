@@ -12,27 +12,31 @@ def get_files_in_dir(dir):
         if(os.path.isdir(file)):
             files.extend(get_files_in_dir(file))
     return files
-
-def compile_file(file):
-    global DEFINES
-    def_str = ""
-    for dfstr in DEFINES:
-        def_str += dfstr + " "
-    print("Compiling " + file + "...")
-    os.system("g++ -c -std=c++11 -D " + def_str + " -o ./bin/o/" + file.split(".")[0] + ".o ./src/" + file)
     
+def is_windows():
+    return sys.platform == "win32"
 
 def compile_files(files):
     global TARGET_NAME
+    global DEFINES
     files_str = ""
     for file in files:
         files_str += ("src/" + file) + " "
-    os.system("g++ -std=c++11 -o ./bin/" + TARGET_NAME + ".exe " + files_str)
+    def_str = ""
+    for dfstr in DEFINES:
+        def_str += " -D"  + dfstr + " "
+    def_str = def_str[:-1]
+    target_extension = ".exe" if is_windows() else ""
+    extra = ""
+    if(not is_windows()):
+        extra = "-lstdc++ -Wl,--no-as-needed -ldl"
+    print("g++ -std=c++11 " + extra + " -o ./bin/" + TARGET_NAME  + target_extension +  " " + files_str)
+    os.system("g++ -std=c++11 " + extra + " -o ./bin/" + TARGET_NAME  + target_extension +  " " + files_str)
     
 
 def main(args):
     global DEFINES
-    DEFINES.extend(sys.argv)
+    DEFINES.extend(args)
     if(not os.path.isdir("./bin")):
         os.mkdir("./bin")
     compile_files(get_files_in_dir("./src"))

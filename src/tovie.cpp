@@ -6,6 +6,28 @@
 #include "toviec.h"
 #include "tovies.h"
 
+#include "tovie_runtimelib.h"
+
+#include <stdexcept>
+#include <string>
+#include <string.h>
+
+#ifdef _WIN32
+
+std::string get_name(){
+    return "tvoie-win32-v2.0";
+}
+
+#endif
+
+#ifdef __unix__
+
+std::string get_name(){
+    return "tvoie-linux-v2.0";
+}
+
+#endif
+
 std::string read_file(std::string filePath){
     std::ifstream file(filePath);
     std::stringstream buffer;
@@ -22,6 +44,7 @@ void write_file(std::string data, std::string filePath){
 void print_usage(){
     std::cout << "Usage: toviec <job> <input_file> [output_file]" << std::endl;
     std::cout << "  job: " << std::endl;
+    std::cout << "    ver  : print version info" << std::endl;
     std::cout << "    com  : compile" << std::endl;
     std::cout << "    sis  : simulate from soruce" << std::endl;
     std::cout << "    sib  : simulate from bytecode" << std::endl;
@@ -73,6 +96,10 @@ int main(int argc, char** argv){
     std::string ofilePath = "a.toviec";
     std::string mode = "com";
     std::string includePath = ".";
+    if(argc == 2 && strcmp(argv[1], "ver") == 0){
+        std::cout << get_name() << std::endl;
+        exit(0);
+    }
     if(argc == 3)
     {
         mode = argv[1];

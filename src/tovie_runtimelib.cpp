@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <string>
 
-#if defined(WIN32) || defined(_WIN32) 
+#ifdef _WIN32
 
 #include <stdio.h>
 #include <wchar.h>
@@ -51,22 +51,42 @@ std::function<void(std::vector<int>&)> get_runtimelib_proc(void* runtimeLib, con
     return funci;
 }
 
-#else
+#endif
+
+#ifdef __unix__
+
+#include <dlfcn.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <limits.h>
 
 void close_runtime_lib(void* lib)
 {
+    dlclose(lib);
 
 }
 
 
-void* open_runtime_lib(const char* lib_name)
-{
-    return nullptr;
+void* open_runtime_lib(const char* lib_name){
+    char cwd[PATH_MAX];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+    } else {
+        perror("getcwd() error");
+        throw std::runtime_error("failed to get current working directory");
+    }
+    std::string lib_path = std::string(cwd) + "/" + lib_name;
+    void* gllID = dlopen(lib_path.c_str(), RTLD_LAZY);
+    if (!gllID){
+        throw std::runtime_error("failed to load runtime library " + std::string(lib_name));
+    }
+    return gllID;
 }
 
 std::function<void(std::vector<int>&)> get_runtimelib_proc(void* runtimeLib, const char* libProcName)
 {
-    return std::function<void(std::vector<int>&)>();
+    void (*funci)(std::vector<int>&);
+    funci = (void (*)(std::vector<int>&))dlsym(runtimeLib, libProcName);
+    return funci;
 }
 
 #endif

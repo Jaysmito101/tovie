@@ -53,6 +53,7 @@ static std::string read_lib(const std::string& lib_name, std::vector<std::string
         }
         *success = false;
     }
+    return "";
 }
 
 std::vector<Operation> parse(std::string& input, std::string& includePath, std::vector<Operation>& ioperations, std::unordered_map<std::string, std::string>& idefs, bool isInclude) {
