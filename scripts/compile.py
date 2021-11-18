@@ -8,9 +8,9 @@ def get_files_in_dir(dir):
     files = []
     for file in os.listdir(dir):
         if file.endswith(".cpp") or file.endswith(".c"):
-            files.append(file)
-        if(os.path.isdir(file)):
-            files.extend(get_files_in_dir(file))
+            files.append(os.path.join(dir, file))
+        if(os.path.isdir(os.path.join(dir, file))):
+            files.extend(get_files_in_dir(os.path.join(dir, file)))
     return files
     
 def is_windows():
@@ -21,7 +21,7 @@ def compile_files(files):
     global DEFINES
     files_str = ""
     for file in files:
-        files_str += ("src/" + file) + " "
+        files_str += (file) + " "
     def_str = ""
     for dfstr in DEFINES:
         def_str += " -D"  + dfstr + " "

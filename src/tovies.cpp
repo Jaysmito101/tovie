@@ -591,7 +591,7 @@ static void simulate_op(std::vector<int> &progStack, Operation op, unsigned long
                     progStack.pop_back();
                     if(debug)
                         std::cout << " [DEBUG]\t memget " << addr << size << std::endl;
-                    for(int k = addr ; k < size ; k++)
+                    for(int k = addr ; k < addr + size ; k++)
                         progStack.push_back(memory[k]);
                 }
                 else{
@@ -611,7 +611,7 @@ static void simulate_op(std::vector<int> &progStack, Operation op, unsigned long
                     progStack.pop_back();
                     if(debug)
                         std::cout << " [DEBUG]\t memset " << addr << size << std::endl;
-                    for(int k = addr ; k < size ; k++){
+                    for(int k = addr ; k < addr + size ; k++){
                         memory[k] = progStack.back();
                         progStack.pop_back();
                     }

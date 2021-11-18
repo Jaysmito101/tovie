@@ -5,28 +5,13 @@
 #include "tovied.h"
 #include "toviec.h"
 #include "tovies.h"
-
+#include "transpilers/tovie2py.h"
 #include "tovie_runtimelib.h"
+#include "transpilers/info.h"
 
 #include <stdexcept>
 #include <string>
 #include <string.h>
-
-#ifdef _WIN32
-
-std::string get_name(){
-    return "tvoie-win32-v2.0";
-}
-
-#endif
-
-#ifdef __unix__
-
-std::string get_name(){
-    return "tvoie-linux-v2.0";
-}
-
-#endif
 
 std::string read_file(std::string filePath){
     std::ifstream file(filePath);
@@ -52,6 +37,10 @@ void print_usage(){
     std::cout << "    sbd  : simulate from bytecode in debug mode" << std::endl;
     std::cout << "    gts  : generate operations table from source" << std::endl;
     std::cout << "    gtb  : generate operations table from binary" << std::endl;
+    std::cout << "    t2p  : translate to python 3" << std::endl;
+    //std::cout << "    t2c  : translate to c++" << std::endl;
+    //std::cout << "    t2s  : translate to c#" << std::endl;
+    //std::cout << "    t2j  : translate to java" << std::endl;
     exit(0);
 }
 
@@ -127,43 +116,43 @@ int main(int argc, char** argv){
     else if(mode == "sis")
     {
         fileData = read_file(filePath);
-        std::cout << "Simulating..." << std::endl;
-        std::cout << std::endl;
         simulate(parse(fileData, includePath));
     }
     else if(mode == "ssd")
     {
         fileData = read_file(filePath);
-        std::cout << "Simulating..." << std::endl;
-        std::cout << std::endl;
         simulate(parse(fileData, includePath), true);
     }
     else if(mode == "sib")
     {
-        std::cout << "Simulating..." << std::endl;
-        std::cout << std::endl;
         std::vector<Operation> operations = load(filePath);
         simulate(operations);
     }
     else if(mode == "sbd")
     {
-        std::cout << "Simulating..." << std::endl;
-        std::cout << std::endl;
         std::vector<Operation> operations = load(filePath);
         simulate(operations, true);
     }
     else if(mode == "gts")
     {
-        std::cout << "Generating OP table..." << std::endl;
+        std::cout << "Generating OP table " << filePath << " ..." << std::endl;
         std::string data = read_file(filePath);
         std::vector<Operation> operations = parse(data, includePath);
         write_file(generate_op_table(operations), filePath + ".tovieopt");
     }
     else if(mode == "gtb")
     {
-        std::cout << "Generating OP table..." << std::endl;
+        std::cout << "Generating OP table " << filePath << " ..." << std::endl;
         std::vector<Operation> operations = load(filePath);
         write_file(generate_op_table(operations), filePath + ".tovieopt");
+    }
+    else if(mode == "t2p")
+    {
+        fileData = read_file(filePath);
+        std::cout << "Transpiling " << filePath << " ..." << std::endl;
+        std::cout << std::endl;
+        std::string out = tovie2py(parse(fileData, includePath));
+        write_file(out, ofilePath + ".py");
     }
     else
     {
