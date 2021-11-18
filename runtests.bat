@@ -15,10 +15,11 @@ echo ----------------------------------------------------
 echo 1to10.tovie
 bin\tovie sis examples\1to10.tovie
 
-echo 
+echo.
 echo ----------------------------------------------------
-echo functionsbasic.tovie
-bin\tovie sis examples\functionbasic.tovie
+echo 1to10.tovie
+bin\tovie sis examples\fizzbuzz.tovie
+
 
 echo on
 pause
