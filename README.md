@@ -17,7 +17,7 @@
 
 # Tovie Lang
 
-Small toy programming language.
+An Advanced Programming Language (Compiler + Interpreter + Transpiler ).
 
 # Docs : 
 ### https://github.com/Jaysmito101/tovie/wiki
