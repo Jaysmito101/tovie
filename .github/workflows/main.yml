@@ -32,7 +32,11 @@ jobs:
         run: python scripts/compile.py TOVIE_LINUX
       
       - name: Run Tests
-        run: ./runtests.sh
+        run: |
+          ./bin/tovie sis ./examples/helloworld.tovie
+          ./bin/tovie sis ./examples/helloworld2.tovie
+          ./bin/tovie sis ./examples/1to10.tovie
+          ./bin/tovie sis ./examples/fizzbuzz.tovie
         
   Windows:
     # The type of runner that the job will run on
@@ -50,4 +54,8 @@ jobs:
         run: python scripts/compile.py TOVIE_WIN32
       
       - name: Run Tests
-        run: ./runtests.bat
+        run: |
+          bin\tovie sis examples\helloworld.tovie
+          bin\tovie sis examples\helloworld2.tovie
+          bin\tovie sis examples\1to10.tovie
+          bin\tovie sis examples\fizzbuzz.tovie
