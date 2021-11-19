@@ -260,6 +260,11 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
         else if(starts_with(token, "for")){
             operations.push_back(Operation(OperationType::FOR, -2));
         }
+        else if(starts_with(token, "pop_")){
+            operations.push_back(Operation(OperationType::FOR, std::stoi(token.substr(4))));
+            operations.push_back(Operation(OperationType::POP));
+            operations.push_back(Operation(OperationType::FOR, -1));
+        }
         else if(token == "do"){
             operations.push_back(Operation(OperationType::PUSH, true));
             operations.push_back(Operation(OperationType::WHILE, 0));
