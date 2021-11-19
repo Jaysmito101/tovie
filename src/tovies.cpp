@@ -320,7 +320,7 @@ void inputs(std::vector<int> &s, Operation op, bool debug = false){
     if(debug)
         std::cout << " [DEBUG]\tinput string" << std::endl;
     std::string ss = "";
-    std::cin >> ss;
+    std::getline(std::cin, ss);
     s.push_back(-1);
     for(int i=0;i<ss.size();i++)
         s.push_back(ss[i]);

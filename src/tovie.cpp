@@ -6,6 +6,7 @@
 #include "toviec.h"
 #include "tovies.h"
 #include "transpilers/tovie2py.h"
+#include "transpilers/tovie2c.h"
 #include "tovie_runtimelib.h"
 #include "transpilers/info.h"
 
@@ -38,7 +39,7 @@ void print_usage(){
     std::cout << "    gts  : generate operations table from source" << std::endl;
     std::cout << "    gtb  : generate operations table from binary" << std::endl;
     std::cout << "    t2p  : translate to python 3" << std::endl;
-    //std::cout << "    t2c  : translate to c++" << std::endl;
+    std::cout << "    t2c  : translate to c (c11)" << std::endl;
     //std::cout << "    t2s  : translate to c#" << std::endl;
     //std::cout << "    t2j  : translate to java" << std::endl;
     exit(0);
@@ -153,6 +154,14 @@ int main(int argc, char** argv){
         std::cout << std::endl;
         std::string out = tovie2py(parse(fileData, includePath));
         write_file(out, ofilePath + ".py");
+    }
+    else if(mode == "t2c")
+    {
+        fileData = read_file(filePath);
+        std::cout << "Transpiling " << filePath << " ..." << std::endl;
+        std::cout << std::endl;
+        std::string out = tovie2c(parse(fileData, includePath));
+        write_file(out, ofilePath + ".c");
     }
     else
     {

@@ -137,7 +137,7 @@ void transpile(CodeMaker& cm, Operation op){
         }
         case OperationType::LOADLIB:
         {                
-            cm.add_line("# TODO : LOADLIB");
+            cm.add_line("# LOADLIB : Operation not supported by python transpiler");
             break;
         }
         case OperationType::DUMPS:
@@ -232,7 +232,13 @@ void transpile(CodeMaker& cm, Operation op){
         }
         case OperationType::INPUTS:
         {
-            cm.add_line("# INPUTS TODO");
+            cm.add_line("tStr = input(\"\")");
+            cm.add_line("_stack.append(-1)");
+            cm.add_line("for tChr in tStr:");
+            cm.begin_block();
+                cm.add_line("_stack.append(ord(tChr))");
+            cm.end_block();
+            cm.add_line("_stack.append(len(tStr))");
             break;
         }
         case OperationType::EQ:
@@ -261,7 +267,7 @@ void transpile(CodeMaker& cm, Operation op){
         }
         case OperationType::NCALL:
         {
-            cm.add_line("# TODO NCALL");
+            cm.add_line("# NCALL : Operation not supported by python transpiler");
             break;
         }
         case OperationType::RECEED:
