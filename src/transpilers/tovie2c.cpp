@@ -97,6 +97,50 @@ struct stack* stack_make(int init_size, float inc_factor)
     return s;
 }
 )";
+
+#ifdef _WIN32
+std::string dllLoader = R"(
+LPCWSTR to_LPCWSTR(const char* str)
+{
+    size_t size = strlen(str) + 1;  
+    wchar_t* outStr = malloc(sizeof(wchar_t) * size); 
+    size_t outSize;
+    mbstowcs(outStr, str, size);
+    return outStr;
+}
+
+typedef void (__stdcall *TovieNativeFunc)(int*, int);
+
+TovieNativeFunc get_runtimelib_proc(HINSTANCE runtimeLib, const char* libProcName)
+{
+    HINSTANCE gllID = runtimeLib;    
+    // resolve function address here
+    TovieNativeFunc funci = (TovieNativeFunc)GetProcAddress(gllID, libProcName);
+    if (!funci) {
+        printf("failed to get proc address for %s", libProcName);
+        exit(-1);
+    }
+    return funci;
+}
+)";
+#endif
+
+#ifdef __unix__
+std::string dllLoader = R"(
+typedef void (*TovieNativeFunc)(int*, int);
+    
+std::function<void(int*, int)> get_runtimelib_proc(void* runtimeLib, const char* libProcName)
+{
+    TovieNativeFunc funci;
+    funci = (TovieNativeFunc)dlsym(runtimeLib, libProcName);
+    if (!funci) {
+        throw std::runtime_error("failed to get proc address for " + std::string(libProcName));
+    }
+    return funci;
+}
+)";
+#endif
+
 #endif
 
 struct ProcAddr
@@ -233,7 +277,44 @@ static void transpile(CodeMaker& cm, Operation op)
         }
         case OperationType::LOADLIB:
         {                
-            cm.add_line("// LOADLIB : Operation not supported by c transpiler");
+            cm.add_line("if(runtime_lib)");
+            cm.add_line("{");
+            cm.begin_block();
+                #ifdef _WIN32
+                cm.add_line("FreeLibrary(runtime_lib);");
+                #else
+                cm.add_line("dlclose(runtime_lib);");
+                #endif
+            cm.end_block();
+            cm.add_line("}");
+            cm.add_line("memset(t_str, 0, MAX_ISTR);");
+            cm.add_line("iterA = 0;");
+            cm.add_line("while(1)");
+            cm.add_line("{");
+            cm.begin_block();
+                cm.add_line("back = stack_pop(_stack);");
+                cm.add_line("if(back == -1)");
+                cm.add_line("{");
+                cm.begin_block();
+                    cm.add_line("break;");
+                cm.end_block();
+                cm.add_line("}");
+                cm.add_line("t_str[iterA] = (char)back;");
+                cm.add_line("iterA++;");
+            cm.end_block();
+            cm.add_line("}");
+            cm.add_line("strrev(t_str);");
+            #ifdef _WIN32
+            cm.add_line("runtime_lib = LoadLibraryW(to_LPCWSTR(t_str));");
+            cm.add_line("if(!runtime_lib)");
+            cm.add_line("{");
+            cm.begin_block();
+                cm.add_line("printf(\"failed to load runtime library %s\\n\", t_str);");
+                cm.add_line("exit(1);");
+            cm.end_block();
+            cm.add_line("}");
+            #else
+            #endif
             break;
         }
         case OperationType::DUMPS:
@@ -373,7 +454,37 @@ static void transpile(CodeMaker& cm, Operation op)
         }
         case OperationType::NCALL:
         {
-            cm.add_line("// NCALL : Operation not supported by c transpiler");
+            cm.add_line("memset(t_str, 0, MAX_ISTR);");
+            cm.add_line("iterA = 0;");
+            cm.add_line("while(1)");
+            cm.add_line("{");
+            cm.begin_block();
+                cm.add_line("back = stack_pop(_stack);");
+                cm.add_line("if(back == -1)");
+                cm.add_line("{");
+                cm.begin_block();
+                    cm.add_line("break;");
+                cm.end_block();
+                cm.add_line("}");
+                cm.add_line("t_str[iterA] = (char)back;");
+                cm.add_line("iterA++;");
+            cm.end_block();
+            cm.add_line("}");
+            cm.add_line("strrev(t_str);");
+            cm.add_line("func = get_runtimelib_proc(runtime_lib, t_str);");
+            cm.add_line("if(func)");
+            cm.add_line("{");
+            cm.begin_block();
+                cm.add_line("func((*_stack).data, (int)((*_stack).cptr - (*_stack).data));");
+            cm.end_block();
+            cm.add_line("}");
+            cm.add_line("else");
+            cm.add_line("{");
+            cm.begin_block();
+                cm.add_line("printf(\"failed to load native functon %s\", t_str);");
+                cm.add_line("exit(-1);");
+            cm.end_block();
+            cm.add_line("}");
             break;
         }
         case OperationType::RECEED:
@@ -423,12 +534,12 @@ static void transpile(CodeMaker& cm, Operation op)
             if(op.arg == -1){
                 cm.add_line("memAddr = stack_pop(_stack);");
                 cm.add_line("memSize = stack_pop(_stack);");
-                cm.add_line("iterA = 0;");
-                cm.add_line("while(iterA < memSize)");
+                cm.add_line("iterA = memSize - 1;");
+                cm.add_line("while(iterA >= 0)");
                 cm.add_line("{");
                 cm.begin_block();
                     cm.add_line("stack_push(_stack, *(_memory + memAddr + iterA));");
-                    cm.add_line("iterA += 1;");
+                    cm.add_line("iterA -= 1;");
                 cm.end_block();
                 cm.add_line("}");
             }
@@ -536,6 +647,14 @@ std::string tovie2c(std::vector<Operation> ops)
     cm.add_line("#include <string.h>");
     cm.add_line("#include <stdint.h>");
 
+    #ifdef _WIN32
+    cm.add_line("#include <windows.h>");
+    #endif
+    #ifdef __unix__
+    cm.add_line("#include <unistd.h>");
+    cm.add_line("#include <dlfcn.h>");
+    #endif
+
     cm.add_line("");
     cm.add_line("");
     cm.add_line("");
@@ -550,8 +669,20 @@ std::string tovie2c(std::vector<Operation> ops)
     // the c stack
     cm.add_line(cSack);
 
+    cm.add_line("");
+    cm.add_line("");
+
+    // dll loader
+    cm.add_line(dllLoader);
+
     // globals
     cm.add_line("struct stack* _stack;");
+
+    #ifdef _WIN32
+    cm.add_line("HINSTANCE runtime_lib;");
+    #else
+    cm.add_line("void* runtime_lib;");
+    #endif
 
     cm.add_line("");
     cm.add_line("");
@@ -589,8 +720,9 @@ std::string tovie2c(std::vector<Operation> ops)
         cm.begin_block();
             cm.add_line("int* _memory = malloc(1024 * sizeof(int));");
             cm.add_line("// declare variables");
-            cm.add_line("int stackA, stackB, memAddr, memSize, length, iterStart, iterA, iterB, count;");
+            cm.add_line("int stackA, stackB, memAddr, memSize, length, iterStart, iterA, iterB, count, back;");
             cm.add_line("char t_str[MAX_ISTR];");
+            cm.add_line("TovieNativeFunc func;");
             for(int i=kv.second.bAddr+1;i<kv.second.eAddr;i++)
             {        
                 Operation op = ops[i];
@@ -613,9 +745,19 @@ std::string tovie2c(std::vector<Operation> ops)
     cm.add_line("int main(int argc, char** argv)");
     cm.add_line("{");
     cm.begin_block();
-    cm.add_line("_stack = stack_make(1024, 1.5f);");
-    cm.add_line("proc_0();");
-    cm.add_line("stack_free(_stack);");
+        cm.add_line("_stack = stack_make(1024, 1.5f);");
+        cm.add_line("proc_0();");
+        cm.add_line("stack_free(_stack);");
+        cm.add_line("if(runtime_lib)");
+        cm.add_line("{");
+        cm.begin_block();
+            #ifdef _WIN32
+            cm.add_line("FreeLibrary(runtime_lib);");
+            #else
+            cm.add_line("dlclose(runtime_lib);");
+            #endif
+        cm.end_block();
+        cm.add_line("}");
     cm.end_block();
     cm.add_line("}");
     return cm.render();

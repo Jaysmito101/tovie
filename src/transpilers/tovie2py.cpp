@@ -309,11 +309,11 @@ void transpile(CodeMaker& cm, Operation op){
             if(op.arg == -1){
                 cm.add_line("memAddr = _stack.pop()");
                 cm.add_line("memSize = _stack.pop()");
-                cm.add_line("iterA = 0");
-                cm.add_line("while iterA < memSize:");
+                cm.add_line("iterA = memSize - 1");
+                cm.add_line("while iterA >= 0:");
                 cm.begin_block();
                 cm.add_line("_stack.append(_memory[memAddr + iterA])");
-                cm.add_line("iterA += 1");
+                cm.add_line("iterA -= 1");
                 cm.end_block();
             }
             else{

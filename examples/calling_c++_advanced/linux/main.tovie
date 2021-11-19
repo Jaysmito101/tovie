@@ -1,0 +1,19 @@
+proc_0
+	"Enter N : " 10 puts
+	inputi memset_0
+	"sort.so" loadlib
+	"Enter Numbers : " 16 putsln
+	memget_0 for
+		inputi
+	for_end
+	memget_0 1 memset
+	"The Numbers are : " 18 putsln
+    memget_0 1 memget
+    memget_0
+	"print_arr" ncall
+    "Sorted Array is : " 18 putsln
+    memget_0 1 memget 
+    memget_0
+    "sort_arr" ncall
+    "print_arr" ncall
+proc_end
