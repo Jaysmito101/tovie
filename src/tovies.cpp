@@ -335,7 +335,7 @@ static void reverse(std::string& str){
 
 static std::unordered_map<int, ProcAddr> procAddresses;
 static void* runtimeLib = nullptr;
-static std::unordered_map<std::string, std::function<void(std::vector<int>&)>> libProcs;
+static std::unordered_map<std::string, std::function<void(int*, int)>> libProcs;
 
 static void loadLibProc(std::vector<int>& progStack, Operation op, bool debug){
     std::string libPath = "";
@@ -374,7 +374,7 @@ static void callLibProc(std::vector<int>& progStack, Operation op, bool debug = 
     if(libProcs.find(libProcName) == libProcs.end()){
         libProcs[libProcName] = get_runtimelib_proc(runtimeLib, libProcName.c_str());
     }
-    libProcs[libProcName](progStack);
+    libProcs[libProcName](progStack.data(), progStack.size());
 }
 
 static void loadProcs(std::vector<Operation> ops){

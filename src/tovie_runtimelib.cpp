@@ -32,21 +32,21 @@ void* open_runtime_lib(const char* lib_name)
 {
     HINSTANCE gllID = LoadLibraryW(to_LPCWSTR(lib_name));
     if (!gllID){
-        throw std::runtime_error("Failed to load runtime library " + std::string(lib_name));
+        throw std::runtime_error("failed to load runtime library " + std::string(lib_name));
     }
     return (void*)gllID;
 }
 
-typedef void (__stdcall *TovieNativeFunc)(std::vector<int>&);
+typedef void (__stdcall *TovieNativeFunc)(int*, int);
 
-std::function<void(std::vector<int>&)> get_runtimelib_proc(void* runtimeLib, const char* libProcName)
+std::function<void(int*, int)> get_runtimelib_proc(void* runtimeLib, const char* libProcName)
 {
     HINSTANCE gllID = (HINSTANCE)runtimeLib;
     
     // resolve function address here
     TovieNativeFunc funci = (TovieNativeFunc)GetProcAddress(gllID, libProcName);
     if (!funci) {
-        throw std::runtime_error("Failed to get proc address for " + std::string(libProcName));
+        throw std::runtime_error("failed to get proc address for " + std::string(libProcName));
     }
     return funci;
 }
@@ -63,7 +63,6 @@ std::function<void(std::vector<int>&)> get_runtimelib_proc(void* runtimeLib, con
 void close_runtime_lib(void* lib)
 {
     dlclose(lib);
-
 }
 
 
@@ -82,10 +81,13 @@ void* open_runtime_lib(const char* lib_name){
     return gllID;
 }
 
-std::function<void(std::vector<int>&)> get_runtimelib_proc(void* runtimeLib, const char* libProcName)
+std::function<void(int*, int)> get_runtimelib_proc(void* runtimeLib, const char* libProcName)
 {
-    void (*funci)(std::vector<int>&);
-    funci = (void (*)(std::vector<int>&))dlsym(runtimeLib, libProcName);
+    void (*funci)(int*, int);
+    funci = (void (*)(int*, int)))dlsym(runtimeLib, libProcName);
+    if (!funci) {
+        throw std::runtime_error("failed to get proc address for " + std::string(libProcName));
+    }
     return funci;
 }
 
