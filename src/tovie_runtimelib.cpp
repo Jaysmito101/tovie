@@ -81,10 +81,13 @@ void* open_runtime_lib(const char* lib_name){
     return gllID;
 }
 
+
+typedef void (*TovieNativeFunc)(int*, int);
+
 std::function<void(int*, int)> get_runtimelib_proc(void* runtimeLib, const char* libProcName)
 {
-    void (*funci)(int*, int);
-    funci = (void (*)(int*, int)))dlsym(runtimeLib, libProcName);
+    TovieNativeFunc funci;;
+    funci = (TovieNativeFunc)dlsym(runtimeLib, libProcName);
     if (!funci) {
         throw std::runtime_error("failed to get proc address for " + std::string(libProcName));
     }
