@@ -34,6 +34,21 @@ An Advanced Programming Language (Compiler + Interpreter + Transpiler ).
 * If statements
 * User Input, ...
 
+## Usage
+
+	Usage: toviec <job> <input_file> [output_file]
+  	job:
+    	ver  : print version info
+    	com  : compile
+    	sis  : simulate from soruce
+    	sib  : simulate from bytecode
+    	ssd  : simulate from source in debug mode
+    	sbd  : simulate from bytecode in debug mode
+    	gts  : generate operations table from source
+    	gtb  : generate operations table from binary
+    	t2p  : translate to python 3
+    	t2c  : translate to c (c11)
+
 ## Examples :
 
 ### 1. Hello World
