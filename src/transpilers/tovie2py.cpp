@@ -137,8 +137,19 @@ void transpile(CodeMaker& cm, Operation op){
         }
         case OperationType::LOADLIB:
         {                
-            cm.add_line("# LOADLIB : Operation not supported by python transpiler");
-            break;
+            cm.add_line("libName = \"\"");
+            cm.add_line("back = 0");
+            cm.add_line("while True:");
+            cm.begin_block();
+                cm.add_line("back = _stack.pop()");
+                cm.add_line("if back == -1:");
+                cm.begin_block();
+                    cm.add_line("break");
+                cm.end_block();
+                cm.add_line("libName += chr(back)");
+            cm.end_block();
+            cm.add_line("libName = libName[::-1]");
+            cm.add_line("_runtime_lib = ctypes.cdll.LoadLibrary(\"./\" + libName)");
         }
         case OperationType::DUMPS:
         {                
@@ -157,7 +168,6 @@ void transpile(CodeMaker& cm, Operation op){
         }
         case OperationType::PUTS:
         {                
-            cm.add_line("# PUTS");
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("iterStart = len(_stack) - stackA");
             cm.add_line("while iterStart < len(_stack):");
@@ -267,7 +277,19 @@ void transpile(CodeMaker& cm, Operation op){
         }
         case OperationType::NCALL:
         {
-            cm.add_line("# NCALL : Operation not supported by python transpiler");
+            cm.add_line("funcName = \"\"");
+            cm.add_line("back = 0");
+            cm.add_line("while True:");
+            cm.begin_block();
+                cm.add_line("back = _stack.pop()");
+                cm.add_line("if back == -1:");
+                cm.begin_block();
+                    cm.add_line("break");
+                cm.end_block();
+                cm.add_line("funcName += chr(back)");
+            cm.end_block();
+            cm.add_line("funcName = funcName[::-1]");
+            cm.add_line("eval(\"_runtime_lib.\" + funcName + \"_stack\")");
             break;
         }
         case OperationType::RECEED:
@@ -409,15 +431,18 @@ std::string tovie2py(std::vector<Operation> ops)
     // import modules
     cm.add_line("import sys");
     cm.add_line("import os");
+    cm.add_line("import ctypes");
 
     // globals
     cm.add_line("_stack = [0]");
+    cm.add_line("_runtime_lib = \"\"");
 
     for(auto& kv : procAddresses){
         cm.add_line("# PROC " + std::to_string(kv.first));
         cm.add_line("def proc_" + std::to_string(kv.first) + "():");
         cm.begin_block();
         cm.add_line("global _stack");
+        cm.add_line("global _runtime_lib");
         cm.add_line("_memory = [0] * 1024");
         for(int i=kv.second.bAddr+1;i<kv.second.eAddr;i++)
         {        

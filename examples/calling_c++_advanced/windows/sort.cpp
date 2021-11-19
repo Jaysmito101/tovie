@@ -1,5 +1,5 @@
 #include <stdio.h>
-extern "C" void __declspec(dllexport) __stdcall print_arr(int* programStack, int stackSize) {
+extern "C" void __declspec(dllexport) print_arr(int* programStack, int stackSize) {
     int length = *(programStack + stackSize - 1);
     int* start = programStack + stackSize - length - 1;
     for(int i=0;i<length;i++)
@@ -10,7 +10,7 @@ extern "C" void __declspec(dllexport) __stdcall print_arr(int* programStack, int
 }
 
 // Bubble sort
-extern "C" void __declspec(dllexport) __stdcall sort_arr(int* programStack, int stackSize) {
+extern "C" void __declspec(dllexport) sort_arr(int* programStack, int stackSize) {
     int length = *(programStack + stackSize - 1);
     int* start = programStack + stackSize - length - 1;
     for(int i=0;i<length;i++)

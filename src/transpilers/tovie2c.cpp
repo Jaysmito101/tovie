@@ -109,7 +109,7 @@ LPCWSTR to_LPCWSTR(const char* str)
     return outStr;
 }
 
-typedef void (__stdcall *TovieNativeFunc)(int*, int);
+typedef void (*TovieNativeFunc)(int*, int);
 
 TovieNativeFunc get_runtimelib_proc(HINSTANCE runtimeLib, const char* libProcName)
 {
@@ -277,13 +277,13 @@ static void transpile(CodeMaker& cm, Operation op)
         }
         case OperationType::LOADLIB:
         {                
-            cm.add_line("if(runtime_lib)");
+            cm.add_line("if(_runtime_lib)");
             cm.add_line("{");
             cm.begin_block();
                 #ifdef _WIN32
-                cm.add_line("FreeLibrary(runtime_lib);");
+                cm.add_line("FreeLibrary(_runtime_lib);");
                 #else
-                cm.add_line("dlclose(runtime_lib);");
+                cm.add_line("dlclose(_runtime_lib);");
                 #endif
             cm.end_block();
             cm.add_line("}");
@@ -305,8 +305,8 @@ static void transpile(CodeMaker& cm, Operation op)
             cm.add_line("}");
             cm.add_line("strrev(t_str);");
             #ifdef _WIN32
-            cm.add_line("runtime_lib = LoadLibraryW(to_LPCWSTR(t_str));");
-            cm.add_line("if(!runtime_lib)");
+            cm.add_line("_runtime_lib = LoadLibraryW(to_LPCWSTR(t_str));");
+            cm.add_line("if(!_runtime_lib)");
             cm.add_line("{");
             cm.begin_block();
                 cm.add_line("printf(\"failed to load runtime library %s\\n\", t_str);");
@@ -471,7 +471,7 @@ static void transpile(CodeMaker& cm, Operation op)
             cm.end_block();
             cm.add_line("}");
             cm.add_line("strrev(t_str);");
-            cm.add_line("func = get_runtimelib_proc(runtime_lib, t_str);");
+            cm.add_line("func = get_runtimelib_proc(_runtime_lib, t_str);");
             cm.add_line("if(func)");
             cm.add_line("{");
             cm.begin_block();
@@ -679,9 +679,9 @@ std::string tovie2c(std::vector<Operation> ops)
     cm.add_line("struct stack* _stack;");
 
     #ifdef _WIN32
-    cm.add_line("HINSTANCE runtime_lib;");
+    cm.add_line("HINSTANCE _runtime_lib;");
     #else
-    cm.add_line("void* runtime_lib;");
+    cm.add_line("void* _runtime_lib;");
     #endif
 
     cm.add_line("");
@@ -748,13 +748,13 @@ std::string tovie2c(std::vector<Operation> ops)
         cm.add_line("_stack = stack_make(1024, 1.5f);");
         cm.add_line("proc_0();");
         cm.add_line("stack_free(_stack);");
-        cm.add_line("if(runtime_lib)");
+        cm.add_line("if(_runtime_lib)");
         cm.add_line("{");
         cm.begin_block();
             #ifdef _WIN32
-            cm.add_line("FreeLibrary(runtime_lib);");
+            cm.add_line("FreeLibrary(_runtime_lib);");
             #else
-            cm.add_line("dlclose(runtime_lib);");
+            cm.add_line("dlclose(_runtime_lib);");
             #endif
         cm.end_block();
         cm.add_line("}");

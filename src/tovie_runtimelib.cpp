@@ -37,7 +37,7 @@ void* open_runtime_lib(const char* lib_name)
     return (void*)gllID;
 }
 
-typedef void (__stdcall *TovieNativeFunc)(int*, int);
+typedef void (*TovieNativeFunc)(int*, int);
 
 std::function<void(int*, int)> get_runtimelib_proc(void* runtimeLib, const char* libProcName)
 {
