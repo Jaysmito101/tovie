@@ -33,7 +33,7 @@ def test_op(op = "com"):
         if is_windows():
             retcode = subprocess.call(BIN_PATH + " " + op + " " + file)
         else:
-            retcode = subprocess.call("./" + BIN_PATH + " " + op + " ./" + file)
+            retcode = subprocess.call(["./" + BIN_PATH, op, "./" + file])
         if retcode != 0:
             print("Test Failed")
             exit(-1)
