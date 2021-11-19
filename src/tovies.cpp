@@ -53,8 +53,6 @@ void andop(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(b);
-    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " && " << a << std::endl;
     s.push_back(b && a);
@@ -65,8 +63,6 @@ void orop(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(b);
-    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " || " << a << std::endl;
     s.push_back(b || a);
@@ -78,8 +74,6 @@ void add(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(b);
-    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " + " << a << std::endl;
     s.push_back(b + a);
@@ -90,8 +84,6 @@ void sub(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(b);
-    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " - " << a << std::endl;
     s.push_back(b - a);
@@ -102,8 +94,6 @@ void mul(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(b);
-    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " * " << a << std::endl;
     s.push_back(b * a);
@@ -114,8 +104,6 @@ void div(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(b);
-    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " / " << a << std::endl;
     s.push_back(b / a);
@@ -126,8 +114,6 @@ void mod(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(b);
-    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " % " << a << std::endl;
     s.push_back(b % a);
@@ -178,8 +164,6 @@ void pow(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(b);
-    s.push_back(a);
     int r = 1;
     for(int i=0;i<a;i++) {
         r *= b;
@@ -241,8 +225,6 @@ void gt(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(b);
-    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " > " << a << std::endl;
     s.push_back(b > a);
@@ -253,8 +235,6 @@ void lt(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(b);
-    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " < " << a << std::endl;
     s.push_back(b < a);
@@ -265,8 +245,6 @@ void ge(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(b);
-    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " >= " << a << std::endl;
     s.push_back(b >= a);
@@ -277,8 +255,6 @@ void le(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(b);
-    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << b << " <= " << a << std::endl;
     s.push_back(b <= a);
@@ -289,8 +265,6 @@ void eq(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(b);
-    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << a << " == " << b << std::endl;
     s.push_back(a == b);
@@ -301,8 +275,6 @@ void neq(std::vector<int> &s, Operation op, bool debug = false) {
     s.pop_back();
     int b = s.back();
     s.pop_back();
-    s.push_back(b);
-    s.push_back(a);
     if(debug)
         std::cout << " [DEBUG]\t" << a << " != " << b << std::endl;
     s.push_back(a != b);
@@ -434,6 +406,7 @@ static void simulate_op(std::vector<int> &progStack, Operation op, unsigned long
         print(progStack);
         std::cout  << " [DEBUG] OP ID :" << *i << std::endl;
     }
+    int a, b;
      switch(op.op){
             case OperationType::PUSH:
                 push(progStack, op, debug);
@@ -467,6 +440,17 @@ static void simulate_op(std::vector<int> &progStack, Operation op, unsigned long
                 break;
             case OperationType::PRINTLNS:
                 printlns(progStack, op, debug);
+                break;
+            case OperationType::DUP:
+                progStack.push_back(progStack.back());
+                break;
+            case OperationType::SWAP:
+                a = progStack.back();
+                progStack.pop_back();
+                b = progStack.back();
+                progStack.pop_back();
+                progStack.push_back(a);
+                progStack.push_back(b);
                 break;
             case OperationType::PRINTLNNS:
                 printlnns(progStack, op, debug);

@@ -49,6 +49,8 @@ enum OperationType
     RET,
     IF,
     WHILE,
+    DUP,
+    SWAP,
     FOR,
     LOADLIB,
     OPERATION_COUNT

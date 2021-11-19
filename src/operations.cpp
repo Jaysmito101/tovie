@@ -66,6 +66,10 @@ std::string to_string(OperationType type){
             return "RECEED";
         case PROCEED:
             return "PROCEED";
+        case DUP:
+            return "DUP";
+        case SWAP:
+            return "SWAP";
         case INPUTI:
             return "INPUTI";
         case INPUTS:

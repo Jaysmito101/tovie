@@ -166,8 +166,7 @@ static void transpile(CodeMaker& cm, Operation op)
         {                
             cm.add_line("stackA = stack_pop(_stack);");
             cm.add_line("stackB = stack_pop(_stack);");
-            cm.add_line("stack_push(_stack, stackB);");
-            cm.add_line("stack_push(_stack, stackA);");
+            
             cm.add_line("stack_push(_stack, stackB && stackA);");
             break;
         }
@@ -175,9 +174,22 @@ static void transpile(CodeMaker& cm, Operation op)
         {                
             cm.add_line("stackA = stack_pop(_stack);");
             cm.add_line("stackB = stack_pop(_stack);");
-            cm.add_line("stack_push(_stack, stackB);");
-            cm.add_line("stack_push(_stack, stackA);");
+            
             cm.add_line("stack_push(_stack, stackB || stackA);");
+            break;
+        }
+        case OperationType::DUP:
+        {
+            cm.add_line("stackA = stack_pop(_stack);");
+            cm.add_line("stack_push(_stack, stackA);");
+            break;
+        }
+        case OperationType::SWAP:
+        {
+            cm.add_line("stackA = stak_pop(_stack);");
+            cm.add_line("stackB = stak_pop(_stack);");
+            cm.add_line("stack_push(_stack, stackA);");
+            cm.add_line("stack_push(_stack, stackB);");
             break;
         }
         case OperationType::POP:
@@ -189,8 +201,7 @@ static void transpile(CodeMaker& cm, Operation op)
         {                
             cm.add_line("stackA = stack_pop(_stack);");
             cm.add_line("stackB = stack_pop(_stack);");
-            cm.add_line("stack_push(_stack, stackB);");
-            cm.add_line("stack_push(_stack, stackA);");
+            
             cm.add_line("stack_push(_stack, stackB + stackA);");
             break;
         }
@@ -198,8 +209,7 @@ static void transpile(CodeMaker& cm, Operation op)
         {                
             cm.add_line("stackA = stack_pop(_stack);");
             cm.add_line("stackB = stack_pop(_stack);");
-            cm.add_line("stack_push(_stack, stackB);");
-            cm.add_line("stack_push(_stack, stackA);");
+            
             cm.add_line("stack_push(_stack, stackB - stackA);");
             break;
         }
@@ -207,8 +217,7 @@ static void transpile(CodeMaker& cm, Operation op)
         {                
             cm.add_line("stackA = stack_pop(_stack);");
             cm.add_line("stackB = stack_pop(_stack);");
-            cm.add_line("stack_push(_stack, stackB);");
-            cm.add_line("stack_push(_stack, stackA);");
+            
             cm.add_line("stack_push(_stack, stackB * stackA);");
             break;
         }
@@ -216,8 +225,7 @@ static void transpile(CodeMaker& cm, Operation op)
         {                
             cm.add_line("stackA = stack_pop(_stack);");
             cm.add_line("stackB = stack_pop(_stack);");
-            cm.add_line("stack_push(_stack, stackB);");
-            cm.add_line("stack_push(_stack, stackA);");
+            
             cm.add_line("stack_push(_stack, stackB / stackA);");
             break;
         }
@@ -225,8 +233,7 @@ static void transpile(CodeMaker& cm, Operation op)
         {                
             cm.add_line("stackA = stack_pop(_stack);");
             cm.add_line("stackB = stack_pop(_stack);");
-            cm.add_line("stack_push(_stack, stackB);");
-            cm.add_line("stack_push(_stack, stackA);");
+            
             cm.add_line("stack_push(_stack, stackB % stackA);");
             break;
         }
@@ -361,8 +368,7 @@ static void transpile(CodeMaker& cm, Operation op)
         {             
             cm.add_line("stackA = stack_pop(_stack);");
             cm.add_line("stackB = stack_pop(_stack);");
-            cm.add_line("stack_push(_stack, stackB);");
-            cm.add_line("stack_push(_stack, stackA);");
+            
             cm.add_line("stack_push(_stack, (int)pow(stackB, stackA));");
             break;   
         }
@@ -370,8 +376,7 @@ static void transpile(CodeMaker& cm, Operation op)
         {                
             cm.add_line("stackA = stack_pop(_stack);");
             cm.add_line("stackB = stack_pop(_stack);");
-            cm.add_line("stack_push(_stack, stackB);");
-            cm.add_line("stack_push(_stack, stackA);");
+            
             cm.add_line("stack_push(_stack, stackB > stackA);");
             break;
         }
@@ -379,8 +384,7 @@ static void transpile(CodeMaker& cm, Operation op)
         {                
             cm.add_line("stackA = stack_pop(_stack);");
             cm.add_line("stackB = stack_pop(_stack);");
-            cm.add_line("stack_push(_stack, stackB);");
-            cm.add_line("stack_push(_stack, stackA);");
+            
             cm.add_line("stack_push(_stack, stackB < stackA);");
             break;
         }
@@ -388,8 +392,7 @@ static void transpile(CodeMaker& cm, Operation op)
         {                
             cm.add_line("stackA = stack_pop(_stack);");
             cm.add_line("stackB = stack_pop(_stack);");
-            cm.add_line("stack_push(_stack, stackB);");
-            cm.add_line("stack_push(_stack, stackA);");
+            
             cm.add_line("stack_push(_stack, stackB >= stackA);");
             break;
         }
@@ -397,8 +400,7 @@ static void transpile(CodeMaker& cm, Operation op)
         {         
             cm.add_line("stackA = stack_pop(_stack);");
             cm.add_line("stackB = stack_pop(_stack);");
-            cm.add_line("stack_push(_stack, stackB);");
-            cm.add_line("stack_push(_stack, stackA);");
+            
             cm.add_line("stack_push(_stack, stackB <= stackA);");
             break;       
         }
@@ -432,8 +434,7 @@ static void transpile(CodeMaker& cm, Operation op)
         {
             cm.add_line("stackA = stack_pop(_stack);");
             cm.add_line("stackB = stack_pop(_stack);");
-            cm.add_line("stack_push(_stack, stackB);");
-            cm.add_line("stack_push(_stack, stackA);");
+            
             cm.add_line("stack_push(_stack, stackB == stackA);");
             break;       
         }
@@ -441,8 +442,7 @@ static void transpile(CodeMaker& cm, Operation op)
         {
             cm.add_line("stackA = stack_pop(_stack);");
             cm.add_line("stackB = stack_pop(_stack);");
-            cm.add_line("stack_push(_stack, stackB);");
-            cm.add_line("stack_push(_stack, stackA);");
+            
             cm.add_line("stack_push(_stack, stackB != stackA);");
             break;       
         }

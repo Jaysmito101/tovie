@@ -152,6 +152,12 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
         else if(token == "println"){
             operations.push_back(Operation(OperationType::PRINTLN));
         }
+        else if(token == "dup"){
+            operations.push_back(Operation(OperationType::DUP));
+        }
+        else if(token == "swap"){
+            operations.push_back(Operation(OperationType::SWAP));
+        }
         else if(token == "printlns"){
             operations.push_back(Operation(OperationType::PRINTLNS));
         }

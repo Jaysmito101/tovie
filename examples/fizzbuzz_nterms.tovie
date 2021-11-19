@@ -7,12 +7,9 @@ proc_main
 proc_end
 
 proc_2
-	3 % 0 == memset_0
-	pop pop pop
-	5 % 0 == memset_1
-	pop pop pop
+	dup 3 % 0 == memset_0
+	dup 5 % 0 == memset_1
 	memget_0 memget_1 && memset_2
-	pop pop
 	memget_2 if
 		5 call
 		ret

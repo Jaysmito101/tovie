@@ -3,6 +3,12 @@ proc_0
     0 1
     inputi for
         print
+	memset_0
+	memset_1
+	memget_1
+	memget_0
+	memget_1
+	memget_0
         +
         32 prints pop // PRINTING THE SPACE
     for_end

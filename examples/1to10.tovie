@@ -1,12 +1,7 @@
 proc_0
-	"Print" 32 "1" 32 "to" 32 "10:"
-	15
-	putsln
-	0 0 0
-	pop
-	pop
-	1 +
-	println
-	10 -
-	7 receed
+	0
+	10 for
+		1 +
+		println
+	for_end
 proc_end

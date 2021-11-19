@@ -7,7 +7,7 @@ proc_end
 // PROC FOR TAKING INPUT
 
 proc_1
-	"Enter" 32 "N:" 32
+	"Enter N: "
 	9 puts
 	inputi
 proc_end
@@ -18,9 +18,8 @@ proc_2
 	memset_0
 	0 0
 	do
-		pop
 		1 +
 		println
-		memget_0 -
+		dup memget_0 -
 	while_end
 proc_end

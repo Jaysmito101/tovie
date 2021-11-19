@@ -26,17 +26,30 @@ void transpile(CodeMaker& cm, Operation op){
         {                
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("stackB = _stack.pop()");
-            cm.add_line("_stack.append(stackB)");
-            cm.add_line("_stack.append(stackA)");
+            
             cm.add_line("_stack.append(stackB and stackA)");
+            break;
+        }
+        case OperationType::DUP:
+        {
+            cm.add_line("stackA = _stack.pop()");
+            cm.add_line("_stack.append(stackA)");
+            cm.add_line("_stack.append(stackA)");
+            break;
+        }
+        case OperationType::SWAP:
+        {
+            cm.add_line("stackA = _stack.pop()");
+            cm.add_line("stackB = _stack.pop()");
+            cm.add_line("_stack.append(stackA)");
+            cm.add_line("_stack.append(stackB)");
             break;
         }
         case OperationType::OR:
         {                
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("stackB = _stack.pop()");
-            cm.add_line("_stack.append(stackB)");
-            cm.add_line("_stack.append(stackA)");
+            
             cm.add_line("_stack.append(stackB or stackA)");
             break;
         }
@@ -49,8 +62,7 @@ void transpile(CodeMaker& cm, Operation op){
         {                
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("stackB = _stack.pop()");
-            cm.add_line("_stack.append(stackB)");
-            cm.add_line("_stack.append(stackA)");
+            
             cm.add_line("_stack.append(stackB + stackA)");
             break;
         }
@@ -58,8 +70,7 @@ void transpile(CodeMaker& cm, Operation op){
         {                
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("stackB = _stack.pop()");
-            cm.add_line("_stack.append(stackB)");
-            cm.add_line("_stack.append(stackA)");
+            
             cm.add_line("_stack.append(stackB - stackA)");
             break;
         }
@@ -67,8 +78,7 @@ void transpile(CodeMaker& cm, Operation op){
         {                
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("stackB = _stack.pop()");
-            cm.add_line("_stack.append(stackB)");
-            cm.add_line("_stack.append(stackA)");
+            
             cm.add_line("_stack.append(stackB * stackA)");
             break;
         }
@@ -76,8 +86,7 @@ void transpile(CodeMaker& cm, Operation op){
         {                
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("stackB = _stack.pop()");
-            cm.add_line("_stack.append(stackB)");
-            cm.add_line("_stack.append(stackA)");
+            
             cm.add_line("_stack.append(stackB // stackA)");
             break;
         }
@@ -85,8 +94,7 @@ void transpile(CodeMaker& cm, Operation op){
         {                
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("stackB = _stack.pop()");
-            cm.add_line("_stack.append(stackB)");
-            cm.add_line("_stack.append(stackA)");
+            
             cm.add_line("_stack.append(stackB % stackA)");
             break;
         }
@@ -194,8 +202,7 @@ void transpile(CodeMaker& cm, Operation op){
         {             
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("stackB = _stack.pop()");
-            cm.add_line("_stack.append(stackB)");
-            cm.add_line("_stack.append(stackA)");
+            
             cm.add_line("_stack.append(stackB ** stackA)");
             break;   
         }
@@ -203,8 +210,7 @@ void transpile(CodeMaker& cm, Operation op){
         {                
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("stackB = _stack.pop()");
-            cm.add_line("_stack.append(stackB)");
-            cm.add_line("_stack.append(stackA)");
+            
             cm.add_line("_stack.append(int(stackB > stackA))");
             break;
         }
@@ -212,8 +218,7 @@ void transpile(CodeMaker& cm, Operation op){
         {                
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("stackB = _stack.pop()");
-            cm.add_line("_stack.append(stackB)");
-            cm.add_line("_stack.append(stackA)");
+            
             cm.add_line("_stack.append(int(stackB < stackA))");
             break;
         }
@@ -221,8 +226,7 @@ void transpile(CodeMaker& cm, Operation op){
         {                
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("stackB = _stack.pop()");
-            cm.add_line("_stack.append(stackB)");
-            cm.add_line("_stack.append(stackA)");
+            
             cm.add_line("_stack.append(int(stackB >= stackA))");
             break;
         }
@@ -230,8 +234,7 @@ void transpile(CodeMaker& cm, Operation op){
         {         
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("stackB = _stack.pop()");
-            cm.add_line("_stack.append(stackB)");
-            cm.add_line("_stack.append(stackA)");
+            
             cm.add_line("_stack.append(int(stackB <= stackA))");
             break;       
         }
@@ -255,8 +258,7 @@ void transpile(CodeMaker& cm, Operation op){
         {
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("stackB = _stack.pop()");
-            cm.add_line("_stack.append(stackB)");
-            cm.add_line("_stack.append(stackA)");
+            
             cm.add_line("_stack.append(int(stackB == stackA))");
             break;       
         }
@@ -264,8 +266,7 @@ void transpile(CodeMaker& cm, Operation op){
         {
             cm.add_line("stackA = _stack.pop()");
             cm.add_line("stackB = _stack.pop()");
-            cm.add_line("_stack.append(stackB)");
-            cm.add_line("_stack.append(stackA)");
+            
             cm.add_line("_stack.append(int(stackB != stackA))");
             break;       
         }
