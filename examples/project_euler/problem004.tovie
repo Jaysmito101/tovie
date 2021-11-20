@@ -1,0 +1,42 @@
+proc_main
+	3 call
+proc_end
+
+proc_3
+	999
+	for_900
+		999
+		for_900
+			memset_0
+			dup memget_0 * 1 call
+			if
+				println
+			if_end	
+			pop memget_0
+			1 -
+		for_end
+		pop
+		1 -
+	for_end
+proc_end
+
+FUNCTION TO CHECK PALINDROME
+proc_1
+	dup
+	dup 2 call	
+	==
+proc_end
+
+FUNCTION TO REVERSE A NUMBER
+proc_2
+	0 memset_0
+	true while
+		dup 10 % memset_1
+		memget_0 10 * memget_1 +
+		memset_0
+		10 /
+		dup 0 >
+	while_end
+	pop
+	memget_0
+proc_end

@@ -1,0 +1,28 @@
+NATIVELY TOVIE DOES NOT SUPPORT SOO BIG INTS SO TRY TRANSPILING TO PYTHON AND TAKING INT AS INPUT
+proc_main
+	1
+	inputi
+	true while
+		swap
+		1 +
+		1 call
+		swap
+		dup 1 >
+	while_end
+	pop
+	println
+proc_end
+
+proc_1
+	memset_0
+	true while
+		dup memget_0 % 0 ==
+		memset_1
+		memget_1 if
+			memget_0 /
+		if_end
+		memget_1
+	while_end
+	memget_0
+proc_end
+

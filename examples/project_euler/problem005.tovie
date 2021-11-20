@@ -1,0 +1,47 @@
+proc_main
+	4 call
+	println
+proc_end
+
+proc_4
+	1 memset_0
+	1
+	true while
+		memset_1
+		memget_0 memget_1 2 call
+		memset_2
+		memget_1 memget_2 /
+		memget_0 * memset_0
+		memget_1
+		1 +
+		dup 20 <
+	while_end
+	memget_0
+proc_end
+
+proc_2
+	3 call
+	memset_1
+	memset_2
+	memget_1
+	true while
+		memset_0
+		memget_1 memget_0 % 0 == memset_3
+		memget_2 memget_0 % 0 == memset_4
+		memget_3 memget_4 && if
+			memget_0 ret
+		if_end
+		memget_0 		
+		1 -
+		dup 1 >=
+	while_end
+proc_end
+
+proc_3
+	memset_0
+	memset_1
+	memget_0 memget_1 > if
+		memget_0 memget_1 ret
+	if_end
+	memget_1 memget_0 ret
+proc_end

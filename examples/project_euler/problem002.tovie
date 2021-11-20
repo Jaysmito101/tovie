@@ -1,0 +1,19 @@
+proc_main
+	0 memset_2
+	1 1
+	true while
+		dup 2 % 0 == if
+			dup memget_2 + memset_2
+		if_end
+		memset_0
+		memset_1
+		memget_1
+		memget_0
+		memget_1
+		memget_0
+		+
+		dup 4000000 <
+	while_end
+	memget_2
+	println
+proc_end
