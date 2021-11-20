@@ -1,0 +1,25 @@
+Operation Table : 
+
+
+	OP ID		OP			ARG
+
+	0		BEGIN			-1
+	1		PROC			0
+	2		PUSH			0
+	3		PUSH			1
+	4		PUSH			10
+	5		FOR			-2
+	6		PRINT			-1
+	7		MEMSET			0
+	8		MEMSET			1
+	9		MEMGET			1
+	10		MEMGET			0
+	11		MEMGET			1
+	12		MEMGET			0
+	13		ADD			-1
+	14		PUSH			32
+	15		PRINTS			-1
+	16		POP			-1
+	17		FOR			-1
+	18		PROC			-1
+	19		END			-1
