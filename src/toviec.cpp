@@ -45,49 +45,13 @@ bool ends_with(const std::string& s, const std::string& suffix) {
     return s.substr(s.size() - suffix.size(), suffix.size()) == suffix;
 }
 
-std::string to_upper(std::string& s){
+static std::string to_upper(std::string& s){
     std::string result;
     for(char c : s){
         result += toupper(c);
     }
     return result;
 }
-
-DataType to_data_type(std::string token){
-    token = to_upper(token);
-    if(token == "I8"){
-        return I8;
-    }
-    if(token == "I16"){
-        return I16;
-    }
-    if(token == "I32"){
-        return I32;
-    }
-    if(token == "I64"){
-        return I64;
-    }
-    if(token == "U8"){
-        return U8;
-    }
-    if(token == "U16"){
-        return U16;
-    }
-    if(token == "U32"){
-        return U32;
-    }
-    if(token == "U64"){
-        return U64;
-    }
-    if(token == "STR"){
-        return STR;
-    }
-    if(token == "BOOL"){
-        return BOOL;
-    }
-    return UNKNOWN;
-}
-
 
 static std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& v) {
     os << "[";
@@ -194,7 +158,7 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
             {
                 long long val = std::stoll(token);
                 unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
-                for(int i = 0; i < sizeof(long long); i++){
+                for(int i = sizeof(long long) - 1 ; i >= 0 ; i--){
                     operations.push_back(Operation(OperationType::PUSH, data[i]));
                 }
             }
@@ -202,7 +166,7 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
         else if(is_float(token)) {
             double val = std::stod(token);
             unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
-            for(int i = 0; i < sizeof(double); i++){
+            for(int i = sizeof(double) - 1; i >= 0 ; i--){
                 operations.push_back(Operation(OperationType::PUSH, data[i]));
             }
         }
@@ -215,7 +179,7 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
             {
                 long long val = std::stoll(token);
                 unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
-                for(int i = 0; i < sizeof(long long); i++){
+                for(int i = sizeof(long long) - 1 ; i >=0 ; i--){
                     operations.push_back(Operation(OperationType::PUSH, data[i]));
                 }
             }
@@ -223,22 +187,29 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
         else if(token[0] == '-' && is_float(token.substr(1))){
             double val = std::stod(token);
             unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
-            for(int i = 0; i < sizeof(double); i++){
-                operations.push_back(Operation(OperationType::PUSH, data[i]));
+            for(int k = sizeof(double) - 1 ; k >= 0; k--){
+                operations.push_back(Operation(OperationType::PUSH, data[k]));
             }
         }
         else if(token[0] == 'u' && is_integer(token.substr(1))){
             try
             {
-                operations.push_back(Operation(OperationType::PUSH, std::stoi(token.substr(1))));
+                operations.push_back(Operation(OperationType::PUSH, (int)std::stoul(token.substr(1))));
             }
             catch(...)
             {
                 unsigned long long val = std::stoull(token.substr(1));
                 unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
-                for(int i = 0; i < sizeof(unsigned long long); i++){
+                for(int i = sizeof(unsigned long long) - 1 ; i >= 0 ; i--){
                     operations.push_back(Operation(OperationType::PUSH, data[i]));
                 }
+            }
+        }
+        else if(token[0] == 'f' && is_float(token.substr(1))){
+            float val = std::stof(token.substr(1));
+            unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
+            for(int k = sizeof(float) - 1; k >= 0 ; k--){
+                operations.push_back(Operation(OperationType::PUSH, data[k]));
             }
         }
         else if(token == "dec"){
@@ -338,6 +309,12 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
             else if(token == "!="){
                 op.arg = OperationType::NEQ;
             }
+            else if(token == "print"){
+                op.arg = OperationType::PRINT;
+            }
+            else if(token == "println"){
+                op.arg = OperationType::PRINTLN;
+            }
         }
         else if(token[0] == '<'){
             token = token.substr(1);
@@ -345,7 +322,7 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
                 throw std::runtime_error("undefined variable : " + token);
             }
             Operation op(OperationType::VAR, vars[token]);
-            op.ops[0] = 1;
+            op.ops[0] = -1;
             operations.push_back(op);
         }
         else if(token[0] == '>'){
@@ -354,7 +331,7 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
                 throw std::runtime_error("undefined variable : " + token);
             }
             Operation op(OperationType::VAR, vars[token]);
-            op.ops[0] = 2;
+            op.ops[0] = -2;
             operations.push_back(op);
         }
         else if(token == "println"){

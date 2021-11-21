@@ -1,5 +1,7 @@
 #include "tovies.h"
 
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 
 #include <functional>
@@ -27,6 +29,23 @@ struct ProcAddr {
         this -> eAddr = eAddr;
     }
 };
+
+struct Variable
+{
+    DataType type;
+    int id;
+    void* value;
+};
+
+std::ostream& operator<<(std::ostream& os, std::unordered_map<int, Variable> vt)
+{
+    os << "[ ";
+    for (auto it = vt.begin(); it != vt.end(); ++it) {
+        os << "(" << it -> second.id << " " << it -> second.type << " " << get_data_value(it->second.value, it->second.type) << ") ";
+    }
+    os << "]";          
+    return os;
+}
 
 // The `#if 1` is just to use code folding in the Editor.
 #if 1
@@ -306,8 +325,17 @@ static void reverse(std::string & str) {
 }
 
 static std::unordered_map < int, ProcAddr > procAddresses;
+static std::unordered_map < int, Variable> gVars;
 static void * runtimeLib = nullptr;
 static std::unordered_map < std::string, std:: function < void(int * , int) >> libProcs;
+
+static void clearVars(std::unordered_map < int, Variable>& v){
+    for(auto& it : v){
+        if(it.second.value)
+            deallocate_data_type(it.second.value, it.second.type);
+    }
+    v.clear();
+}
 
 static void loadLibProc(std::vector < int > & progStack, Operation op, bool debug) {
     std::string libPath = "";
@@ -326,6 +354,30 @@ static void loadLibProc(std::vector < int > & progStack, Operation op, bool debu
         close_runtime_lib(runtimeLib);
     libProcs.clear();
     runtimeLib = open_runtime_lib(libPath.c_str());
+}
+
+static void loadGlobals(std::vector<Operation>& ops)
+{
+    clearVars(gVars);
+    bool inProc = false;
+    for(int i = 0;i< ops.size();i++){
+        if(!inProc){
+            if(ops[i].op == OperationType::DECL){
+                Variable v;
+                v.id = ops[i].arg;
+                v.type = to_data_type(ops[i].ops[0]);
+                v.value = allocate_data_type(v.type);
+                memset(v.value, 0, get_data_type_size(v.type));
+                gVars[v.id] = v;
+            }
+        }
+        if(ops[i].op == OperationType::PROC && ops[i].arg != -1){
+            inProc = true;
+        }
+        if(ops[i].op == OperationType::PROC && ops[i].arg == -1){
+            inProc = false;
+        }
+    }
 }
 
 static void callLibProc(std::vector < int > & progStack, Operation op, bool debug = false) {
@@ -373,33 +425,17 @@ static void loadProcs(std::vector < Operation > ops) {
     }
 }
 
-static int find_next_end(std::vector < Operation > ops, int i, OperationType type, int endArg = 1) {
-    for (int j = i; j < ops.size(); j++) {
-        if (ops[j].op == type && ops[j].arg == endArg) {
-            return j;
-        }
-    }
-    return ops.size();
-}
-
-static int find_prev_begin(std::vector < Operation > ops, int i, OperationType type, int begArg = 0) {
-    for (int j = i; j >= 0; j--) {
-        if (ops[j].op == type && ops[j].arg == begArg) {
-            return j;
-        }
-    }
-    return ops.size();
-}
-
 static void simulate_proc(std::vector < int > & progStack, std::vector < Operation > ops, ProcAddr pAddr, bool debug);
 
-static void simulate_op(std::vector < int > & progStack, Operation op, unsigned long * i, int * memory, std::vector < Operation > & ops, bool debug = false) {
+static void simulate_op(std::vector < int > & progStack, Operation op, unsigned long * i, int * memory, std::vector < Operation > & ops, bool debug, std::unordered_map < int, Variable>& lVars) {
     if (debug && false) // TMP
         std::cout << " [DEBUG]\t" << op.op << "\t\t" << op.arg << std::endl;
     if (debug) {
-        std::cout << " [DEBUG] STACK :";
+        std::cout << " [DEBUG] STACK : ";
         print(progStack);
-        std::cout << " [DEBUG] OP ID :" << * i << std::endl;
+        std::cout << " [DEBUG] GVARS : " << gVars << std::endl;
+        std::cout << " [DEBUG] LVARS : " << lVars << std::endl;
+        std::cout << " [DEBUG] OP ID : " << * i << " [ " << op.op << " " << op.arg << " ]" << std::endl;
     }
     int a, b;
     switch (op.op) {
@@ -513,6 +549,140 @@ static void simulate_op(std::vector < int > & progStack, Operation op, unsigned 
     case OperationType::NEQ:
         neq(progStack, op, debug);
         break;
+    case OperationType::DECL:
+    {
+        Variable v;
+        v.id = ops[*i].arg;
+        v.type = to_data_type(ops[*i].ops[0]);
+        v.value = allocate_data_type(v.type);
+        memset(v.value, 0, get_data_type_size(v.type));
+        lVars[v.id] = v;
+        break;
+    }
+    case OperationType::VAR:
+    {
+        Variable v;
+        bool tp = false;
+        if(gVars.find(op.arg) != gVars.end()) {
+            v = gVars[op.arg];
+            tp = true;
+        }
+        else if(lVars.find(op.arg) != lVars.end()) {
+            v = lVars[op.arg];
+            tp = true;
+        }
+        if(!tp)
+            throw std::runtime_error("variable not found error");
+        if(op.ops[0] == -1)
+        {
+            if(debug)
+                std::cout << " [DEBUG]\t" << " VAR " << op.arg << " SETV" << std::endl;
+            if (v.type < DataType::I8)
+            {
+                progStack.push_back((int)(*(char*)v.value));
+            }
+            else if (v.type < DataType::I16)
+            {
+                progStack.push_back((int)(*(short*)v.value));
+            }
+            else if (v.type < DataType::I32)
+            {
+                progStack.push_back((int)(*(int*)v.value));
+            }
+            else if (v.type < DataType::U8)
+            {
+                progStack.push_back((int)(*(unsigned char*)v.value));
+            }
+            else if (v.type < DataType::U16)
+            {
+                progStack.push_back((int)(*(unsigned short*)v.value));
+            }
+            else if (v.type < DataType::U32)
+            {
+                progStack.push_back((int)(*(unsigned int*)v.value));
+            }
+            else{
+                unsigned char* data = static_cast<unsigned char*>(v.value);
+                for(int i = get_data_type_size(v.type) - 1 ; i >= 0 ; i--)
+                {
+                    progStack.push_back(data[i]);
+                }
+            }
+        }
+        else if(op.ops[0] == -2)
+        {                               
+            if(debug)
+                std::cout << " [DEBUG]\t" << " VAR " << op.arg << " GETV" << std::endl;
+            if (v.type < DataType::I8)
+            {
+                char t = (char)progStack.back();
+                progStack.pop_back();
+                memcpy(v.value, &t, get_data_type_size(v.type));
+            }
+            else if (v.type < DataType::I16)
+            {
+                short t = (short)progStack.back();
+                progStack.pop_back();
+                memcpy(v.value, &t, get_data_type_size(v.type));
+            }
+            else if (v.type < DataType::I32)
+            {
+                int t = progStack.back();
+                progStack.pop_back();
+                memcpy(v.value, &t, get_data_type_size(v.type));
+            }
+            else if (v.type < DataType::U8)
+            {
+                unsigned char t = (unsigned char)progStack.back();
+                progStack.pop_back();
+                memcpy(v.value, &t, get_data_type_size(v.type));
+            }
+            else if (v.type < DataType::U16)
+            {
+                unsigned short t = (unsigned short)progStack.back();
+                progStack.pop_back();
+                memcpy(v.value, &t, get_data_type_size(v.type));
+            }
+            else if (v.type < DataType::U32)
+            {
+                unsigned int t = (unsigned int)progStack.back();
+                progStack.pop_back();
+                memcpy(v.value, &t, get_data_type_size(v.type));
+            }
+            else if(v.type == DataType::STR){
+                int max = get_data_type_size(v.type);
+                char* dt = new char[max];
+                memset(dt, 0, max);
+                for(int i = 0 ; i < max ; i++)
+                {
+                    int tmp = progStack.back();
+                    progStack.pop_back();
+                    if(tmp == -1)
+                        break;
+                    dt[i] = (char)tmp;
+                }
+                strrev(dt);
+                memcpy(v.value, dt, max);
+                delete[] dt;
+            }
+            else{
+                unsigned char* data = (unsigned char*)malloc(get_data_type_size(v.type));
+                for(int i = 0 ; i < get_data_type_size(v.type) ; i++)
+                {
+                    data[i] = (unsigned char)progStack.back();
+                    progStack.pop_back();
+                }
+                memcpy(v.value, data, get_data_type_size(v.type));
+                delete[] data;
+            }
+        }
+        else
+        {
+            if(debug)
+                std::cout << " [DEBUG]\t" << " VAR " << op.arg << " VOP" << std::endl;
+        }
+        break;
+    }
     case OperationType::CALL: {
         int procId = progStack.back();
         progStack.pop_back();
@@ -697,7 +867,7 @@ static void simulate_op(std::vector < int > & progStack, Operation op, unsigned 
                 if (debug)
                     std::cout << " [DEBUG]\t for " << k + 1 << "/" << count << std::endl;
                 for (unsigned long p = * i + 1; p < end && p >= * i; p++)
-                    simulate_op(progStack, ops[p], & p, memory, ops, debug);
+                    simulate_op(progStack, ops[p], & p, memory, ops, debug, lVars);
             }
             * i = end;
         }
@@ -719,24 +889,31 @@ static void simulate_op(std::vector < int > & progStack, Operation op, unsigned 
     }
 }
 
+
 static void simulate_proc(std::vector < int > & progStack, std::vector < Operation > ops, ProcAddr pAddr, bool debug) {
     int * memory = new int[1024];
     int endIdToSkip = 0;
+    std::unordered_map < int, Variable> lVars;
     for (unsigned long i = pAddr.bAddr + 1; i < pAddr.eAddr; i++) {
         Operation op = ops[i];
         if (op.op == OperationType::RET) {
             if (debug)
                 std::cout << " [DEBUG]\treturn" << std::endl;
+            if (memory)
+                delete[] memory;
+            clearVars(lVars);
             return;
         }
-        simulate_op(progStack, op, & i, memory, ops, debug);
+        simulate_op(progStack, op, & i, memory, ops, debug, lVars);
     }
     if (memory)
         delete[] memory;
+    clearVars(lVars);
 }
 
 void simulate(std::vector < Operation > ops, bool debug) {
     loadProcs(ops);
+    loadGlobals(ops);
     runtimeLib = nullptr;
     std::vector < int > progStack;
     progStack.push_back(0);

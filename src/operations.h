@@ -1,5 +1,4 @@
 #pragma once
-
 #include <string>
 enum OperationType
 {
@@ -79,8 +78,15 @@ enum DataType
     DATA_TYPE_COUNT
 };
 
+DataType to_data_type(std::string type);
+DataType to_data_type(int type);
 std::string to_string(DataType type);
 std::ostream& operator<<(std::ostream& os, DataType type);
+void* allocate_data_type(DataType type, int max_str_size = 4096);
+void deallocate_data_type(void* data, DataType type);
+int get_data_type_size(DataType type);
+void set_data_value(void* data, DataType type, void* value);
+std::string get_data_value(void* data, DataType type);
 
 struct Operation 
 {
