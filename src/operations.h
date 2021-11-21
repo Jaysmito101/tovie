@@ -57,6 +57,7 @@ enum OperationType
     OPERATION_COUNT
 };
 
+OperationType to_operation_type(int id);
 std::string to_string(OperationType type);
 std::ostream& operator<<(std::ostream& os, OperationType type);
 

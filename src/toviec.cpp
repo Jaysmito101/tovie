@@ -270,6 +270,15 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
         else if(token == "!="){
             operations.push_back(Operation(OperationType::NEQ));
         }
+        else if(token[0] == '&'){
+            token = token.substr(1);
+            if(vars.find(token) != vars.end()){
+                operations.push_back(Operation(OperationType::PUSH, vars[token]));
+            }
+            else{
+                throw std::runtime_error("unknown variable : "+token);
+            }
+        }
         else if(token[0] == '$'){
             token = token.substr(1);
             Operation op(OperationType::VAR);
@@ -314,6 +323,9 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
             }
             else if(token == "println"){
                 op.arg = OperationType::PRINTLN;
+            }
+            else if(token == "input"){
+                op.arg = OperationType::INPUTI;
             }
         }
         else if(token[0] == '<'){
