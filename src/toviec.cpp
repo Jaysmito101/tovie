@@ -19,8 +19,22 @@
 #define PATH_SEPARATOR "/" 
 #endif
 
-bool is_number(const std::string& s) {
-    return !s.empty() && std::find_if(s.begin(), s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+bool is_integer(std::string token){
+    for(char c : token){
+        if(!isdigit(c)){
+            return false;
+        }
+    }
+    return true;
+}
+
+bool is_float(std::string token){
+    for(char c : token){
+        if(!isdigit(c) && c != '.'){
+            return false;
+        }
+    }
+   return true;
 }
 
 bool starts_with(const std::string& s, const std::string& prefix) {
@@ -30,6 +44,50 @@ bool starts_with(const std::string& s, const std::string& prefix) {
 bool ends_with(const std::string& s, const std::string& suffix) {
     return s.substr(s.size() - suffix.size(), suffix.size()) == suffix;
 }
+
+std::string to_upper(std::string& s){
+    std::string result;
+    for(char c : s){
+        result += toupper(c);
+    }
+    return result;
+}
+
+DataType to_data_type(std::string token){
+    token = to_upper(token);
+    if(token == "I8"){
+        return I8;
+    }
+    if(token == "I16"){
+        return I16;
+    }
+    if(token == "I32"){
+        return I32;
+    }
+    if(token == "I64"){
+        return I64;
+    }
+    if(token == "U8"){
+        return U8;
+    }
+    if(token == "U16"){
+        return U16;
+    }
+    if(token == "U32"){
+        return U32;
+    }
+    if(token == "U64"){
+        return U64;
+    }
+    if(token == "STR"){
+        return STR;
+    }
+    if(token == "BOOL"){
+        return BOOL;
+    }
+    return UNKNOWN;
+}
+
 
 static std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& v) {
     os << "[";
@@ -72,7 +130,14 @@ static std::string read_lib(const std::string& lib_name, std::vector<std::string
     return "";
 }
 
+static std::unordered_map<std::string, int> vars;
+static int varId;
+
 std::vector<Operation> parse(std::string& input, std::string& includePath, std::vector<Operation>& ioperations, std::unordered_map<std::string, std::string>& idefs, bool isInclude) {
+    if(!isInclude){
+        varId = 0;
+        vars.clear();
+    }
     std::vector<std::string> includePaths = lexpp::lex(includePath, ";");
     std::vector<Operation> operations;
     std::unordered_map<std::string, std::string> defs;
@@ -120,12 +185,77 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
 
         process_defs(token, defs, tokens, &l);
         // Operation tokens
-        if(is_number(token)) {
-            try{
+        if(is_integer(token)) {
+            try
+            {
                 operations.push_back(Operation(OperationType::PUSH, std::stoi(token)));
-            }catch(...){
-                throw std::runtime_error(token + " - too big integer error!");
             }
+            catch(...)
+            {
+                long long val = std::stoll(token);
+                unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
+                for(int i = 0; i < sizeof(long long); i++){
+                    operations.push_back(Operation(OperationType::PUSH, data[i]));
+                }
+            }
+        }
+        else if(is_float(token)) {
+            double val = std::stod(token);
+            unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
+            for(int i = 0; i < sizeof(double); i++){
+                operations.push_back(Operation(OperationType::PUSH, data[i]));
+            }
+        }
+        else if(token[0] == '-' && is_integer(token.substr(1))){
+            try
+            {
+                operations.push_back(Operation(OperationType::PUSH, std::stoi(token)));
+            }
+            catch(...)
+            {
+                long long val = std::stoll(token);
+                unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
+                for(int i = 0; i < sizeof(long long); i++){
+                    operations.push_back(Operation(OperationType::PUSH, data[i]));
+                }
+            }
+        }
+        else if(token[0] == '-' && is_float(token.substr(1))){
+            double val = std::stod(token);
+            unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
+            for(int i = 0; i < sizeof(double); i++){
+                operations.push_back(Operation(OperationType::PUSH, data[i]));
+            }
+        }
+        else if(token[0] == 'u' && is_integer(token.substr(1))){
+            try
+            {
+                operations.push_back(Operation(OperationType::PUSH, std::stoi(token.substr(1))));
+            }
+            catch(...)
+            {
+                unsigned long long val = std::stoull(token.substr(1));
+                unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
+                for(int i = 0; i < sizeof(unsigned long long); i++){
+                    operations.push_back(Operation(OperationType::PUSH, data[i]));
+                }
+            }
+        }
+        else if(token == "dec"){
+            token = tokens[++l];
+            std::string name = token.substr(0, token.find(":"));
+            DataType type = to_data_type(token.substr(token.find(":") + 1));
+            if(type == DataType::UNKNOWN){
+                throw std::runtime_error("unknown data type : "+token.substr(token.find(":") + 1));
+            }
+            Operation op(OperationType::DECL);
+            op.arg = varId++;
+            op.ops[0] = type;
+            operations.push_back(op);
+            vars[name] = op.arg;
+        }
+        else if(vars.find(token) != vars.end()){
+            operations.push_back(Operation(OperationType::PUSH, vars[token]));
         }
         else if(token == "true"){
             operations.push_back(Operation(OperationType::PUSH, true));
@@ -168,6 +298,64 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
         }
         else if(token == "!="){
             operations.push_back(Operation(OperationType::NEQ));
+        }
+        else if(token[0] == '$'){
+            token = token.substr(1);
+            Operation op(OperationType::VAR);
+            if(token == "+"){
+                op.arg = OperationType::ADD;
+            }
+            else if(token == "-"){
+                op.arg = OperationType::SUB;
+            }
+            else if(token == "*"){
+                op.arg = OperationType::MUL;
+            }
+            else if(token == "/"){
+                op.arg = OperationType::DIV;
+            }
+            else if(token == "&&"){
+                op.arg = OperationType::AND;
+            }
+            else if(token == "||"){
+                op.arg = OperationType::OR;
+            }
+            else if(token == ">"){
+                op.arg = OperationType::GT;
+            }
+            else if(token == "<"){
+                op.arg = OperationType::LT;
+            }
+            else if(token == "=="){
+                op.arg = OperationType::EQ;
+            }
+            else if(token == "<="){
+                op.arg = OperationType::LE;
+            }
+            else if(token == ">="){
+                op.arg = OperationType::GE;
+            }
+            else if(token == "!="){
+                op.arg = OperationType::NEQ;
+            }
+        }
+        else if(token[0] == '<'){
+            token = token.substr(1);
+            if(vars.find(token) == vars.end()){
+                throw std::runtime_error("undefined variable : " + token);
+            }
+            Operation op(OperationType::VAR, vars[token]);
+            op.ops[0] = 1;
+            operations.push_back(op);
+        }
+        else if(token[0] == '>'){
+            token = token.substr(1);
+            if(vars.find(token) == vars.end()){
+                throw std::runtime_error("undefined variable : " + token);
+            }
+            Operation op(OperationType::VAR, vars[token]);
+            op.ops[0] = 2;
+            operations.push_back(op);
         }
         else if(token == "println"){
             operations.push_back(Operation(OperationType::PRINTLN));

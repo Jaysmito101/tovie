@@ -102,6 +102,10 @@ std::string to_string(OperationType type){
             return "FOR";
         case LOADLIB:
             return "LOADLIB";
+        case DECL:
+            return "DECL";
+        case VAR:
+            return "VAR";
         default:
             return "UNKNOWN";
     }
@@ -113,4 +117,49 @@ std::ostream& operator<<(std::ostream& os, OperationType type)
     return os;
 }
 
+std::string to_string(DataType type)
+{
+    switch(type){
+        case I8:
+            return "I8";
+        case I16:
+            return "I16";
+        case I32:
+            return "I32";
+        case I64:
+            return "I64";
+        case U8:
+            return "U8";
+        case U16:
+            return "U16";
+        case U32:
+            return "U32";
+        case U64:
+            return "U64";
+        case F32:
+            return "F32";
+        case F64:
+            return "F64";
+        case STR:
+            return "STR";
+        case BOOL:
+            return "BOOL";
+        case DATA_TYPE_COUNT:
+            return "DATA_TYPE_COUNT";
+        default:
+            return "UNKNOWN";
+    }
+}
+
+std::ostream& operator<<(std::ostream& os, DataType type)
+{
+    os << to_string(type);
+    return os;
+}
+
 Operation::Operation(OperationType type, int value) : op(type), arg(value) {}
+
+Operation::Operation(OperationType type, int value, int _ops[64]) : op(type), arg(value) 
+{
+    memcpy(ops, _ops, sizeof(int) * 64);
+}

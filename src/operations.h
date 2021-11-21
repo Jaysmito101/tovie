@@ -53,15 +53,39 @@ enum OperationType
     SWAP,
     FOR,
     LOADLIB,
+    DECL,
+    VAR,
     OPERATION_COUNT
 };
 
 std::string to_string(OperationType type);
 std::ostream& operator<<(std::ostream& os, OperationType type);
 
+enum DataType
+{
+    UNKNOWN = 0,
+    I8,
+    I16,
+    I32,
+    I64,
+    U8,
+    U16,
+    U32,
+    U64,
+    F32,
+    F64,
+    STR,
+    BOOL,
+    DATA_TYPE_COUNT
+};
+
+std::string to_string(DataType type);
+std::ostream& operator<<(std::ostream& os, DataType type);
+
 struct Operation 
 {
     Operation(OperationType type, int value = -1);
+    Operation(OperationType type, int value, int ops[64]);
     OperationType op;
     int arg;
     int ops[64];
