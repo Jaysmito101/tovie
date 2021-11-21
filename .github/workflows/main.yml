@@ -35,10 +35,11 @@ jobs:
         run: python scripts/test.py
         
       - name: Upload Artifact
-      - uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v2
         with:
              name: Linux Build
              path: bin/tovie
+             retention-days: 7
         
   Windows:
     # The type of runner that the job will run on
@@ -63,3 +64,4 @@ jobs:
         with:
              name: Windows Build
              path: bin/tovie.exe
+             retention-days: 7
