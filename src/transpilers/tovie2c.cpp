@@ -129,12 +129,13 @@ TovieNativeFunc get_runtimelib_proc(HINSTANCE runtimeLib, const char* libProcNam
 std::string dllLoader = R"(
 typedef void (*TovieNativeFunc)(int*, int);
     
-std::function<void(int*, int)> get_runtimelib_proc(void* runtimeLib, const char* libProcName)
+TovieNativeFunc get_runtimelib_proc(void* runtimeLib, const char* libProcName)
 {
     TovieNativeFunc funci;
     funci = (TovieNativeFunc)dlsym(runtimeLib, libProcName);
     if (!funci) {
-        throw std::runtime_error("failed to get proc address for " + std::string(libProcName));
+        printf("failed to get proc address for %s", libProcName);
+        exit(-1);
     }
     return funci;
 }

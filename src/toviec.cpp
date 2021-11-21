@@ -8,7 +8,9 @@
 #include <vector>
 #include <unordered_map>
 #include <stdexcept>
+#include <iostream>
 
+#include "debug.h"
 
 
 #if defined(WIN32) || defined(_WIN32) 
@@ -29,13 +31,27 @@ bool ends_with(const std::string& s, const std::string& suffix) {
     return s.substr(s.size() - suffix.size(), suffix.size()) == suffix;
 }
 
-static void process_defs(std::string& token, std::unordered_map<std::string, std::string>& defs){
+static std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& v) {
+    os << "[";
+    for (auto& s : v) {
+        os << s << ", ";
+    }
+    os << "]";
+    return os;
+}
+
+static void process_defs(std::string& token, std::unordered_map<std::string, std::string>& defs, std::vector<std::string>& toks, int* index) {
     // iterate over the keys of defs
     for (auto& kv : defs) {
         // if the token starts with the key
         if (token.find(kv.first) != std::string::npos) {
             // replace the key from the string to value
             token.replace(token.find(kv.first), kv.first.size(), kv.second);
+            std::vector<std::string> new_toks = lexpp::lex(token, " \t\r\n");
+            for(int i = 1; i <= new_toks.size(); i++) {
+                toks.insert(toks.begin() + *index + i, new_toks[i - 1]);
+            }
+            toks.erase(toks.begin() + *index);
             return;
         }
     }
@@ -70,15 +86,17 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
         operations.push_back(Operation(OperationType::BEGIN));
     }
     for (int l=0;l<tokens.size();l++) {
-        std::string& token = tokens[l];
+        std::string token = tokens[l];
+        
         if(token.size() == 0){
             continue;
         }
+
         // Preprocessor tokens
         if(starts_with(token, "include<\"")){
             while(!ends_with(token, "\">")){
                 l++;
-                token += " " + tokens[l];
+                token += tokens[l] + " ";
             }
             bool isIncludeOK = false;
             std::string libSrc = read_lib(token.substr(9, token.size()-2), includePaths, &isIncludeOK);
@@ -87,18 +105,20 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
             }else{
                 throw std::runtime_error("include " + token.substr(9, token.size()-2) + " error");
             }
+            continue;
         }
         else if(starts_with(token, "def<")){
             std::string name = token.substr(4);
             token = "";
-            while(token[token.size()-1] != '>'){
-                token += " " + tokens[++l];
+            while(token[token.size()-2] != '>'){
+                l++;
+                token += tokens[l] + " ";
             }
-            defs[name] = token.substr(0, token.size()-1);
-        }
+            defs[name] = token.substr(0, token.size()-2);
+            continue;
+        }   
 
-        process_defs(token, defs);
-
+        process_defs(token, defs, tokens, &l);
         // Operation tokens
         if(is_number(token)) {
             try{

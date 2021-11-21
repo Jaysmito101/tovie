@@ -64,4 +64,5 @@ struct Operation
     Operation(OperationType type, int value = -1);
     OperationType op;
     int arg;
+    int ops[64];
 };
