@@ -34,6 +34,12 @@ jobs:
       - name: Run Tests
         run: python scripts/test.py
         
+      - name: Upload Artifact
+      - uses: actions/upload-artifact@v2
+        with:
+             name: Linux Build
+             path: bin/tovie
+        
   Windows:
     # The type of runner that the job will run on
     runs-on: windows-2019
@@ -51,3 +57,9 @@ jobs:
       
       - name: Run Tests
         run: python scripts/test.py
+        
+      - name: Upload Artifact 
+        uses: actions/upload-artifact@v2
+        with:
+             name: Windows Build
+             path: bin/tovie.exe
