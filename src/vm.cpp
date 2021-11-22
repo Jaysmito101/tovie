@@ -1,6 +1,7 @@
 #include "vm.hpp"
 
 #include "runtimelib.hpp"
+#include "debug.hpp"
 
 #include <algorithm>
 #include <cstdlib>
@@ -9,22 +10,43 @@
 #include <iostream>
 #include <stack>
 #include <unordered_map>
+#include <array>
+#include <iostream>
+#include <type_traits>
+#include <utility>
+#include <string>
+#include <unordered_map>
 
 struct ProcAddr {
 	int			  procId;
-	unsigned long bAddr, eAddr;
+	unsigned long long bAddr, eAddr;
 
 	ProcAddr() {
 		procId = -1;
 		bAddr = eAddr = 0;
 	}
 
-	ProcAddr(int procId, unsigned long bAddr, unsigned long eAddr) {
-		this->procId = procId;
-		this->bAddr	 = bAddr;
-		this->eAddr	 = eAddr;
+	ProcAddr(int procIdi, unsigned long long bAddri, unsigned long long eAddri) {
+		procId = procIdi;
+		bAddr	 = bAddri;
+		eAddr	 = eAddri;
 	}
 };
+
+char *strrev(char *str)
+{
+      char *p1, *p2;
+
+      if (! str || ! *str)
+            return str;
+      for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2)
+      {
+            *p1 ^= *p2;
+            *p2 ^= *p1;
+            *p1 ^= *p2;
+      }
+      return str;
+}
 
 struct Variable {
 	DataType type;
@@ -36,6 +58,20 @@ std::ostream& operator<<(std::ostream& os, std::unordered_map<int, Variable> vt)
 	os << "[ ";
 	for (auto it = vt.begin(); it != vt.end(); ++it) {
 		os << "(" << it->second.id << " " << it->second.type << " " << get_data_value(it->second.value, it->second.type) << ") ";
+	}
+	os << "]";
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, ProcAddr addr){
+	os << addr.procId << " : " << addr.bAddr << " -> " << addr.eAddr;
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, std::unordered_map<int, ProcAddr> pt){
+	os << "[ ";
+	for (auto it = pt.begin(); it != pt.end(); ++it) {
+		os << "(" << it->second.procId << " " << it->second.bAddr << " " << it->second.eAddr << ") ";
 	}
 	os << "]";
 	return os;
@@ -427,7 +463,40 @@ static void addVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
+
+	Variable c;
+	c.type = a.type;
+	c.value = allocate_data_type(c.type);
+	memset(c.value, 0, get_data_type_size(c.type));
+	switch (c.type) {
+	case INT:
+		*(int*) c.value = *(int*) a.value + *(int*) b.value;
+		break;
+	case UINT:
+		*(unsigned int*) c.value = *(unsigned int*) a.value + *(unsigned int*) b.value;
+		break;
+	case LONG:
+		*(long*) c.value = *(long*) a.value + *(long*) b.value;
+		break;
+	case ULONG:
+		*(unsigned long long*) c.value = *(unsigned long long*) a.value + *(unsigned long long*) b.value;
+		break;
+	case DOUBLE:
+		*(double*) c.value = *(double*) a.value + *(double*) b.value;
+		break;
+	case FLOAT:
+		*(float*) c.value = *(float*) a.value + *(float*) b.value;
+		break;
+	case STRING:
+		strcat((char*)c.value, (char*)a.value);
+		strcat((char*)c.value, (char*)b.value);
+		break;
+	default:
+		throw std::runtime_error("type " + to_string(c.type) + " is not supported for op add");
+		break;	
+	}
+	push_variable(s, c, debug);
+	deallocate_data_type(c.value, c.type);
 }
 
 static void subVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -438,14 +507,39 @@ static void subVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
-		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
+		std::cout << " [DEBUG]\t subvop" << a.id << " + " << b.id << std::endl;
 	if(a.type != b.type)
 		throw std::runtime_error("type mismatch");
-	switch (a.type) {
+	
+	Variable c;
+	c.type = a.type;
+	c.value = allocate_data_type(c.type);
+	memset(c.value, 0, get_data_type_size(c.type));
+	switch (c.type) {
 	case INT:
-		
+		*(int*) c.value = *(int*) a.value - *(int*) b.value;
 		break;
+	case UINT:
+		*(unsigned int*) c.value = *(unsigned int*) a.value - *(unsigned int*) b.value;
+		break;
+	case LONG:
+		*(long*) c.value = *(long*) a.value - *(long*) b.value;
+		break;
+	case ULONG:
+		*(unsigned long long*) c.value = *(unsigned long long*) a.value - *(unsigned long long*) b.value;
+		break;
+	case DOUBLE:
+		*(double*) c.value = *(double*) a.value - *(double*) b.value;
+		break;
+	case FLOAT:
+		*(float*) c.value = *(float*) a.value - *(float*) b.value;
+		break;
+	default:
+		throw std::runtime_error("type " + to_string(c.type) + " is not supported for op sub");
+		break;	
 	}
+	push_variable(s, c, debug);
+	deallocate_data_type(c.value, c.type);
 }
 
 static void mulVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -456,8 +550,36 @@ static void mulVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
-		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
+		std::cout << " [DEBUG]\t mulvop" << a.id << " + " << b.id << std::endl;
+	Variable c;
+	c.type = a.type;
+	c.value = allocate_data_type(c.type);
+	memset(c.value, 0, get_data_type_size(c.type));
+	switch (c.type) {
+	case INT:
+		*(int*) c.value = *(int*) a.value * *(int*) b.value;
+		break;
+	case UINT:
+		*(unsigned int*) c.value = *(unsigned int*) a.value * *(unsigned int*) b.value;
+		break;
+	case LONG:
+		*(long*) c.value = *(long*) a.value * *(long*) b.value;
+		break;
+	case ULONG:
+		*(unsigned long long*) c.value = *(unsigned long long*) a.value * *(unsigned long long*) b.value;
+		break;
+	case DOUBLE:
+		*(double*) c.value = *(double*) a.value * *(double*) b.value;
+		break;
+	case FLOAT:
+		*(float*) c.value = *(float*) a.value * *(float*) b.value;
+		break;
+	default:
+		throw std::runtime_error("type " + to_string(c.type) + " is not supported for op mul");
+		break;	
+	}
+	push_variable(s, c, debug);
+	deallocate_data_type(c.value, c.type);
 }
 
 static void divVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -468,8 +590,36 @@ static void divVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
-		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
+		std::cout << " [DEBUG]\t divop" << a.id << " + " << b.id << std::endl;
+	Variable c;
+	c.type = a.type;
+	c.value = allocate_data_type(c.type);
+	memset(c.value, 0, get_data_type_size(c.type));
+	switch (c.type) {
+	case INT:
+		*(int*) c.value = *(int*) a.value / *(int*) b.value;
+		break;
+	case UINT:
+		*(unsigned int*) c.value = *(unsigned int*) a.value / *(unsigned int*) b.value;
+		break;
+	case LONG:
+		*(long*) c.value = *(long*) a.value / *(long*) b.value;
+		break;
+	case ULONG:
+		*(unsigned long long*) c.value = *(unsigned long long*) a.value / *(unsigned long long*) b.value;
+		break;
+	case DOUBLE:
+		*(double*) c.value = *(double*) a.value / *(double*) b.value;
+		break;
+	case FLOAT:
+		*(float*) c.value = *(float*) a.value / *(float*) b.value;
+		break;
+	default:
+		throw std::runtime_error("type " + to_string(c.type) + " is not supported for op div");
+		break;	
+	}
+	push_variable(s, c, debug);
+	deallocate_data_type(c.value, c.type);
 }
 
 static void modVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -481,7 +631,29 @@ static void modVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
+	Variable c;
+	c.type = a.type;
+	c.value = allocate_data_type(c.type);
+	memset(c.value, 0, get_data_type_size(c.type));
+	switch (c.type) {
+	case INT:
+		*(int*) c.value = *(int*) a.value % *(int*) b.value;
+		break;
+	case UINT:
+		*(unsigned int*) c.value = *(unsigned int*) a.value % *(unsigned int*) b.value;
+		break;
+	case LONG:
+		*(long*) c.value = *(long*) a.value % *(long*) b.value;
+		break;
+	case ULONG:
+		*(unsigned long long*) c.value = *(unsigned long long*) a.value % *(unsigned long long*) b.value;
+		break;
+	default:
+		throw std::runtime_error("type " + to_string(c.type) + " is not supported for op mod");
+		break;	
+	}
+	push_variable(s, c, debug);
+	deallocate_data_type(c.value, c.type);
 }
 
 static void gtVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -492,8 +664,36 @@ static void gtVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
-		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
+		std::cout << " [DEBUG]\t gtvop" << a.id << " + " << b.id << std::endl;
+
+	bool flag = false;
+	switch (a.type) {
+	case INT:
+		flag = *(int*) a.value > *(int*) b.value;
+		break;
+	case UINT:
+		flag = *(unsigned int*) a.value > *(unsigned int*) b.value;
+		break;
+	case LONG:
+		flag = *(long*) a.value > *(long*) b.value;
+		break;
+	case ULONG:
+		flag = *(unsigned long long*) a.value > *(unsigned long long*) b.value;
+		break;
+	case DOUBLE:
+		flag = *(double*) a.value > *(double*) b.value;
+		break;
+	case FLOAT:
+		flag = *(float*) a.value > *(float*) b.value;
+		break;
+	case STRING:
+		flag = strcmp((char*) a.value, (char*) b.value) > 0;
+		break;
+	default:
+		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op gt");
+		break;	
+	}
+	s.push_back(flag);
 }
 
 static void ltVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -504,8 +704,36 @@ static void ltVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
-		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
+		std::cout << " [DEBUG]\t ltvop" << a.id << " + " << b.id << std::endl;
 	
+	bool flag = false;
+	switch (a.type) {
+	case INT:
+		flag = *(int*) a.value < *(int*) b.value;
+		break;
+	case UINT:
+		flag = *(unsigned int*) a.value < *(unsigned int*) b.value;
+		break;
+	case LONG:
+		flag = *(long*) a.value < *(long*) b.value;
+		break;
+	case ULONG:
+		flag = *(unsigned long long*) a.value < *(unsigned long long*) b.value;
+		break;
+	case DOUBLE:
+		flag = *(double*) a.value < *(double*) b.value;
+		break;
+	case FLOAT:
+		flag = *(float*) a.value < *(float*) b.value;
+		break;
+	case STRING:
+		flag = strcmp((char*) a.value, (char*) b.value) < 0;
+		break;
+	default:
+		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op lt");
+		break;	
+	}
+	s.push_back(flag);
 }
 
 static void geVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -516,8 +744,36 @@ static void geVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
-		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
+		std::cout << " [DEBUG]\t gevop" << a.id << " + " << b.id << std::endl;
 	
+	bool flag = false;
+	switch (a.type) {
+	case INT:
+		flag = *(int*) a.value >= *(int*) b.value;
+		break;
+	case UINT:
+		flag = *(unsigned int*) a.value >= *(unsigned int*) b.value;
+		break;
+	case LONG:
+		flag = *(long*) a.value >= *(long*) b.value;
+		break;
+	case ULONG:
+		flag = *(unsigned long long*) a.value >= *(unsigned long long*) b.value;
+		break;
+	case DOUBLE:
+		flag = *(double*) a.value >= *(double*) b.value;
+		break;
+	case FLOAT:
+		flag = *(float*) a.value >= *(float*) b.value;
+		break;
+	case STRING:
+		flag = strcmp((char*) a.value, (char*) b.value) >= 0;
+		break;
+	default:
+		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op ge");
+		break;	
+	}
+	s.push_back(flag);
 }
 
 static void leVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -528,8 +784,36 @@ static void leVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
-		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
+		std::cout << " [DEBUG]\t levop" << a.id << " + " << b.id << std::endl;
 	
+	bool flag = false;
+	switch (a.type) {
+	case INT:
+		flag = *(int*) a.value <= *(int*) b.value;
+		break;
+	case UINT:
+		flag = *(unsigned int*) a.value <= *(unsigned int*) b.value;
+		break;
+	case LONG:
+		flag = *(long*) a.value <= *(long*) b.value;
+		break;
+	case ULONG:
+		flag = *(unsigned long long*) a.value <= *(unsigned long long*) b.value;
+		break;
+	case DOUBLE:
+		flag = *(double*) a.value <= *(double*) b.value;
+		break;
+	case FLOAT:
+		flag = *(float*) a.value <= *(float*) b.value;
+		break;
+	case STRING:
+		flag = strcmp((char*) a.value, (char*) b.value) <= 0;
+		break;
+	default:
+		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op le");
+		break;	
+	}
+	s.push_back(flag);
 }
 
 static void eqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -540,20 +824,43 @@ static void eqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
-		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
+		std::cout << " [DEBUG]\t eqvop" << a.id << " + " << b.id << std::endl;
+
+	bool flag = false;
+	switch (a.type) {
+	case INT:
+		flag = *(int*) a.value == *(int*) b.value;
+		break;
+	case UINT:
+		flag = *(unsigned int*) a.value == *(unsigned int*) b.value;
+		break;
+	case LONG:
+		flag = *(long*) a.value == *(long*) b.value;
+		break;
+	case ULONG:
+		flag = *(unsigned long long*) a.value == *(unsigned long long*) b.value;
+		break;
+	case DOUBLE:
+		flag = *(double*) a.value == *(double*) b.value;
+		break;
+	case FLOAT:
+		flag = *(float*) a.value == *(float*) b.value;
+		break;
+	case STRING:
+		flag = strcmp((char*) a.value, (char*) b.value) == 0;
+		break;
+	default:
+		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op eq");
+		break;	
+	}
+	s.push_back(flag);
 }
 
 static void neqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.back(), gV, lV);
+	eqVOP(s, gV, lV, debug);
+	bool flag = !s.back();
 	s.pop_back();
-	Variable b = get_variable(s.back(), gV, lV);
-	s.pop_back();
-	if (a.type != b.type)
-		throw std::runtime_error("type mismatch");
-	if (debug)
-		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
+	s.push_back(flag);
 }
 
 static void andVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -564,7 +871,33 @@ static void andVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 	if (a.type && b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
-		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
+		std::cout << " [DEBUG]\t andvop" << a.id << " + " << b.id << std::endl;
+
+	bool flag = false;
+	switch (a.type) {
+	case INT:
+		flag = *(int*) a.value && *(int*) b.value;
+		break;
+	case UINT:
+		flag = *(unsigned int*) a.value && *(unsigned int*) b.value;
+		break;
+	case LONG:
+		flag = *(long*) a.value && *(long*) b.value;
+		break;
+	case ULONG:
+		flag = *(unsigned long long*) a.value && *(unsigned long long*) b.value;
+		break;
+	case DOUBLE:
+		flag = *(double*) a.value && *(double*) b.value;
+		break;
+	case FLOAT:
+		flag = *(float*) a.value && *(float*) b.value;
+		break;
+	default:
+		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op and");
+		break;	
+	}
+	s.push_back(flag);
 	
 }
 
@@ -576,8 +909,33 @@ static void orVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 	if (a.type || b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
-		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
+		std::cout << " [DEBUG]\t orvop" << a.id << " + " << b.id << std::endl;
 	
+	bool flag = false;
+	switch (a.type) {
+	case INT:
+		flag = *(int*) a.value || *(int*) b.value;
+		break;
+	case UINT:
+		flag = *(unsigned int*) a.value || *(unsigned int*) b.value;
+		break;
+	case LONG:
+		flag = *(long*) a.value || *(long*) b.value;
+		break;
+	case ULONG:
+		flag = *(unsigned long long*) a.value || *(unsigned long long*) b.value;
+		break;
+	case DOUBLE:
+		flag = *(double*) a.value || *(double*) b.value;
+		break;
+	case FLOAT:
+		flag = *(float*) a.value || *(float*) b.value;
+		break;
+	default:
+		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op or");
+		break;	
+	}
+	s.push_back(flag);
 }
 
 static void printVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -591,7 +949,34 @@ static void printlnVOP(std::vector<int>& s, std::unordered_map<int, Variable>& g
 	std::cout << get_data_value(a.value, a.type) << std::endl;
 }
 static void inputVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	std::cout << "TODO" << std::endl;
+	Variable a = get_variable(s.back(), gV, lV);
+	s.pop_back();
+	switch (a.type) {
+	case INT:
+		std::cin >> *(int*) a.value;
+		break;
+	case UINT:
+		std::cin >> *(unsigned int*) a.value;
+		break;
+	case LONG:
+		std::cin >> *(long*) a.value;
+		break;
+	case ULONG:
+		std::cin >> *(unsigned long long*) a.value;
+		break;
+	case DOUBLE:
+		std::cin >> *(double*) a.value;
+		break;
+	case FLOAT:
+		std::cin >> *(float*) a.value;
+		break;
+	case STRING:
+		std::cin >> *(char*) a.value;
+		break;
+	default:
+		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op input");
+		break;	
+	}
 }
 #endif
 
@@ -678,24 +1063,19 @@ static void callLibProc(std::vector<int>& progStack, Operation op, bool debug = 
 static void loadProcs(std::vector<Operation> ops) {
 	procAddresses.clear();
 	ProcAddr pAddr;
-	bool	 inProc = false;
 	for (int i = 0; i < ops.size(); i++) {
-		if (inProc && ops[i].op == OperationType::PROC) {
-			if (ops[i].arg == -1) {
-				pAddr.eAddr					= i;
-				inProc						= false;
-				procAddresses[pAddr.procId] = pAddr;
-			} else {
-				throw std::runtime_error("proc" + std::to_string(pAddr.procId) + " begin inside another proc error!");
-			}
-		} else if (ops[i].op == OperationType::PROC) {
-			if (ops[i].arg > -1) {
-				pAddr.procId = ops[i].arg;
-				pAddr.bAddr	 = i;
-				inProc		 = true;
-			} else {
-				throw std::runtime_error("proc end without begin error!");
-			}
+		if (ops[i].op == OperationType::PROC && ops[i].arg != -1) {
+			pAddr.procId = ops[i].arg;
+			pAddr.bAddr = i;
+		}
+		else if(ops[i].op == OperationType::PROC && ops[i].arg == -1) {
+			pAddr.eAddr = i;
+			procAddresses[pAddr.procId] = pAddr;
+
+			// TODO: FIXME:
+			std::cout << procAddresses[pAddr.procId] << std::endl;
+			std::cout << procAddresses[0] << std::endl;
+
 		}
 	}
 }
@@ -704,7 +1084,8 @@ static void loadProcs(std::vector<Operation> ops) {
 
 static void simulate_proc(std::vector<int>& progStack, std::vector<Operation> ops, ProcAddr pAddr, bool debug);
 
-static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long* i, int* memory, std::vector<Operation>& ops, bool debug, std::unordered_map<int, Variable>& lVars) {
+static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long long* i, int* memory, std::vector<Operation>& ops, bool debug, std::unordered_map<int, Variable>& lVars) {
+
 	if (debug && false)	   // TMP
 		std::cout << " [DEBUG]\t" << op.op << "\t\t" << op.arg << std::endl;
 	if (debug) {
@@ -1106,7 +1487,7 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 				for (int k = 0; k < count; k++) {
 					if (debug)
 						std::cout << " [DEBUG]\t for " << k + 1 << "/" << count << std::endl;
-					for (unsigned long p = *i + 1; p < end && p >= *i; p++)
+					for (unsigned long long p = *i + 1; p < end && p >= *i; p++)
 						simulate_op(progStack, ops[p], &p, memory, ops, debug, lVars);
 				}
 				*i = end;
@@ -1134,7 +1515,7 @@ static void simulate_proc(std::vector<int>& progStack, std::vector<Operation> op
 	int*							  memory	  = new int[1024];
 	int								  endIdToSkip = 0;
 	std::unordered_map<int, Variable> lVars;
-	for (unsigned long i = pAddr.bAddr + 1; i < pAddr.eAddr; i++) {
+	for (unsigned long long i = pAddr.bAddr + 1; i < pAddr.eAddr; i++) {
 		Operation op = ops[i];
 		if (op.op == OperationType::RET) {
 			if (debug)
@@ -1160,5 +1541,6 @@ void simulate(std::vector<Operation> ops, bool debug) {
 	if (procAddresses.find(0) == procAddresses.end()) {
 		throw std::runtime_error("no main proc!");
 	}
+	std::cout << procAddresses << std::endl;
 	simulate_proc(progStack, ops, procAddresses[0], debug);
 }
