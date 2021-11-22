@@ -3,7 +3,7 @@
 #ifdef _WIN32
 
 std::string get_name() {
-	return "tvoie-win32-v2.0";
+	return "tvoie-win32-v3.0";
 }
 
 #endif
@@ -11,7 +11,7 @@ std::string get_name() {
 #ifdef __unix__
 
 std::string get_name() {
-	return "tvoie-linux-v2.0";
+	return "tvoie-linux-v3.0";
 }
 
 #endif
