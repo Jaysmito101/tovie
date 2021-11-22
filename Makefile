@@ -29,7 +29,7 @@ $(BINARY): $(OBJECT_FILES)
 	$(CC) -o $(BINARY) $(OBJECT_FILES) $(LDFLAGS)
 
 %/:
-	mkdir -p $@
+	mkdir $@
 
 dist/%.o: src/%.cpp
 	$(CC) -c -o $@ $< $(CFLAGS)

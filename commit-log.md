@@ -11,6 +11,9 @@ Format:
 - A breaf reason for the change (optional)
 
 
+# 22-NOV-2021 12:06 pm
+ - Jaysmito Mukherjee
+ - Reimplemented Variable Part 1
 
 # 22-NOV-2021 11:25
  - Jaysmito Mukherjee

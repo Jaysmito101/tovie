@@ -41,6 +41,98 @@ std::ostream& operator<<(std::ostream& os, std::unordered_map<int, Variable> vt)
 	return os;
 }
 
+static void push_variable(std::vector<int>& progStack, Variable& v, bool debug = false) {
+	if (debug)
+		std::cout << " [DEBUG]\t push variable : " << v.id << std::endl;
+	if(v.type == DataType::INT) 
+	{
+		int tmp = *(int*)v.value;
+		progStack.push_back(tmp);
+		return;
+	}
+	else if(v.type == DataType::UINT)
+	{
+		unsigned int tmp = *(unsigned int*)v.value;
+		progStack.push_back(tmp);
+		return;
+	}
+	else if(v.type == DataType::BOOL)
+	{
+		bool tmp = *(bool*)v.value;
+		progStack.push_back(tmp);
+		return;		
+	}
+	else if(v.type == DataType::STRING)
+	{
+		char* data = (char*)v.value;
+		for(int i = 0; i < strlen(data); i++)
+		{
+			progStack.push_back(data[i]);
+		}
+		progStack.push_back(-1);
+		return;
+	}
+	else
+	{
+		int size = get_data_type_size(v.type);
+		unsigned char* data = (unsigned char*)v.value;
+		for (int i = size - 1 ; i >= 0 ;  i--)
+		{
+			progStack.push_back(data[i]);
+		}
+		return;
+	}
+}
+
+static void pop_variable(std::vector<int>& progStack, Variable& v, bool debug = false) {
+	if (debug)
+		std::cout << " [DEBUG]\t pop variable : " << v.id << std::endl;
+	if(v.type == DataType::INT || v.type == DataType::UINT) 
+	{
+		int tmp = progStack.back();
+		progStack.pop_back();
+		memcpy(v.value, &tmp, sizeof(int));
+		return;
+	}
+	else if(v.type == DataType::BOOL)
+	{
+		int tmp = progStack.back();
+		progStack.pop_back();
+		bool val = (bool)tmp;
+		memcpy(v.value, &val, sizeof(bool));
+		return;		
+	}
+	else if(v.type == DataType::STRING)
+	{
+		int size = get_data_type_size(v.type);
+		char* data = (char*) malloc(size);
+		memset(data, 0, size);
+		for (int i = 0; i < size; i++) {
+			int v = progStack.back();
+			progStack.pop_back();
+			if(v == -1)
+				break;
+			data[i] = (char) v;
+		}
+		strrev(data);
+		memcpy(v.value, data, size);
+		delete[] data;
+	}
+	else
+	{
+		int size = get_data_type_size(v.type);
+		unsigned char* data = (unsigned char*)malloc(size);
+		memset(data, 0, size);
+		for(int i = 0; i < size; i++)
+		{
+			data[i] = progStack.back();
+			progStack.pop_back();
+		}
+		memcpy(v.value, data, size);
+		delete[] data;
+	}
+}
+
 // The `#if 1` is just to use code folding in the Editor.
 #if 1
 void print(std::vector<int> vec) {
@@ -347,7 +439,13 @@ static void subVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
+	if(a.type != b.type)
+		throw std::runtime_error("type mismatch");
+	switch (a.type) {
+	case INT:
+		
+		break;
+	}
 }
 
 static void mulVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -602,6 +700,8 @@ static void loadProcs(std::vector<Operation> ops) {
 	}
 }
 
+
+
 static void simulate_proc(std::vector<int>& progStack, std::vector<Operation> ops, ProcAddr pAddr, bool debug);
 
 static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long* i, int* memory, std::vector<Operation>& ops, bool debug, std::unordered_map<int, Variable>& lVars) {
@@ -751,12 +851,12 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 				if (debug)
 					std::cout << " [DEBUG]\t"
 							  << " VAR " << op.arg << " SETV" << std::endl;
-				// TODO
+				push_variable(progStack, v);
 			} else if (op.ops[0] == -2) {
 				if (debug)
 					std::cout << " [DEBUG]\t"
 							  << " VAR " << op.arg << " GETV" << std::endl;
-				// TODO
+				pop_variable(progStack, v);
 			} else {
 				if (debug)
 					std::cout << " [DEBUG]\t"
