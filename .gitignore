@@ -12,4 +12,6 @@ a.txt
 a.exe
 
 bin
+dist
 .vscode
+compile_flags.txt
