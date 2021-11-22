@@ -342,9 +342,9 @@ void transpile(CodeMaker& cm, Operation op) {
 	}
 }
 
-static std::unordered_map<int, ProcAddr> procAddresses;
+static std::vector<ProcAddr>  procAddresses;
 
-static void loadProcs(std::vector<Operation> ops) {
+static void loadProcs(std::vector<Operation>& ops) {
 	procAddresses.clear();
 	ProcAddr pAddr;
 	bool	 inProc = false;
@@ -353,7 +353,7 @@ static void loadProcs(std::vector<Operation> ops) {
 			if (ops[i].arg == -1) {
 				pAddr.eAddr					= i;
 				inProc						= false;
-				procAddresses[pAddr.procId] = pAddr;
+				procAddresses.push_back(pAddr);
 			} else {
 				throw std::runtime_error("proc" + std::to_string(pAddr.procId) + " begin inside another proc error!");
 			}
@@ -384,13 +384,13 @@ std::string tovie2py(std::vector<Operation> ops) {
 	cm.add_line("_runtime_lib = \"\"");
 
 	for (auto& kv : procAddresses) {
-		cm.add_line("# PROC " + std::to_string(kv.first));
-		cm.add_line("def proc_" + std::to_string(kv.first) + "():");
+		cm.add_line("# PROC " + std::to_string(kv.procId));
+		cm.add_line("def proc_" + std::to_string(kv.procId) + "():");
 		cm.begin_block();
 		cm.add_line("global _stack");
 		cm.add_line("global _runtime_lib");
 		cm.add_line("_memory = [0] * 1024");
-		for (int i = kv.second.bAddr + 1; i < kv.second.eAddr; i++) {
+		for (int i = kv.bAddr + 1; i < kv.eAddr; i++) {
 			Operation op = ops[i];
 			cm.add_line("# OP " + std::to_string(i) + " [ " + to_string(op.op) + " " + std::to_string(op.arg) + " ]");
 			transpile(cm, op);

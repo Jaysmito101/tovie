@@ -19,17 +19,24 @@
 
 struct ProcAddr {
 	int			  procId;
-	unsigned long long bAddr, eAddr;
+	unsigned long bAddr, eAddr;
 
 	ProcAddr() {
 		procId = -1;
 		bAddr = eAddr = 0;
 	}
 
-	ProcAddr(int procIdi, unsigned long long bAddri, unsigned long long eAddri) {
+	ProcAddr(int procIdi, unsigned long bAddri, unsigned long eAddri) {
 		procId = procIdi;
 		bAddr	 = bAddri;
 		eAddr	 = eAddri;
+	}
+
+	// copy constructor
+	ProcAddr(const ProcAddr& other) {
+		procId = other.procId;
+		bAddr	 = other.bAddr;
+		eAddr	 = other.eAddr;
 	}
 };
 
@@ -54,7 +61,7 @@ struct Variable {
 	void*	 value;
 };
 
-std::ostream& operator<<(std::ostream& os, std::unordered_map<int, Variable> vt) {
+std::ostream& operator<<(std::ostream& os, std::unordered_map<int, Variable>& vt) {
 	os << "[ ";
 	for (auto it = vt.begin(); it != vt.end(); ++it) {
 		os << "(" << it->second.id << " " << it->second.type << " " << get_data_value(it->second.value, it->second.type) << ") ";
@@ -63,15 +70,15 @@ std::ostream& operator<<(std::ostream& os, std::unordered_map<int, Variable> vt)
 	return os;
 }
 
-std::ostream& operator<<(std::ostream& os, ProcAddr addr){
+std::ostream& operator<<(std::ostream& os, ProcAddr& addr){
 	os << addr.procId << " : " << addr.bAddr << " -> " << addr.eAddr;
 	return os;
 }
 
-std::ostream& operator<<(std::ostream& os, std::unordered_map<int, ProcAddr> pt){
+std::ostream& operator<<(std::ostream& os, std::vector<ProcAddr>& vec){
 	os << "[ ";
-	for (auto it = pt.begin(); it != pt.end(); ++it) {
-		os << "(" << it->second.procId << " " << it->second.bAddr << " " << it->second.eAddr << ") ";
+	for (auto it = vec.begin(); it != vec.end(); ++it) {
+		os << *it << " ";
 	}
 	os << "]";
 	return os;
@@ -459,7 +466,7 @@ static void addVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		*(long*) c.value = *(long*) a.value + *(long*) b.value;
 		break;
 	case ULONG:
-		*(unsigned long long*) c.value = *(unsigned long long*) a.value + *(unsigned long long*) b.value;
+		*(unsigned long*) c.value = *(unsigned long*) a.value + *(unsigned long*) b.value;
 		break;
 	case DOUBLE:
 		*(double*) c.value = *(double*) a.value + *(double*) b.value;
@@ -506,7 +513,7 @@ static void subVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		*(long*) c.value = *(long*) a.value - *(long*) b.value;
 		break;
 	case ULONG:
-		*(unsigned long long*) c.value = *(unsigned long long*) a.value - *(unsigned long long*) b.value;
+		*(unsigned long*) c.value = *(unsigned long*) a.value - *(unsigned long*) b.value;
 		break;
 	case DOUBLE:
 		*(double*) c.value = *(double*) a.value - *(double*) b.value;
@@ -546,7 +553,7 @@ static void mulVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		*(long*) c.value = *(long*) a.value * *(long*) b.value;
 		break;
 	case ULONG:
-		*(unsigned long long*) c.value = *(unsigned long long*) a.value * *(unsigned long long*) b.value;
+		*(unsigned long*) c.value = *(unsigned long*) a.value * *(unsigned long*) b.value;
 		break;
 	case DOUBLE:
 		*(double*) c.value = *(double*) a.value * *(double*) b.value;
@@ -586,7 +593,7 @@ static void divVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		*(long*) c.value = *(long*) a.value / *(long*) b.value;
 		break;
 	case ULONG:
-		*(unsigned long long*) c.value = *(unsigned long long*) a.value / *(unsigned long long*) b.value;
+		*(unsigned long*) c.value = *(unsigned long*) a.value / *(unsigned long*) b.value;
 		break;
 	case DOUBLE:
 		*(double*) c.value = *(double*) a.value / *(double*) b.value;
@@ -626,7 +633,7 @@ static void modVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		*(long*) c.value = *(long*) a.value % *(long*) b.value;
 		break;
 	case ULONG:
-		*(unsigned long long*) c.value = *(unsigned long long*) a.value % *(unsigned long long*) b.value;
+		*(unsigned long*) c.value = *(unsigned long*) a.value % *(unsigned long*) b.value;
 		break;
 	default:
 		throw std::runtime_error("type " + to_string(c.type) + " is not supported for op mod");
@@ -658,7 +665,7 @@ static void gtVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		flag = *(long*) a.value > *(long*) b.value;
 		break;
 	case ULONG:
-		flag = *(unsigned long long*) a.value > *(unsigned long long*) b.value;
+		flag = *(unsigned long*) a.value > *(unsigned long*) b.value;
 		break;
 	case DOUBLE:
 		flag = *(double*) a.value > *(double*) b.value;
@@ -698,7 +705,7 @@ static void ltVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		flag = *(long*) a.value < *(long*) b.value;
 		break;
 	case ULONG:
-		flag = *(unsigned long long*) a.value < *(unsigned long long*) b.value;
+		flag = *(unsigned long*) a.value < *(unsigned long*) b.value;
 		break;
 	case DOUBLE:
 		flag = *(double*) a.value < *(double*) b.value;
@@ -738,7 +745,7 @@ static void geVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		flag = *(long*) a.value >= *(long*) b.value;
 		break;
 	case ULONG:
-		flag = *(unsigned long long*) a.value >= *(unsigned long long*) b.value;
+		flag = *(unsigned long*) a.value >= *(unsigned long*) b.value;
 		break;
 	case DOUBLE:
 		flag = *(double*) a.value >= *(double*) b.value;
@@ -778,7 +785,7 @@ static void leVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		flag = *(long*) a.value <= *(long*) b.value;
 		break;
 	case ULONG:
-		flag = *(unsigned long long*) a.value <= *(unsigned long long*) b.value;
+		flag = *(unsigned long*) a.value <= *(unsigned long*) b.value;
 		break;
 	case DOUBLE:
 		flag = *(double*) a.value <= *(double*) b.value;
@@ -818,7 +825,7 @@ static void eqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		flag = *(long*) a.value == *(long*) b.value;
 		break;
 	case ULONG:
-		flag = *(unsigned long long*) a.value == *(unsigned long long*) b.value;
+		flag = *(unsigned long*) a.value == *(unsigned long*) b.value;
 		break;
 	case DOUBLE:
 		flag = *(double*) a.value == *(double*) b.value;
@@ -865,7 +872,7 @@ static void andVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		flag = *(long*) a.value && *(long*) b.value;
 		break;
 	case ULONG:
-		flag = *(unsigned long long*) a.value && *(unsigned long long*) b.value;
+		flag = *(unsigned long*) a.value && *(unsigned long*) b.value;
 		break;
 	case DOUBLE:
 		flag = *(double*) a.value && *(double*) b.value;
@@ -903,7 +910,7 @@ static void orVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		flag = *(long*) a.value || *(long*) b.value;
 		break;
 	case ULONG:
-		flag = *(unsigned long long*) a.value || *(unsigned long long*) b.value;
+		flag = *(unsigned long*) a.value || *(unsigned long*) b.value;
 		break;
 	case DOUBLE:
 		flag = *(double*) a.value || *(double*) b.value;
@@ -942,7 +949,7 @@ static void inputVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV,
 		std::cin >> *(long*) a.value;
 		break;
 	case ULONG:
-		std::cin >> *(unsigned long long*) a.value;
+		std::cin >> *(unsigned long*) a.value;
 		break;
 	case DOUBLE:
 		std::cin >> *(double*) a.value;
@@ -965,10 +972,18 @@ static void reverse(std::string& str) {
 	std::reverse(str.begin(), str.end());
 }
 
-static std::unordered_map<int, ProcAddr>							   procAddresses;
+static std::vector<ProcAddr>							   procAddresses;
 static std::unordered_map<int, Variable>							   gVars;
 static void*														   runtimeLib = nullptr;
 static std::unordered_map<std::string, std::function<void(int*, int)>> libProcs;
+
+static ProcAddr get_proc_addr(int procId) {
+	for (auto& proc : procAddresses) {
+		if (proc.procId == procId)
+			return proc;
+	}
+	throw std::runtime_error("proc " + std::to_string(procId) + " not found");
+}
 
 static void clearVars(std::unordered_map<int, Variable>& v) {
 	for (auto& it : v) {
@@ -1040,30 +1055,35 @@ static void callLibProc(std::vector<int>& progStack, Operation op, bool debug = 
 	libProcs[libProcName](progStack.data(), progStack.size());
 }
 
-static void loadProcs(std::vector<Operation> ops) {
+static void loadProcs(std::vector<Operation>& ops) {
 	procAddresses.clear();
 	ProcAddr pAddr;
+	bool	 inProc = false;
 	for (int i = 0; i < ops.size(); i++) {
-		if (ops[i].op == OperationType::PROC && ops[i].arg != -1) {
-			pAddr.procId = ops[i].arg;
-			pAddr.bAddr = i;
-		}
-		else if(ops[i].op == OperationType::PROC && ops[i].arg == -1) {
-			pAddr.eAddr = i;
-			procAddresses[pAddr.procId] = pAddr;
-
-			// TODO: FIXME:
-			std::cout << procAddresses[pAddr.procId] << std::endl;
-			std::cout << procAddresses[0] << std::endl;
-
+		if (inProc && ops[i].op == OperationType::PROC) {
+			if (ops[i].arg == -1) {
+				pAddr.eAddr					= i;
+				inProc						= false;
+				procAddresses.push_back(pAddr);
+			} else {
+				throw std::runtime_error("proc" + std::to_string(pAddr.procId) + " begin inside another proc error!");
+			}
+		} else if (ops[i].op == OperationType::PROC) {
+			if (ops[i].arg > -1) {
+				pAddr.procId = ops[i].arg;
+				pAddr.bAddr	 = i;
+				inProc		 = true;
+			} else {
+				throw std::runtime_error("proc end without begin error!");
+			}
 		}
 	}
 }
 
 
-static void simulate_proc(std::vector<int>& progStack, std::vector<Operation> ops, ProcAddr pAddr, bool debug);
+static void simulate_proc(std::vector<int>& progStack, std::vector<Operation>& ops, ProcAddr& pAddr, bool debug);
 
-static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long long* i, int* memory, std::vector<Operation>& ops, bool debug, std::unordered_map<int, Variable>& lVars) {
+static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long* i, int* memory, std::vector<Operation>& ops, bool debug, std::unordered_map<int, Variable>& lVars) {
 
 	if (debug && false)	   // TMP
 		std::cout << " [DEBUG]\t" << op.op << "\t\t" << op.arg << std::endl;
@@ -1291,10 +1311,8 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 			progStack.pop_back();
 			if (debug)
 				std::cout << " [DEBUG]\tcall proc_" << procId << std::endl;
-			if (procAddresses.find(procId) == procAddresses.end()) {
-				throw std::runtime_error("proc_" + std::to_string(procId) + " not found!");
-			}
-			simulate_proc(progStack, ops, procAddresses[procId], debug);
+			ProcAddr pAddr = get_proc_addr(procId);
+			simulate_proc(progStack, ops, pAddr, debug);
 			break;
 		}
 		case OperationType::NCALL: {
@@ -1466,7 +1484,7 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 				for (int k = 0; k < count; k++) {
 					if (debug)
 						std::cout << " [DEBUG]\t for " << k + 1 << "/" << count << std::endl;
-					for (unsigned long long p = *i + 1; p < end && p >= *i; p++)
+					for (unsigned long p = *i + 1; p < end && p >= *i; p++)
 						simulate_op(progStack, ops[p], &p, memory, ops, debug, lVars);
 				}
 				*i = end;
@@ -1490,11 +1508,11 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 }
 
 
-static void simulate_proc(std::vector<int>& progStack, std::vector<Operation> ops, ProcAddr pAddr, bool debug) {
+static void simulate_proc(std::vector<int>& progStack, std::vector<Operation>& ops, ProcAddr& pAddr, bool debug) {
 	int*							  memory	  = new int[1024];
 	int								  endIdToSkip = 0;
 	std::unordered_map<int, Variable> lVars;
-	for (unsigned long long i = pAddr.bAddr + 1; i < pAddr.eAddr; i++) {
+	for (unsigned long i = pAddr.bAddr + 1; i < pAddr.eAddr; i++) {
 		Operation op = ops[i];
 		if (op.op == OperationType::RET) {
 			if (debug)
@@ -1517,9 +1535,6 @@ void simulate(std::vector<Operation> ops, bool debug) {
 	runtimeLib = nullptr;
 	std::vector<int> progStack;
 	progStack.push_back(0);
-	if (procAddresses.find(0) == procAddresses.end()) {
-		throw std::runtime_error("no main proc!");
-	}
-	std::cout << procAddresses << std::endl;
-	simulate_proc(progStack, ops, procAddresses[0], debug);
+	ProcAddr pAddr = get_proc_addr(0);
+	simulate_proc(progStack, ops, pAddr, debug);
 }

@@ -212,11 +212,11 @@ void* allocate_data_type(DataType type, int max_str_size) {
 		case FLOAT:
 			return new float;
 		case LONG:
-			return new long long;
+			return new long;
 		case UINT:
 			return new unsigned int;
 		case ULONG:
-			return new unsigned long long;
+			return new unsigned long;
 		case DOUBLE:
 			return new double;
 		case STRING:
@@ -237,13 +237,13 @@ void deallocate_data_type(void* data, DataType type) {
 			delete (float*)data;
 			break;
 		case LONG:
-			delete (long long*)data;
+			delete (long*)data;
 			break;
 		case UINT:
 			delete (unsigned int*)data;
 			break;
 		case ULONG:
-			delete (unsigned long long*)data;
+			delete (unsigned long*)data;
 			break;
 		case DOUBLE:
 			delete (double*)data;
@@ -266,11 +266,11 @@ int get_data_type_size(DataType type) {
 		case FLOAT:
 			return sizeof(float);
 		case LONG:
-			return sizeof(long long);
+			return sizeof(long);
 		case UINT:
 			return sizeof(unsigned int);
 		case ULONG:
-			return sizeof(unsigned long long);
+			return sizeof(unsigned long);
 		case DOUBLE:
 			return sizeof(double);
 		case STRING:
@@ -301,11 +301,11 @@ std::string get_data_value(void* data, DataType type) {
 		case FLOAT:
 			return std::to_string(*(float*)data);
 		case LONG:
-			return std::to_string(*(long long*)data);
+			return std::to_string(*(long*)data);
 		case UINT:
 			return std::to_string(*(unsigned int*)data);
 		case ULONG:
-			return std::to_string(*(unsigned long long*)data);
+			return std::to_string(*(unsigned long*)data);
 		case DOUBLE:
 			return std::to_string(*(double*)data);
 		case STRING:

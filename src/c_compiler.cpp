@@ -552,9 +552,9 @@ static void transpile(CodeMaker& cm, Operation op) {
 	}
 }
 
-static std::unordered_map<int, ProcAddr> procAddresses;
+static std::vector<ProcAddr>  procAddresses;
 
-static void loadProcs(std::vector<Operation> ops) {
+static void loadProcs(std::vector<Operation>& ops) {
 	procAddresses.clear();
 	ProcAddr pAddr;
 	bool	 inProc = false;
@@ -563,7 +563,7 @@ static void loadProcs(std::vector<Operation> ops) {
 			if (ops[i].arg == -1) {
 				pAddr.eAddr					= i;
 				inProc						= false;
-				procAddresses[pAddr.procId] = pAddr;
+				procAddresses.push_back(pAddr);
 			} else {
 				throw std::runtime_error("proc" + std::to_string(pAddr.procId) + " begin inside another proc error!");
 			}
@@ -632,7 +632,7 @@ std::string tovie2c(std::vector<Operation> ops) {
 
 	// proc_defs
 	for (auto& kv : procAddresses) {
-		cm.add_line("void proc_" + std::to_string(kv.first) + "();");
+		cm.add_line("void proc_" + std::to_string(kv.procId) + "();");
 	}
 
 	cm.add_line("");
@@ -647,7 +647,7 @@ std::string tovie2c(std::vector<Operation> ops) {
 	cm.add_line("{");
 	cm.begin_block();
 	for (auto& kv : procAddresses) {
-		cm.add_line("case " + std::to_string(kv.first) + ": proc_" + std::to_string(kv.first) + "(); break;");
+		cm.add_line("case " + std::to_string(kv.procId) + ": proc_" + std::to_string(kv.procId) + "(); break;");
 	}
 	cm.add_line("default : printf(\"proc %d not found error!\", n); exit(-1);");
 	cm.end_block();
@@ -657,8 +657,8 @@ std::string tovie2c(std::vector<Operation> ops) {
 
 
 	for (auto& kv : procAddresses) {
-		cm.add_line("// PROC " + std::to_string(kv.first));
-		cm.add_line("void proc_" + std::to_string(kv.first) + "()");
+		cm.add_line("// PROC " + std::to_string(kv.procId));
+		cm.add_line("void proc_" + std::to_string(kv.procId) + "()");
 		cm.add_line("{");
 		cm.begin_block();
 		cm.add_line("int* _memory = malloc(1024 * sizeof(int));");
@@ -666,7 +666,7 @@ std::string tovie2c(std::vector<Operation> ops) {
 		cm.add_line("int stackA, stackB, memAddr, memSize, length, iterStart, iterA, iterB, count, back;");
 		cm.add_line("char t_str[MAX_ISTR];");
 		cm.add_line("TovieNativeFunc func;");
-		for (int i = kv.second.bAddr + 1; i < kv.second.eAddr; i++) {
+		for (int i = kv.bAddr + 1; i < kv.eAddr; i++) {
 			Operation op = ops[i];
 			cm.add_line("// OP " + std::to_string(i) + " [ " + to_string(op.op) + " " + std::to_string(op.arg) + " ]");
 			transpile(cm, op);
