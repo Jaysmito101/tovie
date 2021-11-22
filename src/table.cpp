@@ -1,4 +1,4 @@
-#include "tovied.hpp"
+#include "table.hpp"
 
 std::string generate_op_table(std::vector<Operation> ops) {
 	std::string opt = "Operation Table : \n\n\n";

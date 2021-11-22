@@ -1,6 +1,6 @@
-#include "tovies.hpp"
+#include "vm.hpp"
 
-#include "tovie_runtimelib.hpp"
+#include "runtimelib.hpp"
 
 #include <algorithm>
 #include <cstdlib>
@@ -1239,7 +1239,7 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 				if (debug)
 					std::cout << " [DEBUG]\t"
 							  << " VAR " << op.arg << " VOP" << std::endl;
-				OperationType vop = to_operation_type(op.ops[0]);
+				OperationType vop = (OperationType) op.ops[0];
 				switch (vop) {
 					case OperationType::ADD: {
 						addVOP(progStack, lVars, gVars, debug);

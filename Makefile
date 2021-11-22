@@ -1,4 +1,4 @@
-ifeq ($(OS),Windows_NT)     # is Windows_NT on XP, 2000, 7, Vista, 10...
+ifeq ($(OS),Windows_NT)
     SYSTEM := Windows
 else
     SYSTEM := $(shell uname) # Linux etc.
@@ -17,19 +17,19 @@ CC := g++
 CFLAGS := -std=c++11 -Iinclude
 LDFLAGS :=
 ifneq ($(SYSTEM), Windows)
-	LDFLAGS := -ldl
+	LDFLAGS += -ldl
 endif
 
-all: bin dist $(BINARY)
+build: bin/ dist/ $(BINARY)
+
+clean:
+	rm -rf dist bin
 
 $(BINARY): $(OBJECT_FILES)
 	$(CC) -o $(BINARY) $(OBJECT_FILES) $(LDFLAGS)
 
-bin:
-	mkdir bin
-
-dist:
-	mkdir dist
+%/:
+	mkdir -p $@
 
 dist/%.o: src/%.cpp
 	$(CC) -c -o $@ $< $(CFLAGS)
