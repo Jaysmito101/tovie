@@ -20,7 +20,7 @@ ifneq ($(SYSTEM), Windows)
 	LDFLAGS += -ldl
 endif
 
-build: bin/ dist/ $(BINARY)
+build: bin dist $(BINARY)
 
 clean:
 	rm -rf dist bin
@@ -28,8 +28,8 @@ clean:
 $(BINARY): $(OBJECT_FILES)
 	$(CC) -o $(BINARY) $(OBJECT_FILES) $(LDFLAGS)
 
-%/:
-	mkdir $@
+bin dist:
+	mkdir -p bin dist
 
 dist/%.o: src/%.cpp
 	$(CC) -c -o $@ $< $(CFLAGS)

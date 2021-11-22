@@ -104,9 +104,9 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 		varId = 0;
 		vars.clear();
 	}
-	std::vector<Operation>&						 operations = ioperations;
-	std::unordered_map<std::string, std::string>& defs = idefs;
-	std::vector<std::string>					 tokens = lexpp::lex(input, " \t\r\n");
+	std::vector<Operation>&						  operations = ioperations;
+	std::unordered_map<std::string, std::string>& defs		 = idefs;
+	std::vector<std::string>					  tokens	 = lexpp::lex(input, " \t\r\n");
 	if (isInclude) {
 		defs	   = idefs;
 		operations = ioperations;

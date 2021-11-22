@@ -26,6 +26,21 @@ struct ProcAddr {
 	}
 };
 
+#ifdef __unix__
+char* strrev(char* str) {
+	char *p1, *p2;
+
+	if (!str || !*str)
+		return str;
+	for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2) {
+		*p1 ^= *p2;
+		*p2 ^= *p1;
+		*p1 ^= *p2;
+	}
+	return str;
+}
+#endif
+
 struct Variable {
 	DataType type;
 	int		 id;
@@ -44,40 +59,29 @@ std::ostream& operator<<(std::ostream& os, std::unordered_map<int, Variable> vt)
 static void push_variable(std::vector<int>& progStack, Variable& v, bool debug = false) {
 	if (debug)
 		std::cout << " [DEBUG]\t push variable : " << v.id << std::endl;
-	if(v.type == DataType::INT) 
-	{
-		int tmp = *(int*)v.value;
+	if (v.type == DataType::INT) {
+		int tmp = *(int*) v.value;
 		progStack.push_back(tmp);
 		return;
-	}
-	else if(v.type == DataType::UINT)
-	{
-		unsigned int tmp = *(unsigned int*)v.value;
+	} else if (v.type == DataType::UINT) {
+		unsigned int tmp = *(unsigned int*) v.value;
 		progStack.push_back(tmp);
 		return;
-	}
-	else if(v.type == DataType::BOOL)
-	{
-		bool tmp = *(bool*)v.value;
+	} else if (v.type == DataType::BOOL) {
+		bool tmp = *(bool*) v.value;
 		progStack.push_back(tmp);
-		return;		
-	}
-	else if(v.type == DataType::STRING)
-	{
-		char* data = (char*)v.value;
-		for(int i = 0; i < strlen(data); i++)
-		{
+		return;
+	} else if (v.type == DataType::STRING) {
+		char* data = (char*) v.value;
+		for (int i = 0; i < strlen(data); i++) {
 			progStack.push_back(data[i]);
 		}
 		progStack.push_back(-1);
 		return;
-	}
-	else
-	{
-		int size = get_data_type_size(v.type);
-		unsigned char* data = (unsigned char*)v.value;
-		for (int i = size - 1 ; i >= 0 ;  i--)
-		{
+	} else {
+		int			   size = get_data_type_size(v.type);
+		unsigned char* data = (unsigned char*) v.value;
+		for (int i = size - 1; i >= 0; i--) {
 			progStack.push_back(data[i]);
 		}
 		return;
@@ -87,44 +91,36 @@ static void push_variable(std::vector<int>& progStack, Variable& v, bool debug =
 static void pop_variable(std::vector<int>& progStack, Variable& v, bool debug = false) {
 	if (debug)
 		std::cout << " [DEBUG]\t pop variable : " << v.id << std::endl;
-	if(v.type == DataType::INT || v.type == DataType::UINT) 
-	{
+	if (v.type == DataType::INT || v.type == DataType::UINT) {
 		int tmp = progStack.back();
 		progStack.pop_back();
 		memcpy(v.value, &tmp, sizeof(int));
 		return;
-	}
-	else if(v.type == DataType::BOOL)
-	{
+	} else if (v.type == DataType::BOOL) {
 		int tmp = progStack.back();
 		progStack.pop_back();
-		bool val = (bool)tmp;
+		bool val = (bool) tmp;
 		memcpy(v.value, &val, sizeof(bool));
-		return;		
-	}
-	else if(v.type == DataType::STRING)
-	{
-		int size = get_data_type_size(v.type);
+		return;
+	} else if (v.type == DataType::STRING) {
+		int	  size = get_data_type_size(v.type);
 		char* data = (char*) malloc(size);
 		memset(data, 0, size);
 		for (int i = 0; i < size; i++) {
 			int v = progStack.back();
 			progStack.pop_back();
-			if(v == -1)
+			if (v == -1)
 				break;
 			data[i] = (char) v;
 		}
 		strrev(data);
 		memcpy(v.value, data, size);
 		delete[] data;
-	}
-	else
-	{
-		int size = get_data_type_size(v.type);
-		unsigned char* data = (unsigned char*)malloc(size);
+	} else {
+		int			   size = get_data_type_size(v.type);
+		unsigned char* data = (unsigned char*) malloc(size);
 		memset(data, 0, size);
-		for(int i = 0; i < size; i++)
-		{
+		for (int i = 0; i < size; i++) {
 			data[i] = progStack.back();
 			progStack.pop_back();
 		}
@@ -427,7 +423,6 @@ static void addVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
 }
 
 static void subVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -439,12 +434,12 @@ static void subVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	if(a.type != b.type)
+	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	switch (a.type) {
-	case INT:
-		
-		break;
+		case INT:
+
+			break;
 	}
 }
 
@@ -457,7 +452,6 @@ static void mulVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
 }
 
 static void divVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -469,7 +463,6 @@ static void divVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
 }
 
 static void modVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -481,7 +474,6 @@ static void modVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
 }
 
 static void gtVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -493,7 +485,6 @@ static void gtVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
 }
 
 static void ltVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -505,7 +496,6 @@ static void ltVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
 }
 
 static void geVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -517,7 +507,6 @@ static void geVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
 }
 
 static void leVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -529,7 +518,6 @@ static void leVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
 }
 
 static void eqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -541,7 +529,6 @@ static void eqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
 }
 
 static void neqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -553,7 +540,6 @@ static void neqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
 }
 
 static void andVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -565,7 +551,6 @@ static void andVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
 }
 
 static void orVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -577,7 +562,6 @@ static void orVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	
 }
 
 static void printVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -699,7 +683,6 @@ static void loadProcs(std::vector<Operation> ops) {
 		}
 	}
 }
-
 
 
 static void simulate_proc(std::vector<int>& progStack, std::vector<Operation> ops, ProcAddr pAddr, bool debug);
