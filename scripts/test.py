@@ -5,9 +5,6 @@ import subprocess
 def is_windows():
     return sys.platform == 'win32'
 
-def get_absolute_path(relative_path):
-    return os.path.abspath(relative_path)
-
 FILES = [
     os.path.join('examples', "helloworld.tovie"),
     os.path.join('examples', "helloworld2.tovie"),
@@ -16,13 +13,7 @@ FILES = [
     os.path.join('examples', "1to10.tovie")
 ]
 
-def path_join(a, b):
-    if is_windows():
-        return a + "\\" + b
-    else:
-        return a + "/" + b
-
-BIN_PATH =  path_join("bin", "tovie")
+BIN_PATH =  os.path.join("bin", "tovie")
 
 def test_op(op = "com"):
     global FILES
@@ -31,7 +22,7 @@ def test_op(op = "com"):
         print(BIN_PATH + " " + op + " " + file)
         retcode = 0
         if is_windows():
-            retcode = subprocess.call(BIN_PATH + " " + op + " " + file)
+            retcode = subprocess.call(BIN_PATH + ".exe " + op + " " + file)
         else:
             retcode = subprocess.call(["./" + BIN_PATH, op, "./" + file])
         if retcode != 0:

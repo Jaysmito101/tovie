@@ -5,9 +5,9 @@ else
 endif
 
 ifeq ($(SYSTEM), Windows)
-	BINARY := tovie.exe
+	BINARY := bin/tovie.exe
 else
-	BINARY := tovie
+	BINARY := bin/tovie
 endif
 
 SOURCE_FILES := $(wildcard src/*.cpp)
@@ -20,10 +20,10 @@ ifneq ($(SYSTEM), Windows)
 	LDFLAGS := -ldl
 endif
 
-all: bin dist bin/tovie
+all: bin dist $(BINARY)
 
-bin/tovie: $(OBJECT_FILES)
-	$(CC) -o bin/toviec $(OBJECT_FILES) $(LDFLAGS)
+$(BINARY): $(OBJECT_FILES)
+	$(CC) -o $(BINARY) $(OBJECT_FILES) $(LDFLAGS)
 
 bin:
 	mkdir bin
