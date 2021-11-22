@@ -99,12 +99,11 @@ static std::string read_lib(const std::string& lib_name, std::vector<std::string
 static std::unordered_map<std::string, int> vars;
 static int									varId;
 
-std::vector<Operation> parse(std::string& input, std::string& includePath, std::vector<Operation>& ioperations, std::unordered_map<std::string, std::string>& idefs, bool isInclude) {
+std::vector<Operation> parse(std::string input, std::vector<std::string> includePaths, std::vector<Operation> ioperations, std::unordered_map<std::string, std::string> idefs, bool isInclude) {
 	if (!isInclude) {
 		varId = 0;
 		vars.clear();
 	}
-	std::vector<std::string>					 includePaths = lexpp::lex(includePath, ";");
 	std::vector<Operation>						 operations;
 	std::unordered_map<std::string, std::string> defs;
 	std::vector<std::string>					 tokens = lexpp::lex(input, " \t\r\n");
@@ -131,7 +130,7 @@ std::vector<Operation> parse(std::string& input, std::string& includePath, std::
 			bool		isIncludeOK = false;
 			std::string libSrc		= read_lib(token.substr(9, token.size() - 2), includePaths, &isIncludeOK);
 			if (isIncludeOK) {
-				parse(libSrc, includePath, operations, defs, true);
+				parse(libSrc, includePaths, operations, defs, true);
 			} else {
 				throw std::runtime_error("include " + token.substr(9, token.size() - 2) + " error");
 			}
