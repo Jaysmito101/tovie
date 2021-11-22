@@ -32,7 +32,7 @@ def compile_files(files):
     if(not is_windows()):
         extra = "-lstdc++ -Wl,--no-as-needed -ldl"
     print("g++ -std=c++11 " + extra + " -o ./bin/" + TARGET_NAME  + target_extension +  " " + files_str)
-    retcode = os.system("g++ -std=c++11 " + extra + " -o ./bin/" + TARGET_NAME  + target_extension +  " " + files_str)
+    retcode = os.system("g++ -I ⁹./include -std=c++11 " + extra + " -o ./bin/" + TARGET_NAME  + target_extension +  " " + files_str)
     if(retcode != 0):
         print("Compilation failed")
         exit(-1)
