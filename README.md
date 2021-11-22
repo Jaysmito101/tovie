@@ -140,6 +140,27 @@ An Advanced Programming Language (Compiler + Interpreter + Transpiler ).
     	end_while
     proc_end
 
+# How to install and use tovie?
+
+Requirements:
+- git (optional)
+- make
+- g++
+
+You have to download this repository, you go to *tags* and download the latest version or use `git clone`:
+```
+$ git clone https://github.com/Jaysmito101/tovie
+$ cd tovie
+```
+
+To build **tovie** just run `make`:
+```
+$ make
+```
+
+Your built `tovie` executable (or `tovie.exe` on windows) is in `bin`, run `tovie -h` to print a help message.
+
+> *Have fun using Tovie!*
 
 # Support
 
