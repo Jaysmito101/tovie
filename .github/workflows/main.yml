@@ -29,7 +29,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run build script
-        run: python scripts/compile.py TOVIE_LINUX
+        run: make
       
       - name: Run Tests
         run: python scripts/test.py
@@ -37,9 +37,9 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
-             name: Linux Build
-             path: bin/tovie
-             retention-days: 7
+          name: Linux Build
+          path: bin/tovie
+          retention-days: 7
         
   Windows:
     # The type of runner that the job will run on
@@ -54,14 +54,14 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run build script
-        run: python scripts/compile.py TOVIE_WIN32
-      
+        run: make
+   
       - name: Run Tests
         run: python scripts/test.py
         
       - name: Upload Artifact 
         uses: actions/upload-artifact@v2
         with:
-             name: Windows Build
-             path: bin/tovie.exe
-             retention-days: 7
+          name: Windows Build
+          path: bin/tovie.exe
+          retention-days: 7
