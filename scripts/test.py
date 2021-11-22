@@ -24,7 +24,7 @@ def test_op(op = "com"):
         if is_windows():
             retcode = subprocess.call(BIN_PATH + ".exe " + op + " " + file)
         else:
-            retcode = subprocess.call(["./" + BIN_PATH, op, "./" + file])
+            retcode = subprocess.call(["./" + BIN_PATH, *op.split(" "), file])
         if retcode != 0:
             print("Test Failed")
             exit(-1)
@@ -32,19 +32,19 @@ def test_op(op = "com"):
 def test():
     print("\n\n")
     print("Testing compiler ...")
-    test_op("com")
+    test_op("")
 
     print("\n\n")
     print("Testing interpreter ...")
-    test_op("sis")
+    test_op("-r")
 
     print("\n\n")
     print("Testing python transpiler ...")
-    test_op("t2p")
+    test_op("-f python")
 
     print("\n\n")
     print("Testing c transpiler ...")
-    test_op("t2c")
+    test_op("-f c")
 
 if __name__ == "__main__":
     print("Starting tests ...")
