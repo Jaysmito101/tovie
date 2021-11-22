@@ -281,6 +281,7 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 			} else if (token == "input") {
 				op.arg = OperationType::INPUTI;
 			}
+			operations.push_back(op);
 		} else if (token[0] == '<') {
 			token = token.substr(1);
 			if (vars.find(token) == vars.end()) {

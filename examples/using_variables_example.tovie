@@ -1,0 +1,19 @@
+def<p2 1>
+dec hello1:double
+dec hello2:double
+dec hello3:double
+proc_main
+	-454.00
+	>hello1
+	100.0
+	>hello2
+	&hello1 &hello2 $+
+	>hello3 &hello3 $println
+	&hello1 $println
+	&hello1 &hello2 $/
+	>hello3 &hello3 $println
+proc_end
+
+proc_p2
+	"Hello" 5 puts
+proc_end

@@ -926,16 +926,22 @@ static void orVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 }
 
 static void printVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	if(debug)
+		std::cout << " [DEBUG]\t printvop" << std::endl;
 	Variable a = get_variable(s.back(), gV, lV);
 	s.pop_back();
 	std::cout << get_data_value(a.value, a.type);
 }
 static void printlnVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	if(debug)
+		std::cout << " [DEBUG]\t printlnvop" << std::endl;
 	Variable a = get_variable(s.back(), gV, lV);
 	s.pop_back();
 	std::cout << get_data_value(a.value, a.type) << std::endl;
 }
 static void inputVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	if(debug)
+		std::cout << " [DEBUG]\t inputvop" << std::endl;
 	Variable a = get_variable(s.back(), gV, lV);
 	s.pop_back();
 	switch (a.type) {
@@ -1225,7 +1231,7 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 				v  = lVars[op.arg];
 				tp = true;
 			}
-			if (!tp)
+			if (!tp && (op.ops[0] == -1 || op.ops[0] == -2) )
 				throw std::runtime_error("variable not found error");
 			if (op.ops[0] == -1) {
 				if (debug)
@@ -1238,10 +1244,11 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 							  << " VAR " << op.arg << " GETV" << std::endl;
 				pop_variable(progStack, v);
 			} else {
+				OperationType vop = (OperationType) op.arg;
 				if (debug)
 					std::cout << " [DEBUG]\t"
-							  << " VAR " << op.arg << " VOP" << std::endl;
-				OperationType vop = (OperationType) op.ops[0];
+							  << " VAR " << op.arg << " VOP " << vop << std::endl;
+
 				switch (vop) {
 					case OperationType::ADD: {
 						addVOP(progStack, lVars, gVars, debug);
