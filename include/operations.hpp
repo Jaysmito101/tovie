@@ -62,17 +62,13 @@ std::ostream& operator<<(std::ostream& os, OperationType type);
 
 enum DataType {
 	UNKNOWN = 0,
-	I8,
-	I16,
-	I32,
-	I64,
-	U8,
-	U16,
-	U32,
-	U64,
-	F32,
-	F64,
-	STR,
+	INT,
+	LONG,
+	UINT,
+	ULONG,
+	FLOAT,
+	DOUBLE,
+	STRING,
 	BOOL,
 	DATA_TYPE_COUNT
 };

@@ -122,32 +122,22 @@ std::ostream& operator<<(std::ostream& os, OperationType type) {
 
 std::string to_string(DataType type) {
 	switch (type) {
-		case I8:
-			return "I8";
-		case I16:
-			return "I16";
-		case I32:
-			return "I32";
-		case I64:
-			return "I64";
-		case U8:
-			return "U8";
-		case U16:
-			return "U16";
-		case U32:
-			return "U32";
-		case U64:
-			return "U64";
-		case F32:
-			return "F32";
-		case F64:
-			return "F64";
-		case STR:
-			return "STR";
+		case INT:
+			return "INT";
+		case FLOAT:
+			return "FLOAT";
+		case LONG:
+			return "LONG";
+		case UINT:
+			return "UINT";
+		case ULONG:
+			return "ULONG";
+		case DOUBLE:
+			return "DOUBLE";
+		case STRING:
+			return "STRING";
 		case BOOL:
 			return "BOOL";
-		case DATA_TYPE_COUNT:
-			return "DATA_TYPE_COUNT";
 		default:
 			return "UNKNOWN";
 	}
@@ -168,71 +158,44 @@ std::ostream& operator<<(std::ostream& os, DataType type) {
 
 DataType to_data_type(std::string token) {
 	token = to_upper(token);
-	if (token == "I8") {
-		return I8;
-	}
-	if (token == "I16") {
-		return I16;
-	}
-	if (token == "I32") {
-		return I32;
-	}
-	if (token == "I64") {
-		return I64;
-	}
-	if (token == "U8") {
-		return U8;
-	}
-	if (token == "U16") {
-		return U16;
-	}
-	if (token == "U32") {
-		return U32;
-	}
-	if (token == "U64") {
-		return U64;
-	}
-	if (token == "F32") {
-		return F32;
-	}
-	if (token == "F64") {
-		return F64;
-	}
-	if (token == "STR") {
-		return STR;
-	}
-	if (token == "BOOL") {
+	if (token == "INT") {
+		return INT;
+	} else if (token == "FLOAT") {
+		return FLOAT;
+	} else if (token == "LONG") {
+		return LONG;
+	} else if (token == "UINT") {
+		return UINT;
+	} else if (token == "ULONG") {
+		return ULONG;
+	} else if (token == "DOUBLE") {
+		return DOUBLE;
+	} else if (token == "STRING") {
+		return STRING;
+	} else if (token == "BOOL") {
 		return BOOL;
+	} else {
+		return UNKNOWN;
 	}
-	return UNKNOWN;
 }
 
 DataType to_data_type(int type) {
-	std::cout << "to_data_type(" << type << ")" << std::endl;
 	switch (type) {
-		case 1:
-			return I8;
-		case 2:
-			return I16;
-		case 3:
-			return I32;
-		case 4:
-			return I64;
-		case 5:
-			return U8;
-		case 6:
-			return U16;
-		case 7:
-			return U32;
-		case 8:
-			return U64;
-		case 9:
-			return F32;
-		case 10:
-			return F64;
-		case 11:
-			return STR;
-		case 12:
+		case INT:
+			return INT;
+		case FLOAT:
+			return FLOAT;
+		case LONG:
+			return LONG;
+		case UINT:
+			return UINT;
+		case ULONG:
+			return ULONG;
+		case DOUBLE:
+			return DOUBLE;
+		case STRING:
+			return STRING;
+		case BOOL:
 			return BOOL;
 		default:
 			return UNKNOWN;
@@ -244,28 +207,20 @@ static int max_str_size_i = 4096;
 void* allocate_data_type(DataType type, int max_str_size) {
 	max_str_size_i = max_str_size;
 	switch (type) {
-		case I8:
-			return new char;
-		case I16:
-			return new short;
-		case I32:
+		case INT:
 			return new int;
-		case I64:
-			return new long long;
-		case U8:
-			return new unsigned char;
-		case U16:
-			return new unsigned short;
-		case U32:
-			return new unsigned int;
-		case U64:
-			return new unsigned long long;
-		case F32:
+		case FLOAT:
 			return new float;
-		case F64:
+		case LONG:
+			return new long long;
+		case UINT:
+			return new unsigned int;
+		case ULONG:
+			return new unsigned long long;
+		case DOUBLE:
 			return new double;
-		case STR:
-			return new char[max_str_size];
+		case STRING:
+			return new char[max_str_size_i];
 		case BOOL:
 			return new bool;
 		default:
@@ -275,69 +230,51 @@ void* allocate_data_type(DataType type, int max_str_size) {
 
 void deallocate_data_type(void* data, DataType type) {
 	switch (type) {
-		case I8:
-			delete (char*) data;
+		case INT:
+			delete (int*)data;
 			break;
-		case I16:
-			delete (short*) data;
+		case FLOAT:
+			delete (float*)data;
 			break;
-		case I32:
-			delete (int*) data;
+		case LONG:
+			delete (long long*)data;
 			break;
-		case I64:
-			delete (long long*) data;
+		case UINT:
+			delete (unsigned int*)data;
 			break;
-		case U8:
-			delete (unsigned char*) data;
+		case ULONG:
+			delete (unsigned long long*)data;
 			break;
-		case U16:
-			delete (unsigned short*) data;
+		case DOUBLE:
+			delete (double*)data;
 			break;
-		case U32:
-			delete (unsigned int*) data;
-			break;
-		case U64:
-			delete (unsigned long long*) data;
-			break;
-		case F32:
-			delete (float*) data;
-			break;
-		case F64:
-			delete (double*) data;
-			break;
-		case STR:
-			delete[](char*) data;
+		case STRING:
+			delete[] (char*)data;
 			break;
 		case BOOL:
-			delete (bool*) data;
+			delete (bool*)data;
+			break;
+		default:
 			break;
 	}
 }
 
 int get_data_type_size(DataType type) {
 	switch (type) {
-		case I8:
-			return sizeof(char);
-		case I16:
-			return sizeof(short);
-		case I32:
+		case INT:
 			return sizeof(int);
-		case I64:
-			return sizeof(long long);
-		case U8:
-			return sizeof(unsigned char);
-		case U16:
-			return sizeof(unsigned short);
-		case U32:
-			return sizeof(unsigned int);
-		case U64:
-			return sizeof(unsigned long long);
-		case F32:
+		case FLOAT:
 			return sizeof(float);
-		case F64:
+		case LONG:
+			return sizeof(long long);
+		case UINT:
+			return sizeof(unsigned int);
+		case ULONG:
+			return sizeof(unsigned long long);
+		case DOUBLE:
 			return sizeof(double);
-		case STR:
-			return max_str_size_i * sizeof(char);
+		case STRING:
+			return max_str_size_i;
 		case BOOL:
 			return sizeof(bool);
 		default:
@@ -359,33 +296,25 @@ std::string get_data_value(void* data, DataType type) {
 	}
 	int size = get_data_type_size(type);
 	switch (type) {
-		case I8:
-			return std::to_string(*(char*) data);
-		case I16:
-			return std::to_string(*(short*) data);
-		case I32:
-			return std::to_string(*(int*) data);
-		case I64:
-			return std::to_string(*(long long*) data);
-		case U8:
-			return std::to_string(*(unsigned char*) data);
-		case U16:
-			return std::to_string(*(unsigned short*) data);
-		case U32:
-			return std::to_string(*(unsigned int*) data);
-		case U64:
-			return std::to_string(*(unsigned long long*) data);
-		case F32:
-			return std::to_string(*(float*) data);
-		case F64:
-			return std::to_string(*(double*) data);
-		case STR:
-			return std::string((char*) data);
+		case INT:
+			return std::to_string(*(int*)data);
+		case FLOAT:
+			return std::to_string(*(float*)data);
+		case LONG:
+			return std::to_string(*(long long*)data);
+		case UINT:
+			return std::to_string(*(unsigned int*)data);
+		case ULONG:
+			return std::to_string(*(unsigned long long*)data);
+		case DOUBLE:
+			return std::to_string(*(double*)data);
+		case STRING:
+			return std::string((char*)data);
 		case BOOL:
-			return std::to_string(*(bool*) data);
+			return std::to_string(*(bool*)data);
 		default:
 			return "";
-	}
+	}	
 }
 
 Operation::Operation(OperationType type, int value)

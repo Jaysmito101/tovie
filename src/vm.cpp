@@ -335,43 +335,7 @@ static void addVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	switch (a.type) {
-		case DataType::U8:
-			*((unsigned char*) b.value) = *(unsigned char*) b.value + *(unsigned char*) a.value;
-			break;
-		case DataType::U16:
-			*((unsigned short*) b.value) = *(unsigned short*) b.value + *(unsigned short*) a.value;
-			break;
-		case DataType::U32:
-			*((unsigned int*) b.value) = *(unsigned int*) b.value + *(unsigned int*) a.value;
-			break;
-		case DataType::U64:
-			*((unsigned long long*) b.value) = *(unsigned long long*) b.value + *(unsigned long long*) a.value;
-			break;
-		case DataType::I8:
-			*((char*) b.value) = *(char*) b.value + *(char*) a.value;
-			break;
-		case DataType::I16:
-			*((short*) b.value) = *(short*) b.value + *(short*) a.value;
-			break;
-		case DataType::I32:
-			*((int*) b.value) = *(int*) b.value + *(int*) a.value;
-			break;
-		case DataType::I64:
-			*((long long*) b.value) = *(long long*) b.value + *(long long*) a.value;
-			break;
-		case DataType::F32:
-			*((float*) b.value) = *(float*) b.value + *(float*) a.value;
-			break;
-		case DataType::F64:
-			*((double*) b.value) = *(double*) b.value + *(double*) a.value;
-			break;
-		case DataType::STR:
-			strcat((char*) b.value, (char*) a.value);
-			break;
-		default:
-			throw std::runtime_error("unsupported type for add operation");
-	}
+	
 }
 
 static void subVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -383,39 +347,7 @@ static void subVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	switch (a.type) {
-		case DataType::U8:
-			*((unsigned char*) b.value) = *(unsigned char*) b.value - *(unsigned char*) a.value;
-			break;
-		case DataType::U16:
-			*((unsigned short*) b.value) = *(unsigned short*) b.value - *(unsigned short*) a.value;
-			break;
-		case DataType::U32:
-			*((unsigned int*) b.value) = *(unsigned int*) b.value - *(unsigned int*) a.value;
-			break;
-		case DataType::U64:
-			*((unsigned long long*) b.value) = *(unsigned long long*) b.value - *(unsigned long long*) a.value;
-			break;
-		case DataType::I8:
-			*((char*) b.value) = *(char*) b.value - *(char*) a.value;
-			break;
-		case DataType::I16:
-			*((short*) b.value) = *(short*) b.value - *(short*) a.value;
-			break;
-		case DataType::I32:
-			*((int*) b.value) = *(int*) b.value - *(int*) a.value;
-			break;
-		case DataType::I64:
-			*((long long*) b.value) = *(long long*) b.value - *(long long*) a.value;
-			break;
-		case DataType::F32:
-			*((float*) b.value) = *(float*) b.value - *(float*) a.value;
-			break;
-		case DataType::F64:
-			*((double*) b.value) = *(double*) b.value - *(double*) a.value;
-		default:
-			throw std::runtime_error("unsupported type for sub operation");
-	}
+	
 }
 
 static void mulVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -427,39 +359,7 @@ static void mulVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	switch (a.type) {
-		case DataType::U8:
-			*((unsigned char*) b.value) = *(unsigned char*) b.value * *(unsigned char*) a.value;
-			break;
-		case DataType::U16:
-			*((unsigned short*) b.value) = *(unsigned short*) b.value * *(unsigned short*) a.value;
-			break;
-		case DataType::U32:
-			*((unsigned int*) b.value) = *(unsigned int*) b.value * *(unsigned int*) a.value;
-			break;
-		case DataType::U64:
-			*((unsigned long long*) b.value) = *(unsigned long long*) b.value * *(unsigned long long*) a.value;
-			break;
-		case DataType::I8:
-			*((char*) b.value) = *(char*) b.value * *(char*) a.value;
-			break;
-		case DataType::I16:
-			*((short*) b.value) = *(short*) b.value * *(short*) a.value;
-			break;
-		case DataType::I32:
-			*((int*) b.value) = *(int*) b.value * *(int*) a.value;
-			break;
-		case DataType::I64:
-			*((long long*) b.value) = *(long long*) b.value * *(long long*) a.value;
-			break;
-		case DataType::F32:
-			*((float*) b.value) = *(float*) b.value * *(float*) a.value;
-			break;
-		case DataType::F64:
-			*((double*) b.value) = *(double*) b.value * *(double*) a.value;
-		default:
-			throw std::runtime_error("unsupported type for sub operation");
-	}
+	
 }
 
 static void divVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -471,39 +371,7 @@ static void divVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	switch (a.type) {
-		case DataType::U8:
-			*((unsigned char*) b.value) = *(unsigned char*) b.value / *(unsigned char*) a.value;
-			break;
-		case DataType::U16:
-			*((unsigned short*) b.value) = *(unsigned short*) b.value / *(unsigned short*) a.value;
-			break;
-		case DataType::U32:
-			*((unsigned int*) b.value) = *(unsigned int*) b.value / *(unsigned int*) a.value;
-			break;
-		case DataType::U64:
-			*((unsigned long long*) b.value) = *(unsigned long long*) b.value / *(unsigned long long*) a.value;
-			break;
-		case DataType::I8:
-			*((char*) b.value) = *(char*) b.value / *(char*) a.value;
-			break;
-		case DataType::I16:
-			*((short*) b.value) = *(short*) b.value / *(short*) a.value;
-			break;
-		case DataType::I32:
-			*((int*) b.value) = *(int*) b.value / *(int*) a.value;
-			break;
-		case DataType::I64:
-			*((long long*) b.value) = *(long long*) b.value / *(long long*) a.value;
-			break;
-		case DataType::F32:
-			*((float*) b.value) = *(float*) b.value / *(float*) a.value;
-			break;
-		case DataType::F64:
-			*((double*) b.value) = *(double*) b.value / *(double*) a.value;
-		default:
-			throw std::runtime_error("unsupported type for sub operation");
-	}
+	
 }
 
 static void modVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -515,34 +383,7 @@ static void modVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	switch (a.type) {
-		case DataType::U8:
-			*((unsigned char*) b.value) = *(unsigned char*) b.value % *(unsigned char*) a.value;
-			break;
-		case DataType::U16:
-			*((unsigned short*) b.value) = *(unsigned short*) b.value % *(unsigned short*) a.value;
-			break;
-		case DataType::U32:
-			*((unsigned int*) b.value) = *(unsigned int*) b.value % *(unsigned int*) a.value;
-			break;
-		case DataType::U64:
-			*((unsigned long long*) b.value) = *(unsigned long long*) b.value % *(unsigned long long*) a.value;
-			break;
-		case DataType::I8:
-			*((char*) b.value) = *(char*) b.value % *(char*) a.value;
-			break;
-		case DataType::I16:
-			*((short*) b.value) = *(short*) b.value % *(short*) a.value;
-			break;
-		case DataType::I32:
-			*((int*) b.value) = *(int*) b.value % *(int*) a.value;
-			break;
-		case DataType::I64:
-			*((long long*) b.value) = *(long long*) b.value % *(long long*) a.value;
-			break;
-		default:
-			throw std::runtime_error("unsupported type for sub operation");
-	}
+	
 }
 
 static void gtVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -554,39 +395,7 @@ static void gtVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	switch (a.type) {
-		case DataType::U8:
-			*((unsigned char*) b.value) = *(unsigned char*) b.value > *(unsigned char*) a.value;
-			break;
-		case DataType::U16:
-			*((unsigned short*) b.value) = *(unsigned short*) b.value > *(unsigned short*) a.value;
-			break;
-		case DataType::U32:
-			*((unsigned int*) b.value) = *(unsigned int*) b.value > *(unsigned int*) a.value;
-			break;
-		case DataType::U64:
-			*((unsigned long long*) b.value) = *(unsigned long long*) b.value > *(unsigned long long*) a.value;
-			break;
-		case DataType::I8:
-			*((char*) b.value) = *(char*) b.value > *(char*) a.value;
-			break;
-		case DataType::I16:
-			*((short*) b.value) = *(short*) b.value > *(short*) a.value;
-			break;
-		case DataType::I32:
-			*((int*) b.value) = *(int*) b.value > *(int*) a.value;
-			break;
-		case DataType::I64:
-			*((long long*) b.value) = *(long long*) b.value > *(long long*) a.value;
-			break;
-		case DataType::F32:
-			*((float*) b.value) = *(float*) b.value > *(float*) a.value;
-			break;
-		case DataType::F64:
-			*((double*) b.value) = *(double*) b.value > *(double*) a.value;
-		default:
-			throw std::runtime_error("unsupported type for sub operation");
-	}
+	
 }
 
 static void ltVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -598,39 +407,7 @@ static void ltVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	switch (a.type) {
-		case DataType::U8:
-			*((unsigned char*) b.value) = *(unsigned char*) b.value < *(unsigned char*) a.value;
-			break;
-		case DataType::U16:
-			*((unsigned short*) b.value) = *(unsigned short*) b.value < *(unsigned short*) a.value;
-			break;
-		case DataType::U32:
-			*((unsigned int*) b.value) = *(unsigned int*) b.value < *(unsigned int*) a.value;
-			break;
-		case DataType::U64:
-			*((unsigned long long*) b.value) = *(unsigned long long*) b.value < *(unsigned long long*) a.value;
-			break;
-		case DataType::I8:
-			*((char*) b.value) = *(char*) b.value < *(char*) a.value;
-			break;
-		case DataType::I16:
-			*((short*) b.value) = *(short*) b.value < *(short*) a.value;
-			break;
-		case DataType::I32:
-			*((int*) b.value) = *(int*) b.value < *(int*) a.value;
-			break;
-		case DataType::I64:
-			*((long long*) b.value) = *(long long*) b.value < *(long long*) a.value;
-			break;
-		case DataType::F32:
-			*((float*) b.value) = *(float*) b.value < *(float*) a.value;
-			break;
-		case DataType::F64:
-			*((double*) b.value) = *(double*) b.value < *(double*) a.value;
-		default:
-			throw std::runtime_error("unsupported type for sub operation");
-	}
+	
 }
 
 static void geVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -642,39 +419,7 @@ static void geVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	switch (a.type) {
-		case DataType::U8:
-			*((unsigned char*) b.value) = *(unsigned char*) b.value >= *(unsigned char*) a.value;
-			break;
-		case DataType::U16:
-			*((unsigned short*) b.value) = *(unsigned short*) b.value >= *(unsigned short*) a.value;
-			break;
-		case DataType::U32:
-			*((unsigned int*) b.value) = *(unsigned int*) b.value >= *(unsigned int*) a.value;
-			break;
-		case DataType::U64:
-			*((unsigned long long*) b.value) = *(unsigned long long*) b.value >= *(unsigned long long*) a.value;
-			break;
-		case DataType::I8:
-			*((char*) b.value) = *(char*) b.value >= *(char*) a.value;
-			break;
-		case DataType::I16:
-			*((short*) b.value) = *(short*) b.value >= *(short*) a.value;
-			break;
-		case DataType::I32:
-			*((int*) b.value) = *(int*) b.value >= *(int*) a.value;
-			break;
-		case DataType::I64:
-			*((long long*) b.value) = *(long long*) b.value >= *(long long*) a.value;
-			break;
-		case DataType::F32:
-			*((float*) b.value) = *(float*) b.value >= *(float*) a.value;
-			break;
-		case DataType::F64:
-			*((double*) b.value) = *(double*) b.value >= *(double*) a.value;
-		default:
-			throw std::runtime_error("unsupported type for sub operation");
-	}
+	
 }
 
 static void leVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -686,39 +431,7 @@ static void leVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	switch (a.type) {
-		case DataType::U8:
-			*((unsigned char*) b.value) = *(unsigned char*) b.value <= *(unsigned char*) a.value;
-			break;
-		case DataType::U16:
-			*((unsigned short*) b.value) = *(unsigned short*) b.value <= *(unsigned short*) a.value;
-			break;
-		case DataType::U32:
-			*((unsigned int*) b.value) = *(unsigned int*) b.value <= *(unsigned int*) a.value;
-			break;
-		case DataType::U64:
-			*((unsigned long long*) b.value) = *(unsigned long long*) b.value <= *(unsigned long long*) a.value;
-			break;
-		case DataType::I8:
-			*((char*) b.value) = *(char*) b.value <= *(char*) a.value;
-			break;
-		case DataType::I16:
-			*((short*) b.value) = *(short*) b.value <= *(short*) a.value;
-			break;
-		case DataType::I32:
-			*((int*) b.value) = *(int*) b.value <= *(int*) a.value;
-			break;
-		case DataType::I64:
-			*((long long*) b.value) = *(long long*) b.value <= *(long long*) a.value;
-			break;
-		case DataType::F32:
-			*((float*) b.value) = *(float*) b.value <= *(float*) a.value;
-			break;
-		case DataType::F64:
-			*((double*) b.value) = *(double*) b.value <= *(double*) a.value;
-		default:
-			throw std::runtime_error("unsupported type for sub operation");
-	}
+	
 }
 
 static void eqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -730,39 +443,7 @@ static void eqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	switch (a.type) {
-		case DataType::U8:
-			*((unsigned char*) b.value) = *(unsigned char*) b.value == *(unsigned char*) a.value;
-			break;
-		case DataType::U16:
-			*((unsigned short*) b.value) = *(unsigned short*) b.value == *(unsigned short*) a.value;
-			break;
-		case DataType::U32:
-			*((unsigned int*) b.value) = *(unsigned int*) b.value == *(unsigned int*) a.value;
-			break;
-		case DataType::U64:
-			*((unsigned long long*) b.value) = *(unsigned long long*) b.value == *(unsigned long long*) a.value;
-			break;
-		case DataType::I8:
-			*((char*) b.value) = *(char*) b.value == *(char*) a.value;
-			break;
-		case DataType::I16:
-			*((short*) b.value) = *(short*) b.value == *(short*) a.value;
-			break;
-		case DataType::I32:
-			*((int*) b.value) = *(int*) b.value == *(int*) a.value;
-			break;
-		case DataType::I64:
-			*((long long*) b.value) = *(long long*) b.value == *(long long*) a.value;
-			break;
-		case DataType::F32:
-			*((float*) b.value) = *(float*) b.value == *(float*) a.value;
-			break;
-		case DataType::F64:
-			*((double*) b.value) = *(double*) b.value == *(double*) a.value;
-		default:
-			throw std::runtime_error("unsupported type for sub operation");
-	}
+	
 }
 
 static void neqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -774,39 +455,7 @@ static void neqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	switch (a.type) {
-		case DataType::U8:
-			*((unsigned char*) b.value) = *(unsigned char*) b.value != *(unsigned char*) a.value;
-			break;
-		case DataType::U16:
-			*((unsigned short*) b.value) = *(unsigned short*) b.value != *(unsigned short*) a.value;
-			break;
-		case DataType::U32:
-			*((unsigned int*) b.value) = *(unsigned int*) b.value != *(unsigned int*) a.value;
-			break;
-		case DataType::U64:
-			*((unsigned long long*) b.value) = *(unsigned long long*) b.value != *(unsigned long long*) a.value;
-			break;
-		case DataType::I8:
-			*((char*) b.value) = *(char*) b.value != *(char*) a.value;
-			break;
-		case DataType::I16:
-			*((short*) b.value) = *(short*) b.value != *(short*) a.value;
-			break;
-		case DataType::I32:
-			*((int*) b.value) = *(int*) b.value != *(int*) a.value;
-			break;
-		case DataType::I64:
-			*((long long*) b.value) = *(long long*) b.value != *(long long*) a.value;
-			break;
-		case DataType::F32:
-			*((float*) b.value) = *(float*) b.value != *(float*) a.value;
-			break;
-		case DataType::F64:
-			*((double*) b.value) = *(double*) b.value != *(double*) a.value;
-		default:
-			throw std::runtime_error("unsupported type for sub operation");
-	}
+	
 }
 
 static void andVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -818,39 +467,7 @@ static void andVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	switch (a.type) {
-		case DataType::U8:
-			*((unsigned char*) b.value) = *(unsigned char*) b.value && *(unsigned char*) a.value;
-			break;
-		case DataType::U16:
-			*((unsigned short*) b.value) = *(unsigned short*) b.value && *(unsigned short*) a.value;
-			break;
-		case DataType::U32:
-			*((unsigned int*) b.value) = *(unsigned int*) b.value && *(unsigned int*) a.value;
-			break;
-		case DataType::U64:
-			*((unsigned long long*) b.value) = *(unsigned long long*) b.value && *(unsigned long long*) a.value;
-			break;
-		case DataType::I8:
-			*((char*) b.value) = *(char*) b.value && *(char*) a.value;
-			break;
-		case DataType::I16:
-			*((short*) b.value) = *(short*) b.value && *(short*) a.value;
-			break;
-		case DataType::I32:
-			*((int*) b.value) = *(int*) b.value && *(int*) a.value;
-			break;
-		case DataType::I64:
-			*((long long*) b.value) = *(long long*) b.value && *(long long*) a.value;
-			break;
-		case DataType::F32:
-			*((float*) b.value) = *(float*) b.value && *(float*) a.value;
-			break;
-		case DataType::F64:
-			*((double*) b.value) = *(double*) b.value && *(double*) a.value;
-		default:
-			throw std::runtime_error("unsupported type for sub operation");
-	}
+	
 }
 
 static void orVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -862,39 +479,7 @@ static void orVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type mismatch");
 	if (debug)
 		std::cout << " [DEBUG]\t addvop" << a.id << " + " << b.id << std::endl;
-	switch (a.type) {
-		case DataType::U8:
-			*((unsigned char*) b.value) = *(unsigned char*) b.value || *(unsigned char*) a.value;
-			break;
-		case DataType::U16:
-			*((unsigned short*) b.value) = *(unsigned short*) b.value || *(unsigned short*) a.value;
-			break;
-		case DataType::U32:
-			*((unsigned int*) b.value) = *(unsigned int*) b.value || *(unsigned int*) a.value;
-			break;
-		case DataType::U64:
-			*((unsigned long long*) b.value) = *(unsigned long long*) b.value || *(unsigned long long*) a.value;
-			break;
-		case DataType::I8:
-			*((char*) b.value) = *(char*) b.value || *(char*) a.value;
-			break;
-		case DataType::I16:
-			*((short*) b.value) = *(short*) b.value || *(short*) a.value;
-			break;
-		case DataType::I32:
-			*((int*) b.value) = *(int*) b.value || *(int*) a.value;
-			break;
-		case DataType::I64:
-			*((long long*) b.value) = *(long long*) b.value || *(long long*) a.value;
-			break;
-		case DataType::F32:
-			*((float*) b.value) = *(float*) b.value || *(float*) a.value;
-			break;
-		case DataType::F64:
-			*((double*) b.value) = *(double*) b.value || *(double*) a.value;
-		default:
-			throw std::runtime_error("unsupported type for sub operation");
-	}
+	
 }
 
 static void printVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
@@ -1166,75 +751,12 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 				if (debug)
 					std::cout << " [DEBUG]\t"
 							  << " VAR " << op.arg << " SETV" << std::endl;
-				if (v.type < DataType::I8) {
-					progStack.push_back((int) (*(char*) v.value));
-				} else if (v.type < DataType::I16) {
-					progStack.push_back((int) (*(short*) v.value));
-				} else if (v.type < DataType::I32) {
-					progStack.push_back((int) (*(int*) v.value));
-				} else if (v.type < DataType::U8) {
-					progStack.push_back((int) (*(unsigned char*) v.value));
-				} else if (v.type < DataType::U16) {
-					progStack.push_back((int) (*(unsigned short*) v.value));
-				} else if (v.type < DataType::U32) {
-					progStack.push_back((int) (*(unsigned int*) v.value));
-				} else {
-					unsigned char* data = static_cast<unsigned char*>(v.value);
-					for (int i = get_data_type_size(v.type) - 1; i >= 0; i--) {
-						progStack.push_back(data[i]);
-					}
-				}
+				// TODO
 			} else if (op.ops[0] == -2) {
 				if (debug)
 					std::cout << " [DEBUG]\t"
 							  << " VAR " << op.arg << " GETV" << std::endl;
-				if (v.type < DataType::I8) {
-					char t = (char) progStack.back();
-					progStack.pop_back();
-					memcpy(v.value, &t, get_data_type_size(v.type));
-				} else if (v.type < DataType::I16) {
-					short t = (short) progStack.back();
-					progStack.pop_back();
-					memcpy(v.value, &t, get_data_type_size(v.type));
-				} else if (v.type < DataType::I32) {
-					int t = progStack.back();
-					progStack.pop_back();
-					memcpy(v.value, &t, get_data_type_size(v.type));
-				} else if (v.type < DataType::U8) {
-					unsigned char t = (unsigned char) progStack.back();
-					progStack.pop_back();
-					memcpy(v.value, &t, get_data_type_size(v.type));
-				} else if (v.type < DataType::U16) {
-					unsigned short t = (unsigned short) progStack.back();
-					progStack.pop_back();
-					memcpy(v.value, &t, get_data_type_size(v.type));
-				} else if (v.type < DataType::U32) {
-					unsigned int t = (unsigned int) progStack.back();
-					progStack.pop_back();
-					memcpy(v.value, &t, get_data_type_size(v.type));
-				} else if (v.type == DataType::STR) {
-					int	  max = get_data_type_size(v.type);
-					char* dt  = new char[max];
-					memset(dt, 0, max);
-					for (int i = 0; i < max; i++) {
-						int tmp = progStack.back();
-						progStack.pop_back();
-						if (tmp == -1)
-							break;
-						dt[i] = (char) tmp;
-					}
-					// strrev(dt);
-					memcpy(v.value, dt, max);
-					delete[] dt;
-				} else {
-					unsigned char* data = (unsigned char*) malloc(get_data_type_size(v.type));
-					for (int i = 0; i < get_data_type_size(v.type); i++) {
-						data[i] = (unsigned char) progStack.back();
-						progStack.pop_back();
-					}
-					memcpy(v.value, data, get_data_type_size(v.type));
-					delete[] data;
-				}
+				// TODO
 			} else {
 				if (debug)
 					std::cout << " [DEBUG]\t"

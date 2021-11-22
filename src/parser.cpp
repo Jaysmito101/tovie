@@ -99,18 +99,20 @@ static std::string read_lib(const std::string& lib_name, std::vector<std::string
 static std::unordered_map<std::string, int> vars;
 static int									varId;
 
-std::vector<Operation> parse(std::string input, std::vector<std::string> includePaths, std::vector<Operation> ioperations, std::unordered_map<std::string, std::string> idefs, bool isInclude) {
+std::vector<Operation> parse(std::string input, std::vector<std::string> includePaths, std::vector<Operation>& ioperations, std::unordered_map<std::string, std::string>& idefs, bool isInclude) {
 	if (!isInclude) {
 		varId = 0;
 		vars.clear();
 	}
-	std::vector<Operation>						 operations;
-	std::unordered_map<std::string, std::string> defs;
+	std::vector<Operation>&						 operations = ioperations;
+	std::unordered_map<std::string, std::string>& defs = idefs;
 	std::vector<std::string>					 tokens = lexpp::lex(input, " \t\r\n");
 	if (isInclude) {
 		defs	   = idefs;
 		operations = ioperations;
 	} else {
+		defs.clear();
+		operations.clear();
 		defs["main"] = "0";
 		operations.push_back(Operation(OperationType::BEGIN));
 	}
@@ -436,7 +438,5 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 	}
 	if (!isInclude)
 		operations.push_back(Operation(OperationType::END));
-	ioperations = operations;
-	idefs		= defs;
 	return operations;
 }

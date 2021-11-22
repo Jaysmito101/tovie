@@ -5,8 +5,14 @@ If you are commiting to this repositiory please add an entry here. It will help 
 
 Format:
 
-- DATE
+- DATE + TIME UTC
 - AUTHOR
 - A description of whats changed
 - A breaf reason for the change (optional)
 
+
+
+# 22-NOV-2021 11:25
+ - Jaysmito Mukherjee
+ - Removed U8, U16, I8, I16
+ - The stack uses 32 bit integers so not much sense in having 8 bit or 16 bit types
