@@ -154,9 +154,9 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 			try {
 				operations.push_back(Operation(OperationType::PUSH, std::stoi(token)));
 			} catch (...) {
-				long long	   val	= std::stoll(token);
+				long	   val	= (long)std::stoll(token);
 				unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
-				for (int i = sizeof(long long) - 1; i >= 0; i--) {
+				for (int i = sizeof(long) - 1; i >= 0; i--) {
 					operations.push_back(Operation(OperationType::PUSH, data[i]));
 				}
 			}
@@ -170,9 +170,9 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 			try {
 				operations.push_back(Operation(OperationType::PUSH, std::stoi(token)));
 			} catch (...) {
-				long long	   val	= std::stoll(token);
+				long	   val	= std::stoll(token);
 				unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
-				for (int i = sizeof(long long) - 1; i >= 0; i--) {
+				for (int i = sizeof(long) - 1; i >= 0; i--) {
 					operations.push_back(Operation(OperationType::PUSH, data[i]));
 				}
 			}
@@ -186,9 +186,9 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 			try {
 				operations.push_back(Operation(OperationType::PUSH, (int) std::stoul(token.substr(1))));
 			} catch (...) {
-				unsigned long long val	= std::stoull(token.substr(1));
+				unsigned long val	= std::stoull(token.substr(1));
 				unsigned char*	   data = static_cast<unsigned char*>(static_cast<void*>(&val));
-				for (int i = sizeof(unsigned long long) - 1; i >= 0; i--) {
+				for (int i = sizeof(unsigned long) - 1; i >= 0; i--) {
 					operations.push_back(Operation(OperationType::PUSH, data[i]));
 				}
 			}
