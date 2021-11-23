@@ -34,6 +34,12 @@ An Advanced Programming Language (Compiler + Interpreter + Transpiler ).
 * If statements
 * User Input, ...
 
+# Todo
+
+* A standard library in tovie
+* A standard library implemented in c
+* Add more examples
+
 ## Usage
 
     Usage: C:\Users\Jaysmito Mukherjee\Desktop\tovie\bin\tovie.exe [options] <input>
