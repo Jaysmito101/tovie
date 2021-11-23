@@ -10,7 +10,8 @@ FILES = [
     os.path.join('examples', "helloworld2.tovie"),
     os.path.join('examples', "fibonacii.tovie"),
     os.path.join('examples', "fizzbuzz.tovie"),
-    os.path.join('examples', "1to10.tovie")
+    os.path.join('examples', "1to10.tovie"),
+    os.path.join('examples', "using_variables_example.tovie")
 ]
 
 BIN_PATH =  os.path.join("bin", "tovie")
