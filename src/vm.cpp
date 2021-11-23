@@ -1231,19 +1231,27 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 				v  = lVars[op.arg];
 				tp = true;
 			}
-			if (!tp && (op.ops[0] == -1 || op.ops[0] == -2) )
+			if (!tp && (op.ops[0] == -1 || op.ops[0] == -2 || op.ops[0] == -3) )
 				throw std::runtime_error("variable not found error");
 			if (op.ops[0] == -1) {
 				if (debug)
 					std::cout << " [DEBUG]\t"
 							  << " VAR " << op.arg << " SETV" << std::endl;
 				push_variable(progStack, v);
-			} else if (op.ops[0] == -2) {
+			}
+			else if (op.ops[0] == -2) {
 				if (debug)
 					std::cout << " [DEBUG]\t"
 							  << " VAR " << op.arg << " GETV" << std::endl;
 				pop_variable(progStack, v);
-			} else {
+			}
+			else if(op.ops[0] == -3){
+				if (debug)
+					std::cout << " [DEBUG]\t"
+							  << " VAR " << op.arg << " PUTV" << std::endl;
+				progStack.push_back(v.id);
+			}
+			else {
 				OperationType vop = (OperationType) op.arg;
 				if (debug)
 					std::cout << " [DEBUG]\t"

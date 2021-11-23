@@ -243,7 +243,9 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 		} else if (token[0] == '&') {
 			token = token.substr(1);
 			if (vars.find(token) != vars.end()) {
-				operations.push_back(Operation(OperationType::PUSH, vars[token]));
+				Operation op(OperationType::VAR, vars[token]);
+				op.ops[0] = -3;
+				operations.push_back(op);
 			} else {
 				throw std::runtime_error("unknown variable : " + token);
 			}

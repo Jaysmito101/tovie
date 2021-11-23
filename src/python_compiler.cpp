@@ -16,7 +16,92 @@ struct ProcAddr {
 	ProcAddr(int procId, unsigned long bAddr, unsigned long eAddr);
 };
 
-void transpile(CodeMaker& cm, Operation op) {
+struct Variable {
+	DataType type;
+	int		 id;
+	void*	 value;
+};
+
+std::ostream& operator<<(std::ostream& os, std::unordered_map<int, Variable>& vt);
+
+static std::unordered_map<int, Variable>							   gVars;
+static std::unordered_map<int, Variable>							   lVars;
+static std::vector<int> 											varStack;
+static std::vector<ProcAddr>  procAddresses;
+
+
+static void py_push_variable(CodeMaker& cm, Operation op){
+	Variable v;
+	bool global = false;
+	if(gVars.find(op.arg) != gVars.end()){
+		v = gVars[op.arg];
+		global = true;
+	}
+	else if(lVars.find(op.arg) != lVars.end()){
+		v = lVars[op.arg];
+	}
+	else{
+		throw std::runtime_error("Variable not found");
+	}
+	std::string vName = (global ? "gVar" : "lVar") + std::to_string(v.id) + "_" + to_string(v.type);
+	if (v.type == DataType::INT || v.type == DataType::UINT) {
+		cm.add_line("_stack.append(" + vName + ")");
+	}
+	else if (v.type == DataType::BOOL) {
+		cm.add_line("_stack.append((int)" + vName + ")");
+	} 
+	else if (v.type == DataType::STRING) {
+		cm.add_line("for item in " + vName + ":");
+		cm.begin_block();
+			cm.add_line("_stack.append(item)");
+		cm.end_block();
+		cm.add_line("_stack.append(-1)");
+		return;
+	} else {
+		// TMP
+		cm.add_line("_stack.append(" + vName + ")");
+	}
+}
+
+static void py_pop_variable(CodeMaker& cm, Operation op){
+	Variable v;
+	bool global = false;
+	if(gVars.find(op.arg) != gVars.end()){
+		v = gVars[op.arg];
+		global = true;
+	}
+	else if(lVars.find(op.arg) != lVars.end()){
+		v = lVars[op.arg];
+	}
+	else{
+		throw std::runtime_error("Variable not found");
+	}
+	std::string vName = (global ? "gVar" : "lVar") + std::to_string(v.id) + "_" + to_string(v.type);
+	if (v.type == DataType::INT || v.type == DataType::UINT) {
+		cm.add_line(vName + " = _stack.pop()");
+	}
+	else if (v.type == DataType::BOOL) {
+		cm.add_line(vName + "_stack.pop()");
+	} 
+	else if (v.type == DataType::STRING) {
+		cm.add_line("t_Str = \"\"");
+		cm.add_line("while True:");
+		cm.begin_block();
+			cm.add_line("tp = _stack.pop()");
+			cm.add_line("if tp == -1:");
+			cm.begin_block();
+				cm.add_line("break");
+			cm.end_block();
+			cm.add_line("t_Str += chr(tp)");
+		cm.end_block();
+		return;
+	} else {
+		// TMP
+		cm.add_line(vName + " = _stack.pop()");
+	}
+}
+
+static void transpile(CodeMaker& cm, Operation op) {
 	switch (op.op) {
 		case OperationType::PUSH: {
 			cm.add_line("_stack.append(" + std::to_string(op.arg) + ")");
@@ -335,14 +420,64 @@ void transpile(CodeMaker& cm, Operation op) {
 		}
 		case OperationType::EXIT: {
 			cm.add_line("exit()");
+			break;
 		}
 		case OperationType::RET: {
 			cm.add_line("return");
+			break;
+		}
+		case OperationType::DECL: {
+			Variable v;
+			v.id	= op.arg;
+			v.type	= to_data_type(op.ops[0]);
+			lVars[v.id] = v;
+			switch (v.type) {
+				case DataType::INT:
+					cm.add_line("lVar" + std::to_string(op.arg) + "_" + to_string(v.type) + " = 0");
+					break;
+				case DataType::UINT:
+					cm.add_line("lVar" + std::to_string(op.arg) + "_" + to_string(v.type) + " = 0");
+					break;
+				case DataType::LONG:
+					cm.add_line("lVar" + std::to_string(op.arg) + "_" + to_string(v.type) + " = 0");
+					break;
+				case DataType::ULONG:
+					cm.add_line("lVar" + std::to_string(op.arg) + "_" + to_string(v.type) + " = 0");
+					break;
+				case DataType::FLOAT:
+					cm.add_line("lVar" + std::to_string(op.arg) + "_" + to_string(v.type) + " = 0.0");
+					break;
+				case DataType::DOUBLE:
+					cm.add_line("lVar" + std::to_string(op.arg) + "_" + to_string(v.type) + " = 0.0");
+					break;
+				case DataType::STRING:
+					cm.add_line("lVar" + std::to_string(op.arg) + "_" + to_string(v.type) + " = \"\"");
+					break;
+				case DataType::BOOL:
+					cm.add_line("lVar" + std::to_string(op.arg) + "_" + to_string(v.type) + " = False");
+					break;
+				default :
+					throw std::runtime_error("unknown type");				
+			}
+			break;
+		}
+		case OperationType::VAR: {
+			if(op.ops[0] == -1) {
+				py_push_variable(cm, op);
+			} 
+			else if(op.ops[0] == -2){
+				py_pop_variable(cm, op);
+			}	
+			else if(op.ops[0] == -3){
+				varStack.push_back(op.arg);
+				cm.add_line("_stack.append(" + std::to_string(op.arg) + ")");
+			}
+			else{
+				cm.add_line("# TODO : Var OPS");
+			}
 		}
 	}
 }
-
-static std::vector<ProcAddr>  procAddresses;
 
 static void loadProcs(std::vector<Operation>& ops) {
 	procAddresses.clear();
@@ -369,8 +504,31 @@ static void loadProcs(std::vector<Operation>& ops) {
 	}
 }
 
+static void loadGlobals(std::vector<Operation>& ops) {
+	gVars.clear();
+	bool inProc = false;
+	for (int i = 0; i < ops.size(); i++) {
+		if (!inProc) {
+			if (ops[i].op == OperationType::DECL) {
+				Variable v;
+				v.id	= ops[i].arg;
+				v.type	= to_data_type(ops[i].ops[0]);
+				gVars[v.id] = v;
+			}
+		}
+		if (ops[i].op == OperationType::PROC && ops[i].arg != -1) {
+			inProc = true;
+		}
+		if (ops[i].op == OperationType::PROC && ops[i].arg == -1) {
+			inProc = false;
+		}
+	}
+}
+
+
 std::string tovie2py(std::vector<Operation> ops) {
 	loadProcs(ops);
+	loadGlobals(ops);
 	CodeMaker cm;
 	cm.add_line("# This code has been generated by " + get_name());
 
@@ -383,12 +541,50 @@ std::string tovie2py(std::vector<Operation> ops) {
 	cm.add_line("_stack = [0]");
 	cm.add_line("_runtime_lib = \"\"");
 
+	for(auto& kv : gVars)
+	{
+		switch(kv.second.type){
+			case DataType::INT:
+				cm.add_line("gVar" + std::to_string(kv.second.id) + "_" + to_string(kv.second.type) + " = 0");
+				break;
+			case DataType::UINT:
+				cm.add_line("gVar" + std::to_string(kv.second.id) + "_" + to_string(kv.second.type) + " = 0");
+				break;
+			case DataType::LONG:
+				cm.add_line("gVar" + std::to_string(kv.second.id) + "_" + to_string(kv.second.type) + " = 0");
+				break;
+			case DataType::ULONG:
+				cm.add_line("gVar" + std::to_string(kv.second.id) + "_" + to_string(kv.second.type) + " = 0");
+				break;
+			case DataType::FLOAT:
+				cm.add_line("gVar" + std::to_string(kv.second.id) + "_" + to_string(kv.second.type) + " = 0.0");
+				break;
+			case DataType::DOUBLE:
+				cm.add_line("gVar" + std::to_string(kv.second.id) + "_" + to_string(kv.second.type) + " = 0.0");
+				break;
+			case DataType::STRING:
+				cm.add_line("gVar" + std::to_string(kv.second.id) + "_" + to_string(kv.second.type) + " = \"\"");
+				break;
+			case DataType::BOOL:
+				cm.add_line("gVar" + std::to_string(kv.second.id) + "_" + to_string(kv.second.type) + " = False");
+				break;
+			default :
+				throw std::runtime_error("unknown type " + to_string(kv.second.type));
+		}
+	}
+
 	for (auto& kv : procAddresses) {
+		lVars.clear();
 		cm.add_line("# PROC " + std::to_string(kv.procId));
 		cm.add_line("def proc_" + std::to_string(kv.procId) + "():");
 		cm.begin_block();
 		cm.add_line("global _stack");
 		cm.add_line("global _runtime_lib");
+
+		for(auto& kv : gVars){
+			cm.add_line("global gVar" + std::to_string(kv.second.id) + "_" + to_string(kv.second.type));
+		}
+
 		cm.add_line("_memory = [0] * 1024");
 		for (int i = kv.bAddr + 1; i < kv.eAddr; i++) {
 			Operation op = ops[i];
