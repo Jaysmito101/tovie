@@ -92,7 +92,7 @@ static const char* format_to_string(file_format format) {
 	return "";
 }
 
-int main(int argc, const char** argv) {
+int main_(int argc, const char** argv) {
 	std::string	  input_file;
 	file_format_t input_format = FORMAT_DEFAULT;
 

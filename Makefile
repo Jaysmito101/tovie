@@ -10,11 +10,12 @@ else
 	BINARY := bin/tovie
 endif
 
-SOURCE_FILES := $(wildcard src/*.cpp)
-OBJECT_FILES := $(patsubst src/%.cpp,dist/%.o,$(SOURCE_FILES))
+SOURCE_FILES := $(wildcard src/*.cpp) $(wildcard src/*.c)
+OBJECT_FILES := $(patsubst src/%,dist/%.o,$(SOURCE_FILES))
 
 CC := g++
-CFLAGS := -std=c++11 -Iinclude
+C := gcc
+CFLAGS := -Iinclude
 LDFLAGS :=
 ifneq ($(SYSTEM), Windows)
 	LDFLAGS += -ldl
@@ -31,5 +32,8 @@ $(BINARY): $(OBJECT_FILES)
 bin dist:
 	mkdir -p bin dist
 
-dist/%.o: src/%.cpp
-	$(CC) -c -o $@ $< $(CFLAGS)
+dist/%.c.o: src/%.c
+	$(C) -c -o $@ $< $(CFLAGS)
+
+dist/%.cpp.o: src/%.cpp
+	$(CC) -c -o $@ $< $(CFLAGS) -std=c++11
