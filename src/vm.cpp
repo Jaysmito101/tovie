@@ -1287,21 +1287,27 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 					}
 					case OperationType::GT: {
 						gtVOP(progStack, lVars, gVars, debug);
+						break;
 					}
 					case OperationType::LT: {
 						ltVOP(progStack, lVars, gVars, debug);
+						break;
 					}
 					case OperationType::EQ: {
 						eqVOP(progStack, lVars, gVars, debug);
+						break;
 					}
 					case OperationType::NEQ: {
 						neqVOP(progStack, lVars, gVars, debug);
+						break;
 					}
 					case OperationType::GE: {
 						geVOP(progStack, lVars, gVars, debug);
+						break;
 					}
 					case OperationType::LE: {
 						leVOP(progStack, lVars, gVars, debug);
+						break;
 					}
 					case OperationType::PRINT: {
 						printVOP(progStack, lVars, gVars, debug);

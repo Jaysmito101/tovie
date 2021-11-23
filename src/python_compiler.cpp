@@ -473,7 +473,102 @@ static void transpile(CodeMaker& cm, Operation op) {
 				cm.add_line("_stack.append(" + std::to_string(op.arg) + ")");
 			}
 			else{
-				cm.add_line("# TODO : Var OPS");
+				OperationType vop = (OperationType) op.arg;
+				switch (vop) {
+						case OperationType::ADD: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+							break;
+						}
+						case OperationType::SUB: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+							break;
+						}
+						case OperationType::MUL: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+							break;
+						}
+						case OperationType::DIV: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+							break;
+						}
+						case OperationType::MOD: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+						}
+						case OperationType::AND: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+							break;
+						}
+						case OperationType::OR: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+							break;
+						}
+						case OperationType::GT: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+						}
+						case OperationType::LT: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+							break;
+						}
+						case OperationType::EQ: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+							break;
+						}
+						case OperationType::NEQ: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+							break;
+						}
+						case OperationType::GE: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+							break;
+						}
+						case OperationType::LE: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+							break;
+						}
+						case OperationType::PRINT: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+							break;
+						}
+						case OperationType::PRINTLN: {
+							cm.add_line("_stack.pop()");
+							cm.add_line("# TODO");
+							break;
+						}
+						case OperationType::INPUTI: {
+							cm.add_line("_stack.pop()");;
+							cm.add_line("# TODO");;
+							break;
+						}
+						default:
+							throw std::runtime_error("invalid variable operation type");
+					}
 			}
 		}
 	}
