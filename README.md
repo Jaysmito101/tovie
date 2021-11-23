@@ -36,18 +36,19 @@ An Advanced Programming Language (Compiler + Interpreter + Transpiler ).
 
 ## Usage
 
-	Usage: toviec <job> <input_file> [output_file]
-  	job:
-    	ver  : print version info
-    	com  : compile
-    	sis  : simulate from soruce
-    	sib  : simulate from bytecode
-    	ssd  : simulate from source in debug mode
-    	sbd  : simulate from bytecode in debug mode
-    	gts  : generate operations table from source
-    	gtb  : generate operations table from binary
-    	t2p  : translate to python 3
-    	t2c  : translate to c (c11)
+    Usage: C:\Users\Jaysmito Mukherjee\Desktop\tovie\bin\tovie.exe [options] <input>
+    
+    Options:
+      -h, --help ............ prints this message and exits
+      -v, --version ......... prints tovie's version and exits
+      -r, --run ............. runs <input> instead of compiling (`-f` will specify the backend; will also compile if `-o` is given)
+      -d, --debug ........... prints useful debug information
+      -o, --output <path> ... specifies the output-file
+      -f, --format <format> . specifies the output-format (bytecode,table,c,python; default: bytecode)
+      -i, --include <path> .. specifies include directories (can be used multiple times)
+      -I, --input <format> .. specifies the input-format (source,bytecode; default: extension)
+
+
 
 ## Examples :
 
