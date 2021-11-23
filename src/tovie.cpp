@@ -209,7 +209,7 @@ int main(int argc, const char** argv) {
 
 	std::vector<Operation> input_ops;
 	if (input_format == FORMAT_SOURCE) {
-		input_ops = parse(read_file(input_file), include_paths);
+		input_ops = parse(read_file(input_file), include_paths, debug);
 	} else if (input_format == FORMAT_BYTECODE) {
 		input_ops = load(input_file);
 	}

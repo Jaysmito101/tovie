@@ -1,0 +1,49 @@
+proc_main
+	dec length:int
+	dec target:int
+	dec i:int
+	dec j:int
+	dec t1:int
+	dec t2:int
+	dec t3:int
+	0 >i
+	3 call >length
+	<length 0 memset
+	"Enter target : " 15 puts
+	&target $input
+	<length
+	for
+		<i 1 + >i
+		0 >j
+		<length 1 memget
+		<length for
+			<j 1 + >j
+			1 <length <i - memget >t1
+			>t2
+			&t1 &t2 $+ >t3
+			<t3 <target == if
+				"[" prints
+				<i 1 - print
+				"," prints
+				<j 1 - print
+				"]"  printlns
+				exit
+			if_end
+
+			0 printlns pop
+		for_end
+	for_end
+		
+	for_end
+proc_end
+
+proc_3
+	"Enter Number of elements : " 27 puts
+	inputi memset_0
+	"Enter elements : " 17 putsln
+	memget_0
+	for
+		inputi
+	for_end
+	memget_0
+proc_end

@@ -99,7 +99,7 @@ static std::string read_lib(const std::string& lib_name, std::vector<std::string
 static std::unordered_map<std::string, int> vars;
 static int									varId;
 
-std::vector<Operation> parse(std::string input, std::vector<std::string> includePaths, std::vector<Operation>& ioperations, std::unordered_map<std::string, std::string>& idefs, bool isInclude) {
+std::vector<Operation> parse(std::string input, std::vector<std::string> includePaths, bool debug, std::vector<Operation>& ioperations, std::unordered_map<std::string, std::string>& idefs, bool isInclude) {
 	if (!isInclude) {
 		varId = 0;
 		vars.clear();
@@ -132,7 +132,7 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 			bool		isIncludeOK = false;
 			std::string libSrc		= read_lib(token.substr(9, token.size() - 2), includePaths, &isIncludeOK);
 			if (isIncludeOK) {
-				parse(libSrc, includePaths, operations, defs, true);
+				parse(libSrc, includePaths, debug, operations, defs, true);
 			} else {
 				throw std::runtime_error("include " + token.substr(9, token.size() - 2) + " error");
 			}
@@ -149,6 +149,11 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 		}
 
 		process_defs(token, defs, tokens, &l);
+
+		if(debug) {
+			std::cout << "token: " << token << std::endl;
+		}
+
 		// Operation tokens
 		if (is_integer(token)) {
 			try {
@@ -166,7 +171,7 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 			for (int i = sizeof(double) - 1; i >= 0; i--) {
 				operations.push_back(Operation(OperationType::PUSH, data[i]));
 			}
-		} else if (token[0] == '-' && is_integer(token.substr(1))) {
+		} else if (token[0] == '-' && token.size() >=2  && is_integer(token.substr(1))) {
 			try {
 				operations.push_back(Operation(OperationType::PUSH, std::stoi(token)));
 			} catch (...) {
@@ -176,7 +181,7 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 					operations.push_back(Operation(OperationType::PUSH, data[i]));
 				}
 			}
-		} else if (token[0] == '-' && is_float(token.substr(1))) {
+		} else if (token[0] == '-' && token.size() >=2 && is_float(token.substr(1))) {
 			double		   val	= std::stod(token);
 			unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
 			for (int k = sizeof(double) - 1; k >= 0; k--) {
