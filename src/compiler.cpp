@@ -1,6 +1,6 @@
 #define LEXPP_IMPLEMENTATION
 
-#include "parser.hpp"
+#include "compiler.hpp"
 
 #include "debug.hpp"
 #include "lexpp.hpp"

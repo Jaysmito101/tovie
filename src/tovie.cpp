@@ -1,10 +1,10 @@
-#include "c_compiler.hpp"
 #include "info.hpp"
 #include "operations.hpp"
-#include "parser.hpp"
-#include "python_compiler.hpp"
+#include "compiler.hpp"
+#include "python_transpiler.hpp"
+#include "c_transpiler.hpp"
 #include "runtimelib.hpp"
-#include "table.hpp"
+#include "op_table.hpp"
 #include "vm.hpp"
 
 #include <fstream>
