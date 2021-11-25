@@ -1,5 +1,6 @@
 #include "codemaker.hpp"
 #include "info.hpp"
+#include "helpers.hpp"
 #include "operations.hpp"
 #include "c_transpiler.hpp"
 
@@ -144,16 +145,6 @@ TovieNativeFunc get_runtimelib_proc(void* runtimeLib, const char* libProcName)
 #	endif
 
 #endif
-
-struct ProcAddr {
-	int			  procId;
-	unsigned long bAddr, eAddr;
-
-	ProcAddr();
-
-	ProcAddr(int procId, unsigned long bAddr, unsigned long eAddr);
-};
-
 
 static void transpile(CodeMaker& cm, Operation op) {
 	switch (op.op) {

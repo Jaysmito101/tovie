@@ -17,28 +17,7 @@
 #include <string>
 #include <unordered_map>
 
-struct ProcAddr {
-	int			  procId;
-	unsigned long bAddr, eAddr;
-
-	ProcAddr() {
-		procId = -1;
-		bAddr = eAddr = 0;
-	}
-
-	ProcAddr(int procIdi, unsigned long bAddri, unsigned long eAddri) {
-		procId = procIdi;
-		bAddr	 = bAddri;
-		eAddr	 = eAddri;
-	}
-
-	// copy constructor
-	ProcAddr(const ProcAddr& other) {
-		procId = other.procId;
-		bAddr	 = other.bAddr;
-		eAddr	 = other.eAddr;
-	}
-};
+#include "helpers.hpp"
 
 #ifdef __unix__
 char* strrev(char* str) {

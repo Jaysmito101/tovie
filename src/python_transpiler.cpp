@@ -2,19 +2,12 @@
 
 #include "codemaker.hpp"
 #include "info.hpp"
+#include "helpers.hpp"
 #include "operations.hpp"
 
 #include <stdexcept>
 #include <unordered_map>
 
-struct ProcAddr {
-	int			  procId;
-	unsigned long bAddr, eAddr;
-
-	ProcAddr();
-
-	ProcAddr(int procId, unsigned long bAddr, unsigned long eAddr);
-};
 
 struct Variable {
 	DataType type;

@@ -32,4 +32,4 @@ bin dist:
 	mkdir -p bin dist
 
 dist/%.o: src/%.cpp
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -O3 -c -o $@ $< $(CFLAGS)
