@@ -1,6 +1,7 @@
 #pragma once
 
 #define STACK_SIZE 4096 * 4096
+#define validate(x) revalidate(x)
 
 class Stack
 {
@@ -33,9 +34,9 @@ class Stack
     void print_int(const char* end = "\n");
     int length();
     void* get_data();
+    void revalidate(int size);
 
     private:
-    void validate(int size);
 
     float incFactor;
     char* top;

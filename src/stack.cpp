@@ -38,7 +38,7 @@ void Stack::print_int(const char* end)
     printf("%s", end);
 }
 
-void Stack::validate(int sizei)
+void Stack::revalidate(int sizei)
 {
     if(sizei + size > capacity)
     {
