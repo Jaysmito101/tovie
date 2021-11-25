@@ -15,6 +15,5 @@ proc_0
 proc_end
 
 proc_1
-    "Enter" 32 "N" 32 ":" 32
-    10 puts
+    "Enter N : " puts
 proc_end

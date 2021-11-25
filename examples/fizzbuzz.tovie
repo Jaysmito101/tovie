@@ -8,7 +8,7 @@ proc_end
 
 proc_2
 	dup 3 % 0 == memset_0
-	dup 5 % 0 == memset_1
+	println dup println 5 % 0 == memset_1
 	memget_0 memget_1 && memset_2
 	memget_2 if
 		5 call
@@ -26,21 +26,17 @@ proc_2
 proc_end
 
 proc_3
-	"Fizz" 4 putsln
-	for_5 pop for_end
+	"Fizz" putsln
 proc_end
 
 proc_4
-	"Buzz" 4 putsln
-	for_5 pop for_end
+	"Buzz" putsln
 proc_end
 
 proc_5
-	"FizzBuzz" 8 putsln
-	for_9 pop for_end
+	"FizzBuzz" putsln
 proc_end
 
 proc_1
-	"FizzBuzz : " 11 puts
-	for_12 pop for_end
+	"FizzBuzz : " puts
 proc_end

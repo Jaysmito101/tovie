@@ -28,6 +28,16 @@ void Stack::print(const char* end)
     printf("%s", end);
 }
 
+void Stack::print_int(const char* end)
+{
+    printf("[ ");
+    int count = size / sizeof(int);
+    for(int i = 0; i < count; i++)
+        printf("%d ", ((int*)data)[i]);
+    printf("]");
+    printf("%s", end);
+}
+
 void Stack::validate(int sizei)
 {
     if(sizei + size > capacity)
@@ -73,6 +83,14 @@ void Stack::push(char value)
     size += sizeof(char);
 }
 
+void Stack::push(bool value)
+{
+    validate(sizeof(bool));
+    memcpy(top, &value, sizeof(bool));
+    top += sizeof(bool);
+    size += sizeof(bool);
+}
+
 void Stack::push(char* value)
 {
     validate(strlen(value) + 1);
@@ -106,12 +124,12 @@ void Stack::push(unsigned long long value)
     size += sizeof(unsigned long long);
 }
 
-void Stack::push(char* value, int size)
+void Stack::push(char* value, int sizei)
 {
     validate(size);
-    memcpy(top, value, size);
-    top += size;
-    size += size;
+    memcpy(top, value, sizei);
+    top += sizei;
+    size += sizei;
 }
 
 float Stack::pop_float()
@@ -141,6 +159,15 @@ int Stack::pop_int()
     return value;   
 }
 
+bool Stack::pop_bool()
+{
+    bool value;
+    memcpy(&value, top - sizeof(bool), sizeof(bool));
+    top -= sizeof(bool);
+    size -= sizeof(bool);
+    return value;   
+}
+
 char Stack::pop_char()
 {
     char value;
@@ -161,6 +188,7 @@ char* Stack::pop_str()
         sizei++;
     }
     char* outStr = (char*)malloc((top - value) + 1);
+    memset(outStr, '\0', (top - value) + 1);
     memcpy(outStr, value + 1, top - value);
     outStr[top - value] = '\0';
     top -= sizei + 1;
@@ -170,9 +198,10 @@ char* Stack::pop_str()
 
 char* Stack::pop(int sizei)
 {
-    char* value = top - 1 - sizei;
+    char* value = top - sizei;
     char* outStr = (char*)malloc((top - value));
-    memcpy(outStr, value + 1, top - value);
+    memset(outStr, '\0', (top - value));
+    memcpy(outStr, value, top - value);
     top -= sizei;
     size -= sizei;
     return outStr;   
@@ -204,4 +233,14 @@ unsigned long long Stack::pop_ullong()
     top -= sizeof(unsigned long long);
     size -= sizeof(unsigned long long);
     return value;      
+}
+
+int Stack::length()
+{
+    return size;
+}
+
+void* Stack::get_data()
+{
+    return data;
 }

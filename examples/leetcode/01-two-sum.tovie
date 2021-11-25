@@ -9,7 +9,7 @@ proc_main
 	0 >i
 	3 call >length
 	<length 0 memset
-	"Enter target : " 15 puts
+	"Enter target : " puts
 	&target $input
 	<length
 	for
@@ -38,9 +38,9 @@ proc_main
 proc_end
 
 proc_3
-	"Enter Number of elements : " 27 puts
+	"Enter Number of elements : " puts
 	inputi memset_0
-	"Enter elements : " 17 putsln
+	"Enter elements : " putsln
 	memget_0
 	for
 		inputi

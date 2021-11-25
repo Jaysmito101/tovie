@@ -1,6 +1,6 @@
 proc_0
     0 1
-    10 for
+    30 for
         print
 	memset_0
 	memset_1

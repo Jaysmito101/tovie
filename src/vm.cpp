@@ -17,22 +17,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "stack.hpp"
 #include "helpers.hpp"
-
-#ifdef __unix__
-char* strrev(char* str) {
-	char *p1, *p2;
-
-	if (!str || !*str)
-		return str;
-	for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2) {
-		*p1 ^= *p2;
-		*p2 ^= *p1;
-		*p1 ^= *p2;
-	}
-	return str;
-}
-#endif
 
 struct Variable {
 	DataType type;
@@ -63,76 +49,116 @@ std::ostream& operator<<(std::ostream& os, std::vector<ProcAddr>& vec){
 	return os;
 }
 
-static void push_variable(std::vector<int>& progStack, Variable& v, bool debug = false) {
+static void print(char* data, int size){
+	std::cout << "[ ";
+	for (int i = 0; i < size; i++) {
+		std::cout << (int)*(data + i) << " ";
+	}
+	std::cout << "]";
+}
+
+static void push_variable(Stack& progStack, Variable& v, bool debug = false) {
 	if (debug)
 		std::cout << " [DEBUG]\t push variable : " << v.id << std::endl;
-	if (v.type == DataType::INT) {
-		int tmp = *(int*) v.value;
-		progStack.push_back(tmp);
-		return;
-	} else if (v.type == DataType::UINT) {
-		unsigned int tmp = *(unsigned int*) v.value;
-		progStack.push_back(tmp);
-		return;
-	} else if (v.type == DataType::BOOL) {
-		bool tmp = *(bool*) v.value;
-		progStack.push_back(tmp);
-		return;
-	} else if (v.type == DataType::STRING) {
-		char* data = (char*) v.value;
-		for (int i = 0; i < strlen(data); i++) {
-			progStack.push_back(data[i]);
+	switch(v.type)
+	{
+		case INT:
+		{
+			progStack.push(*(int*)v.value);
+			break;
+		}		
+		case UINT:
+		{
+			progStack.push(*(unsigned int*)v.value);
+			break;
 		}
-		progStack.push_back(-1);
-		return;
-	} else {
-		int			   size = get_data_type_size(v.type);
-		unsigned char* data = (unsigned char*) v.value;
-		for (int i = size - 1; i >= 0; i--) {
-			progStack.push_back(data[i]);
+		case LONG:
+		{
+			progStack.push(*(long long*)v.value);
+			break;
 		}
-		return;
+		case ULONG:
+		{
+			progStack.push(*(unsigned long long*)v.value);
+			break;
+		}
+		case FLOAT:
+		{
+			progStack.push(*(float*)v.value);
+			break;
+		}
+		case DOUBLE:
+		{
+			progStack.push(*(double*)v.value);
+			break;
+		}
+		case BOOL:
+		{
+			progStack.push(*(bool*)v.value);
+			break;
+		}
+		case STRING:
+		{
+			progStack.push((char*)v.value);
+			break;
+		}
 	}
 }
 
-static void pop_variable(std::vector<int>& progStack, Variable& v, bool debug = false) {
+static void pop_variable(Stack& progStack, Variable& v, bool debug = false) {
 	if (debug)
 		std::cout << " [DEBUG]\t pop variable : " << v.id << std::endl;
-	if (v.type == DataType::INT || v.type == DataType::UINT) {
-		int tmp = progStack.back();
-		progStack.pop_back();
-		memcpy(v.value, &tmp, sizeof(int));
-		return;
-	} else if (v.type == DataType::BOOL) {
-		int tmp = progStack.back();
-		progStack.pop_back();
-		bool val = (bool) tmp;
-		memcpy(v.value, &val, sizeof(bool));
-		return;
-	} else if (v.type == DataType::STRING) {
-		int	  size = get_data_type_size(v.type);
-		char* data = (char*) malloc(size);
-		memset(data, 0, size);
-		for (int i = 0; i < size; i++) {
-			int v = progStack.back();
-			progStack.pop_back();
-			if (v == -1)
-				break;
-			data[i] = (char) v;
+	switch(v.type)
+	{
+		case INT:
+		{
+			int tmp = progStack.pop_int();
+			memcpy(v.value, &tmp, sizeof(int));
+			break;
+		}		
+		case UINT:
+		{
+			unsigned int tmp = progStack.pop_uint();
+			memcpy(v.value, &tmp, sizeof(unsigned int));
+			break;
 		}
-		strrev(data);
-		memcpy(v.value, data, size);
-		delete[] data;
-	} else {
-		int			   size = get_data_type_size(v.type);
-		unsigned char* data = (unsigned char*) malloc(size);
-		memset(data, 0, size);
-		for (int i = 0; i < size; i++) {
-			data[i] = progStack.back();
-			progStack.pop_back();
+		case LONG:
+		{
+			long long tmp = progStack.pop_llong();
+			memcpy(v.value, &tmp, sizeof(long long));
+			break;
 		}
-		memcpy(v.value, data, size);
-		delete[] data;
+		case ULONG:
+		{
+			unsigned long long tmp = progStack.pop_ullong();
+			memcpy(v.value, &tmp, sizeof(unsigned long long));
+			break;
+		}
+		case FLOAT:
+		{
+			float tmp = progStack.pop_float();
+			memcpy(v.value, &tmp, sizeof(float));
+			break;
+		}
+		case DOUBLE:
+		{
+			double tmp = progStack.pop_double();
+			memcpy(v.value, &tmp, sizeof(double));
+			break;
+		}
+		case BOOL:
+		{
+			bool tmp = progStack.pop_bool();
+			memcpy(v.value, &tmp, sizeof(bool));
+			break;
+		}
+		case STRING:
+		{
+			char* data = progStack.pop_str();
+			memcpy(v.value, data, strlen(data));
+			delete[] data;
+			break;
+		}
 	}
 }
 
@@ -145,270 +171,190 @@ void print(std::vector<int> vec) {
 	std::cout << "]" << std::endl;
 }
 
-void push(std::vector<int>& s, Operation op, bool debug = false) {
+void push(Stack& s, Operation op, bool debug = false) {
 	if (debug)
-		std::cout << " [DEBUG]\t push " << op.arg << std::endl;
-	s.push_back(op.arg);
+		std::cout << " [DEBUG]\t push  size: " << op.arg << "(" << to_data_type_name(op.arg) << " " << get_value(op.ops, op.arg) << ")" << std::endl;
+	int size = op.arg;
+	for (int i = 0; i < size; i++) {
+		s.push((char)op.ops[i]);
+	}
 }
 
-void pop(std::vector<int>& s, Operation op, bool debug = false) {
+void pop(Stack& s, Operation op, bool debug = false) {
 	if (debug)
 		std::cout << " [DEBUG]\t pop " << std::endl;
-	s.pop_back();
+	s.pop_int();
 }
 
-void andop(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	s.pop_back();
-	int b = s.back();
-	s.pop_back();
+void andop(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	int b = s.pop_int();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " && " << a << std::endl;
-	s.push_back(b && a);
+	s.push((int)(b && a));
 }
 
-void orop(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	s.pop_back();
-	int b = s.back();
-	s.pop_back();
+void orop(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	int b = s.pop_int();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " || " << a << std::endl;
-	s.push_back(b || a);
+	s.push((int)(b || a));
 }
 
-void add(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	s.pop_back();
-	int b = s.back();
-	s.pop_back();
+void add(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	int b = s.pop_int();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " + " << a << std::endl;
-	s.push_back(b + a);
+	s.push(b + a);
 }
 
-void sub(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	s.pop_back();
-	int b = s.back();
-	s.pop_back();
+void sub(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	int b = s.pop_int();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " - " << a << std::endl;
-	s.push_back(b - a);
+	s.push(b - a);
 }
 
-void mul(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	s.pop_back();
-	int b = s.back();
-	s.pop_back();
+void mul(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	int b = s.pop_int();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " * " << a << std::endl;
-	s.push_back(b * a);
+	s.push(b * a);
 }
 
-void div(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	s.pop_back();
-	int b = s.back();
-	s.pop_back();
+void div(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	int b = s.pop_int();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " / " << a << std::endl;
-	s.push_back(b / a);
+	s.push(b / a);
 }
 
-void mod(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	s.pop_back();
-	int b = s.back();
-	s.pop_back();
+void mod(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	int b = s.pop_int();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " % " << a << std::endl;
-	s.push_back(b % a);
+	s.push(b % a);
 }
 
-void dump(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
+void println(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	s.push(a);
 	std::cout << a << std::endl;
 }
 
-void dumps(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	std::cout << (char) a << std::endl;
+void printlns(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	s.push(a);
+	std::cout << (char)a << std::endl;
 }
 
-void dumpns(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s[(int) s.size() - 1 - s.back()];
-	std::cout << (char) a << std::endl;
-}
-
-void dumpn(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s[(int) s.size() - 1 - s.back()];
-	std::cout << a << std::endl;
-}
-
-void println(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	std::cout << a << std::endl;
-}
-
-void printlns(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	std::cout << (char) a << std::endl;
-}
-
-void printlnns(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s[(int) s.size() - 1 - s.back()];
-	std::cout << (char) a << std::endl;
-}
-
-void printlnn(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s[(int) s.size() - 1 - s.back()];
-	std::cout << a << std::endl;
-}
-
-void pow(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	s.pop_back();
-	int b = s.back();
-	s.pop_back();
+void pow(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	int b = s.pop_int();
 	int r = 1;
 	for (int i = 0; i < a; i++) {
 		r *= b;
 	}
 	if (debug)
 		std::cout << b << " ^ " << a << std::endl;
-	s.push_back(r);
+	s.push(r);
 }
 
-void print(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
+void print(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	s.push(a);
 	std::cout << a;
 }
 
-void prints(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	std::cout << (char) a;
+void prints(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	s.push(a);
+	std::cout << (char)a;
 }
 
-void printns(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s[(int) s.size() - 1 - s.back()];
-	std::cout << (char) a;
-}
-
-void printn(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s[(int) s.size() - 1 - s.back()];
-	std::cout << a;
-}
-
-void puts(std::vector<int>& s, Operation op, bool debug = false) {
-	int l = s.back();
-	s.pop_back();
-	int i = s.size() - l;
+void puts(Stack& s, Operation op, bool debug = false) {
 	if (debug) {
 		std::cout << " [DEBUG]\t puts" << std::endl;
-		std::cout << " [DEBUG]\t\t"
-				  << " length : " << l << std::endl;
-		std::cout << " [DEBUG]\t\t"
-				  << " begin : " << i << std::endl;
 	}
-	for (int j = i; j < s.size(); j++)
-		std::cout << (char) s[j];
+	char* str_c = s.pop_str();
+	std::cout << str_c;
+	delete[] str_c;
 }
 
-void putsln(std::vector<int>& s, Operation op, bool debug = false) {
-	int l = s.back();
-	s.pop_back();
-	int i = s.size() - l;
-	if (debug) {
-		std::cout << " [DEBUG]\t putsln" << std::endl;
-		std::cout << " [DEBUG]\t\t"
-				  << " length : " << l << std::endl;
-		std::cout << " [DEBUG]\t\t"
-				  << " begin : " << i << std::endl;
-	}
-	for (int j = i; j < s.size(); j++)
-		std::cout << (char) s[j];
+void putsln(Stack& s, Operation op, bool debug = false) {
+	puts(s, op, debug);
 	std::cout << std::endl;
 }
 
-void gt(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	s.pop_back();
-	int b = s.back();
-	s.pop_back();
+void gt(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	int b = s.pop_int();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " > " << a << std::endl;
-	s.push_back(b > a);
+	s.push((int)(b > a));
 }
 
-void lt(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	s.pop_back();
-	int b = s.back();
-	s.pop_back();
+void lt(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	int b = s.pop_int();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " < " << a << std::endl;
-	s.push_back(b < a);
+	s.push((int)(b < a));
 }
 
-void ge(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	s.pop_back();
-	int b = s.back();
-	s.pop_back();
+void ge(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	int b = s.pop_int();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " >= " << a << std::endl;
-	s.push_back(b >= a);
+	s.push((int)(b >= a));
 }
 
-void le(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	s.pop_back();
-	int b = s.back();
-	s.pop_back();
+void le(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	int b = s.pop_int();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " <= " << a << std::endl;
-	s.push_back(b <= a);
+	s.push((int)(b <= a));
 }
 
-void eq(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	s.pop_back();
-	int b = s.back();
-	s.pop_back();
+void eq(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	int b = s.pop_int();
 	if (debug)
 		std::cout << " [DEBUG]\t" << a << " == " << b << std::endl;
-	s.push_back(a == b);
+	s.push((int)(b == a));
 }
 
-void neq(std::vector<int>& s, Operation op, bool debug = false) {
-	int a = s.back();
-	s.pop_back();
-	int b = s.back();
-	s.pop_back();
+void neq(Stack& s, Operation op, bool debug = false) {
+	int a = s.pop_int();
+	int b = s.pop_int();
 	if (debug)
 		std::cout << " [DEBUG]\t" << a << " != " << b << std::endl;
-	s.push_back(a != b);
+	s.push((int)(b != a));
 }
 
-void inputi(std::vector<int>& s, Operation op, bool debug = false) {
+void inputi(Stack& s, Operation op, bool debug = false) {
 	if (debug)
 		std::cout << " [DEBUG]\tinput integer" << std::endl;
 	int n = 0;
 	std::cin >> n;
-	s.push_back(n);
+	s.push(n);
 }
 
-void inputs(std::vector<int>& s, Operation op, bool debug = false) {
+void inputs(Stack& s, Operation op, bool debug = false) {
 	if (debug)
 		std::cout << " [DEBUG]\tinput string" << std::endl;
 	std::string ss = "";
 	std::getline(std::cin, ss);
-	s.push_back(-1);
-	for (int i = 0; i < ss.size(); i++)
-		s.push_back(ss[i]);
-	s.push_back(ss.size());
+	s.push(ss.c_str());
+	s.push(ss.size());
 }
 #endif
 
@@ -421,11 +367,10 @@ static Variable get_variable(int id, std::unordered_map<int, Variable>& gV, std:
 	throw std::runtime_error("variable (" + std::to_string(id) + ") is not defined");
 }
 
-static void addVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
-	Variable b = get_variable(s.back(), gV, lV);
-	s.pop_back();
+static void addVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable b = get_variable(s.pop_int(), gV, lV);
+
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -465,11 +410,10 @@ static void addVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 	deallocate_data_type(c.value, c.type);
 }
 
-static void subVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
-	Variable b = get_variable(s.back(), gV, lV);
-	s.pop_back();
+static void subVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable b = get_variable(s.pop_int(), gV, lV);
+
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -508,11 +452,10 @@ static void subVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 	deallocate_data_type(c.value, c.type);
 }
 
-static void mulVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
-	Variable b = get_variable(s.back(), gV, lV);
-	s.pop_back();
+static void mulVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable b = get_variable(s.pop_int(), gV, lV);
+
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -548,11 +491,10 @@ static void mulVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 	deallocate_data_type(c.value, c.type);
 }
 
-static void divVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
-	Variable b = get_variable(s.back(), gV, lV);
-	s.pop_back();
+static void divVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable b = get_variable(s.pop_int(), gV, lV);
+
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -588,11 +530,9 @@ static void divVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 	deallocate_data_type(c.value, c.type);
 }
 
-static void modVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
-	Variable b = get_variable(s.back(), gV, lV);
-	s.pop_back();
+static void modVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable b = get_variable(s.pop_int(), gV, lV);
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -622,11 +562,9 @@ static void modVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 	deallocate_data_type(c.value, c.type);
 }
 
-static void gtVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
-	Variable b = get_variable(s.back(), gV, lV);
-	s.pop_back();
+static void gtVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable b = get_variable(s.pop_int(), gV, lV);
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -659,14 +597,12 @@ static void gtVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op gt");
 		break;	
 	}
-	s.push_back(flag);
+	s.push((int)flag);
 }
 
-static void ltVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
-	Variable b = get_variable(s.back(), gV, lV);
-	s.pop_back();
+static void ltVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable b = get_variable(s.pop_int(), gV, lV);
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -699,14 +635,12 @@ static void ltVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op lt");
 		break;	
 	}
-	s.push_back(flag);
+	s.push((int)flag);
 }
 
-static void geVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
-	Variable b = get_variable(s.back(), gV, lV);
-	s.pop_back();
+static void geVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable b = get_variable(s.pop_int(), gV, lV);
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -739,14 +673,12 @@ static void geVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op ge");
 		break;	
 	}
-	s.push_back(flag);
+	s.push((int)flag);
 }
 
-static void leVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
-	Variable b = get_variable(s.back(), gV, lV);
-	s.pop_back();
+static void leVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable b = get_variable(s.pop_int(), gV, lV);
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -779,14 +711,12 @@ static void leVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op le");
 		break;	
 	}
-	s.push_back(flag);
+	s.push((int)flag);
 }
 
-static void eqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
-	Variable b = get_variable(s.back(), gV, lV);
-	s.pop_back();
+static void eqVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable b = get_variable(s.pop_int(), gV, lV);
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -819,21 +749,18 @@ static void eqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op eq");
 		break;	
 	}
-	s.push_back(flag);
+	s.push((int)flag);
 }
 
-static void neqVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+static void neqVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
 	eqVOP(s, gV, lV, debug);
-	bool flag = !s.back();
-	s.pop_back();
-	s.push_back(flag);
+	bool flag = !s.pop_bool();
+	s.push((int)flag);
 }
 
-static void andVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
-	Variable b = get_variable(s.back(), gV, lV);
-	s.pop_back();
+static void andVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable b = get_variable(s.pop_int(), gV, lV);
 	if (a.type && b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -863,15 +790,13 @@ static void andVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, s
 		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op and");
 		break;	
 	}
-	s.push_back(flag);
+	s.push((int)flag);
 	
 }
 
-static void orVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
-	Variable b = get_variable(s.back(), gV, lV);
-	s.pop_back();
+static void orVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable b = get_variable(s.pop_int(), gV, lV);
 	if (a.type || b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -901,28 +826,25 @@ static void orVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, st
 		throw std::runtime_error("type " + to_string(a.type) + " is not supported for op or");
 		break;	
 	}
-	s.push_back(flag);
+	s.push((int)flag);
 }
 
-static void printVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+static void printVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
 	if(debug)
 		std::cout << " [DEBUG]\t printvop" << std::endl;
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
+	Variable a = get_variable(s.pop_int(), gV, lV);
 	std::cout << get_data_value(a.value, a.type);
 }
-static void printlnVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+static void printlnVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
 	if(debug)
 		std::cout << " [DEBUG]\t printlnvop" << std::endl;
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
+	Variable a = get_variable(s.pop_int(), gV, lV);
 	std::cout << get_data_value(a.value, a.type) << std::endl;
 }
-static void inputVOP(std::vector<int>& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
+static void inputVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
 	if(debug)
 		std::cout << " [DEBUG]\t inputvop" << std::endl;
-	Variable a = get_variable(s.back(), gV, lV);
-	s.pop_back();
+	Variable a = get_variable(s.pop_int(), gV, lV);
 	switch (a.type) {
 	case INT:
 		std::cin >> *(int*) a.value;
@@ -960,7 +882,7 @@ static void reverse(std::string& str) {
 static std::vector<ProcAddr>							   procAddresses;
 static std::unordered_map<int, Variable>							   gVars;
 static void*														   runtimeLib = nullptr;
-static std::unordered_map<std::string, std::function<void(int*, int)>> libProcs;
+static std::unordered_map<std::string, std::function<void(void*, int)>> libProcs;
 
 static ProcAddr get_proc_addr(int procId) {
 	for (auto& proc : procAddresses) {
@@ -978,17 +900,10 @@ static void clearVars(std::unordered_map<int, Variable>& v) {
 	v.clear();
 }
 
-static void loadLibProc(std::vector<int>& progStack, Operation op, bool debug) {
-	std::string libPath = "";
+static void loadLibProc(Stack& progStack, Operation op, bool debug) {
+	std::string libPath(progStack.pop_str());
+	libPath = libPath.substr(0, libPath.size() - 1);
 	int			back	= 0;
-	while (true) {
-		back = progStack.back();
-		progStack.pop_back();
-		if (back == -1)
-			break;
-		libPath += (char) back;
-	}
-	reverse(libPath);
 	if (debug)
 		std::cout << " [DEBUG]\t load library : " << libPath << std::endl;
 	if (runtimeLib)
@@ -1020,24 +935,16 @@ static void loadGlobals(std::vector<Operation>& ops) {
 	}
 }
 
-static void callLibProc(std::vector<int>& progStack, Operation op, bool debug = false) {
-	std::string libProcName = "";
-	int			back		= 0;
-	while (true) {
-		back = progStack.back();
-		progStack.pop_back();
-		if (back == -1)
-			break;
-		libProcName += (char) back;
-	}
-	reverse(libProcName);
+static void callLibProc(Stack& progStack, Operation op, bool debug = false) {
+	std::string libProcName(progStack.pop_str());
+	libProcName = libProcName.substr(0, libProcName.size() - 1);
 	if (debug)
 		std::cout << " [DEBUG]\t call library procedure : " << libProcName << std::endl;
 	// Find Key libProcName exists in libProcs or not
 	if (libProcs.find(libProcName) == libProcs.end()) {
 		libProcs[libProcName] = get_runtimelib_proc(runtimeLib, libProcName.c_str());
 	}
-	libProcs[libProcName](progStack.data(), progStack.size());
+	libProcs[libProcName](progStack.get_data(), progStack.length());
 }
 
 static void loadProcs(std::vector<Operation>& ops) {
@@ -1066,24 +973,48 @@ static void loadProcs(std::vector<Operation>& ops) {
 }
 
 
-static void simulate_proc(std::vector<int>& progStack, std::vector<Operation>& ops, ProcAddr& pAddr, bool debug);
+static void simulate_proc(Stack& progStack, std::vector<Operation>& ops, ProcAddr& pAddr, bool debug);
 
-static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long* i, int* memory, std::vector<Operation>& ops, bool debug, std::unordered_map<int, Variable>& lVars) {
+static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* memory, std::vector<Operation>& ops, bool debug, std::unordered_map<int, Variable>& lVars) {
 
 	if (debug && false)	   // TMP
 		std::cout << " [DEBUG]\t" << op.op << "\t\t" << op.arg << std::endl;
 	if (debug) {
-		std::cout << " [DEBUG] STACK : ";
-		print(progStack);
-		std::cout << " [DEBUG] GVARS : " << gVars << std::endl;
-		std::cout << " [DEBUG] LVARS : " << lVars << std::endl;
-		std::cout << " [DEBUG] OP ID : " << *i << " [ " << op.op << " " << op.arg << " ]" << std::endl;
+		std::cout << " [DEBUG] STACK (" << progStack.length() <<  ") : ";
+		progStack.print();
+		//std::cout << " [DEBUG] GVARS : " << gVars << std::endl;
+		//std::cout << " [DEBUG] LVARS : " << lVars << std::endl;
+		//std::cout << " [DEBUG] OP ID : " << *i << " [ " << op.op << " " << op.arg << " ]" << std::endl;
 	}
 	int a, b;
 	switch (op.op) {
 		case OperationType::PUSH:
 			push(progStack, op, debug);
 			break;
+		case PUSHS:
+		{
+			char data[4096];
+			int co = 0;
+			*i += 1;
+			while(co <= 4096)
+			{
+				unsigned long c = *i;
+				c += 1;
+				if(c >= ops.size() || ops[c - 1].op != OperationType::PUSHS){
+					if(debug)
+						std::cout << " [DEBUG] PUSHS done data : " << data << std::endl;
+					break;
+				}
+				if(debug)
+					std::cout << " [DEBUG] " << ops[*i].op << "\t\t" << ops[*i].arg << std::endl;
+				data[co++] = (char)ops[*i].arg;
+				*i += 1;
+			}
+			*i -= 1;
+			progStack.push('\0');
+			progStack.push(data, co);
+			break;
+		}
 		case OperationType::AND:
 			andop(progStack, op, debug);
 			break;
@@ -1109,28 +1040,26 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 			mod(progStack, op, debug);
 			break;
 		case OperationType::PRINTLN:
-			println(progStack, op, debug);
+			println(progStack, op, debug);;
 			break;
 		case OperationType::PRINTLNS:
-			printlns(progStack, op, debug);
+			printlns(progStack, op, debug);;
 			break;
 		case OperationType::DUP:
-			progStack.push_back(progStack.back());
+			a = progStack.pop_int();
+			progStack.push(a);
+			progStack.push(a);
 			break;
 		case OperationType::SWAP:
-			a = progStack.back();
-			progStack.pop_back();
-			b = progStack.back();
-			progStack.pop_back();
-			progStack.push_back(a);
-			progStack.push_back(b);
+			a = progStack.pop_int();
+			b = progStack.pop_int();			
+			progStack.push(a);
+			progStack.push(b);
 			break;
 		case OperationType::PRINTLNNS:
-			printlnns(progStack, op, debug);
-			break;
+			throw std::runtime_error("printlnns deperecated!");
 		case OperationType::PRINTLNN:
-			printlnn(progStack, op, debug);
-			break;
+			throw std::runtime_error("printlnn deperecated!");
 		case OperationType::PRINT:
 			print(progStack, op, debug);
 			break;
@@ -1138,26 +1067,22 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 			prints(progStack, op, debug);
 			break;
 		case OperationType::PRINTNS:
-			printns(progStack, op, debug);
-			break;
+			throw std::runtime_error("printns deperecated!");
 		case OperationType::PRINTN:
-			printn(progStack, op, debug);
-			break;
+			throw std::runtime_error("printn deperecated!");
 		case OperationType::DUMP:
-			dump(progStack, op, debug);
+			println(progStack, op, debug);
 			break;
 		case OperationType::LOADLIB:
 			loadLibProc(progStack, op, debug);
 			break;
 		case OperationType::DUMPS:
-			dumps(progStack, op, debug);
+			printlns(progStack, op, debug);
 			break;
 		case OperationType::DUMPN:
-			dumpn(progStack, op, debug);
-			break;
+			throw std::runtime_error("dumpn deperecated!");
 		case OperationType::DUMPNS:
-			dumpns(progStack, op, debug);
-			break;
+			throw std::runtime_error("dumpns deperecated!");
 		case OperationType::PUTS:
 			puts(progStack, op, debug);
 			break;
@@ -1228,7 +1153,7 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 				if (debug)
 					std::cout << " [DEBUG]\t"
 							  << " VAR " << op.arg << " PUTV" << std::endl;
-				progStack.push_back(v.id);
+				progStack.push(v.id);
 			}
 			else {
 				OperationType vop = (OperationType) op.arg;
@@ -1307,8 +1232,7 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 			break;
 		}
 		case OperationType::CALL: {
-			int procId = progStack.back();
-			progStack.pop_back();
+			int procId = progStack.pop_int();
 			if (debug)
 				std::cout << " [DEBUG]\tcall proc_" << procId << std::endl;
 			ProcAddr pAddr = get_proc_addr(procId);
@@ -1320,26 +1244,13 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 			break;
 		}
 		case OperationType::RECEED: {
-			int count = progStack.back();
-			progStack.pop_back();
-			if (progStack.back())
-				*i -= count + 2;
-			if (debug && progStack.back())
-				std::cout << " [DEBUG]\t receed " << count << std::endl;
-			break;
+			throw std::runtime_error("RECEED operation deprecated!");
 		}
 		case OperationType::PROCEED: {
-			int count = progStack.back();
-			progStack.pop_back();
-			if (progStack.back())
-				*i += count - 1;
-			if (debug && progStack.back())
-				std::cout << " [DEBUG]\t porceed " << count << std::endl;
-			break;
+			throw std::runtime_error("PROCEED operation deprecated!");
 		}
 		case OperationType::MALLOC: {
-			int count = progStack.back();
-			progStack.pop_back();
+			int count = progStack.pop_int();
 			if (debug)
 				std::cout << " [DEBUG]\t malloc " << count << std::endl;
 			if (memory != nullptr)
@@ -1349,47 +1260,40 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 		}
 		case OperationType::MEMGET: {
 			if (op.arg == -1) {
-				int addr = progStack.back();
-				progStack.pop_back();
-				int size = progStack.back();
-				progStack.pop_back();
+				int addr = progStack.pop_int();
+				int size = progStack.pop_int();
 				if (debug)
 					std::cout << " [DEBUG]\t memget " << addr << size << std::endl;
 				for (int k = addr + size - 1; k >= addr; k--)
-					progStack.push_back(memory[k]);
+					progStack.push(memory[k]);
 			} else {
 				int addr = op.arg;
 				if (debug)
 					std::cout << " [DEBUG]\t memget " << addr << std::endl;
-				progStack.push_back(memory[addr]);
+				progStack.push(memory[addr]);
 			}
 			break;
 		}
 		case OperationType::MEMSET: {
 			if (op.arg == -1) {
-				int addr = progStack.back();
-				progStack.pop_back();
-				int size = progStack.back();
-				progStack.pop_back();
+				int addr = progStack.pop_int();
+				int size = progStack.pop_int();
 				if (debug)
 					std::cout << " [DEBUG]\t memset " << addr << size << std::endl;
 				for (int k = addr; k < addr + size; k++) {
-					memory[k] = progStack.back();
-					progStack.pop_back();
+					memory[k] = progStack.pop_int();
 				}
 			} else {
 				int addr = op.arg;
 				if (debug)
 					std::cout << " [DEBUG]\t memset " << addr << std::endl;
-				memory[addr] = progStack.back();
-				progStack.pop_back();
+				memory[addr] = progStack.pop_int();
 			}
 			break;
 		}
 		case OperationType::IF: {
 			if (op.arg == 0) {
-				int condition = progStack.back();
-				progStack.pop_back();
+				int condition = progStack.pop_int();
 				if (debug)
 					std::cout << " [DEBUG]\t if " << condition << std::endl;
 				if (condition) {
@@ -1417,8 +1321,7 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 		}
 		case OperationType::WHILE: {
 			if (op.arg == 0) {
-				int condition = progStack.back();
-				progStack.pop_back();
+				int condition = progStack.pop_int();
 				if (condition) {
 					// For future use
 					if (debug)
@@ -1475,8 +1378,7 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 				}
 				int count = op.arg;
 				if (op.arg == -2) {
-					count = progStack.back();
-					progStack.pop_back();
+					count = progStack.pop_int();
 				}
 				if (debug) {
 					std::cout << " [DEBUG]\t for " << count << " times from " << *i << " to " << end << std::endl;
@@ -1493,11 +1395,12 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 			break;
 		}
 		case OperationType::EXIT: {
+			int code = progStack.pop_int();
 			if (debug)
-				std::cout << " [DEBUG]\texit " << progStack.back() << std::endl;
+				std::cout << " [DEBUG]\texit " << code << std::endl;
 			if (memory != nullptr)
 				delete[] memory;
-			exit(progStack.back());
+			exit(code);
 		}
 		case OperationType::RET: {
 			if (debug)
@@ -1508,7 +1411,7 @@ static void simulate_op(std::vector<int>& progStack, Operation op, unsigned long
 }
 
 
-static void simulate_proc(std::vector<int>& progStack, std::vector<Operation>& ops, ProcAddr& pAddr, bool debug) {
+static void simulate_proc(Stack& progStack, std::vector<Operation>& ops, ProcAddr& pAddr, bool debug) {
 	int*							  memory	  = new int[1024];
 	int								  endIdToSkip = 0;
 	std::unordered_map<int, Variable> lVars;
@@ -1533,8 +1436,8 @@ void simulate(std::vector<Operation> ops, bool debug) {
 	loadProcs(ops);
 	loadGlobals(ops);
 	runtimeLib = nullptr;
-	std::vector<int> progStack;
-	progStack.push_back(0);
+	Stack progStack;
+	progStack.push(0);
 	ProcAddr pAddr = get_proc_addr(0);
 	simulate_proc(progStack, ops, pAddr, debug);
 }

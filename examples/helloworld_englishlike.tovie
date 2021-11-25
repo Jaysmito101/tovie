@@ -1,1 +1,0 @@
-Lets start with proc_0 as the main function. Then i push 2 into the stack to call procedure 2. Lastly I end this proc by end_proc . As far as proc_2 is concerned, first i push the string "Hello!" of size 6 in the stack. Then just puts in on screen! Lastly proc_end .

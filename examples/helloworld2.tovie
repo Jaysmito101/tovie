@@ -1,7 +1,6 @@
 proc_0
-	0 "olleH"
-	prints
-	pop
-	2
-	receed
+	0 33 111 108 108 101 72
+	true while
+		prints
+	while_end
 proc_end

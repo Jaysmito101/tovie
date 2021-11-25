@@ -33,9 +33,9 @@ void* open_runtime_lib(const char* lib_name) {
 	return (void*) gllID;
 }
 
-typedef void (*TovieNativeFunc)(int*, int);
+typedef void (*TovieNativeFunc)(void*, int);
 
-std::function<void(int*, int)> get_runtimelib_proc(void* runtimeLib, const char* libProcName) {
+std::function<void(void*, int)> get_runtimelib_proc(void* runtimeLib, const char* libProcName) {
 	HINSTANCE gllID = (HINSTANCE) runtimeLib;
 
 	// resolve function address here
@@ -76,9 +76,9 @@ void* open_runtime_lib(const char* lib_name) {
 }
 
 
-typedef void (*TovieNativeFunc)(int*, int);
+typedef void (*TovieNativeFunc)(void*, int);
 
-std::function<void(int*, int)> get_runtimelib_proc(void* runtimeLib, const char* libProcName) {
+std::function<void(void*, int)> get_runtimelib_proc(void* runtimeLib, const char* libProcName) {
 	TovieNativeFunc funci;
 	;
 	funci = (TovieNativeFunc) dlsym(runtimeLib, libProcName);

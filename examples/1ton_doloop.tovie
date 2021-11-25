@@ -7,8 +7,7 @@ proc_end
 // PROC FOR TAKING INPUT
 
 proc_1
-	"Enter N: "
-	9 puts
+	"Enter N: " puts
 	inputi
 proc_end
 

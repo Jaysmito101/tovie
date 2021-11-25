@@ -1,3 +1,3 @@
 @echo off
-..\\..\\..\\bin\\tovie sis main.tovie
+..\\..\\..\\bin\\tovie -r main.tovie
 pause

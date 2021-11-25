@@ -36,6 +36,8 @@ std::string to_string(OperationType type) {
 			return "LT";
 		case PUSH:
 			return "PUSH";
+		case PUSHS:
+			return "PUSHS";
 		case POP:
 			return "POP";
 		case PRINTLN:

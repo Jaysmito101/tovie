@@ -17,6 +17,7 @@ enum OperationType {
 	GT,
 	LT,
 	PUSH,
+	PUSHS,
 	POP,
 	PRINTLN,
 	PRINTLNS,

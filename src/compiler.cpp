@@ -99,6 +99,15 @@ static std::string read_lib(const std::string& lib_name, std::vector<std::string
 static std::unordered_map<std::string, int> vars;
 static int									varId;
 
+static void push_number(Operation& op, int size, void* d)
+{
+	op.arg = size;
+	char* data = static_cast<char*>(d);
+	for (int i = 0; i < size; i++) {
+		op.ops[i] = data[i];
+	}
+}
+
 std::vector<Operation> parse(std::string input, std::vector<std::string> includePaths, bool debug, std::vector<Operation>& ioperations, std::unordered_map<std::string, std::string>& idefs, bool isInclude) {
 	if (!isInclude) {
 		varId = 0;
@@ -156,53 +165,50 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 
 		// Operation tokens
 		if (is_integer(token)) {
+			Operation opers(OperationType::PUSH);
 			try {
-				operations.push_back(Operation(OperationType::PUSH, std::stoi(token)));
+				int n = std::stoi(token);
+				push_number(opers, sizeof(int), &n);
 			} catch (...) {
-				long	   val	= (long)std::stoll(token);
-				unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
-				for (int i = sizeof(long) - 1; i >= 0; i--) {
-					operations.push_back(Operation(OperationType::PUSH, data[i]));
-				}
+				long long val = std::stoll(token);
+				push_number(opers, sizeof(long long), &val);
 			}
+			operations.push_back(opers);
 		} else if (is_float(token)) {
+			Operation opers(OperationType::PUSH);
 			double		   val	= std::stod(token);
-			unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
-			for (int i = sizeof(double) - 1; i >= 0; i--) {
-				operations.push_back(Operation(OperationType::PUSH, data[i]));
-			}
+			push_number(opers, sizeof(double), &val);
+			operations.push_back(opers);
 		} else if (token[0] == '-' && token.size() >=2  && is_integer(token.substr(1))) {
+			Operation opers(OperationType::PUSH);
 			try {
-				operations.push_back(Operation(OperationType::PUSH, std::stoi(token)));
+				int n = std::stoi(token);
+				push_number(opers, sizeof(int), &n);
 			} catch (...) {
-				long	   val	= std::stoll(token);
-				unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
-				for (int i = sizeof(long) - 1; i >= 0; i--) {
-					operations.push_back(Operation(OperationType::PUSH, data[i]));
-				}
+				long long val = std::stoll(token);
+				push_number(opers, sizeof(long long), &val);
 			}
+			operations.push_back(opers);
 		} else if (token[0] == '-' && token.size() >=2 && is_float(token.substr(1))) {
+			Operation opers(OperationType::PUSH);
 			double		   val	= std::stod(token);
-			unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
-			for (int k = sizeof(double) - 1; k >= 0; k--) {
-				operations.push_back(Operation(OperationType::PUSH, data[k]));
-			}
+			push_number(opers, sizeof(double), &val);
+			operations.push_back(opers);
 		} else if (token[0] == 'u' && is_integer(token.substr(1))) {
+			Operation opers(OperationType::PUSH);
 			try {
-				operations.push_back(Operation(OperationType::PUSH, (int) std::stoul(token.substr(1))));
+				int n = std::stoi(token.substr(1));
+				push_number(opers, sizeof(int), &n);
 			} catch (...) {
-				unsigned long val	= std::stoull(token.substr(1));
-				unsigned char*	   data = static_cast<unsigned char*>(static_cast<void*>(&val));
-				for (int i = sizeof(unsigned long) - 1; i >= 0; i--) {
-					operations.push_back(Operation(OperationType::PUSH, data[i]));
-				}
+				unsigned long long val = std::stoull(token.substr(1));
+				push_number(opers, sizeof(unsigned long long), &val);
 			}
+			operations.push_back(opers);
 		} else if (token[0] == 'f' && is_float(token.substr(1))) {
-			float		   val	= std::stof(token.substr(1));
-			unsigned char* data = static_cast<unsigned char*>(static_cast<void*>(&val));
-			for (int k = sizeof(float) - 1; k >= 0; k--) {
-				operations.push_back(Operation(OperationType::PUSH, data[k]));
-			}
+			Operation opers(OperationType::PUSH);
+			float val = std::stof(token);
+			push_number(opers, sizeof(float), &val);
+			operations.push_back(opers);
 		} else if (token == "dec") {
 			token			 = tokens[++l];
 			std::string name = token.substr(0, token.find(":"));
@@ -216,11 +222,20 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 			operations.push_back(op);
 			vars[name] = op.arg;
 		} else if (vars.find(token) != vars.end()) {
-			operations.push_back(Operation(OperationType::PUSH, vars[token]));
+			Operation op(OperationType::PUSH);
+			int val = vars[token];
+			push_number(op, sizeof(int), &val);
+			operations.push_back(op);
 		} else if (token == "true") {
-			operations.push_back(Operation(OperationType::PUSH, true));
+			Operation op(OperationType::PUSH);
+			int val = true;
+			push_number(op, sizeof(int), &val);
+			operations.push_back(op);
 		} else if (token == "false") {
-			operations.push_back(Operation(OperationType::PUSH, false));
+			Operation op(OperationType::PUSH);
+			int val = false;
+			push_number(op, sizeof(int), &val);
+			operations.push_back(op);
 		} else if (token == "+") {
 			operations.push_back(Operation(OperationType::ADD));
 		} else if (token == "-") {
@@ -388,7 +403,10 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 			operations.push_back(Operation(OperationType::POP));
 			operations.push_back(Operation(OperationType::FOR, -1));
 		} else if (token == "do") {
-			operations.push_back(Operation(OperationType::PUSH, true));
+			Operation op(OperationType::PUSH);
+			int val = true;
+			push_number(op, sizeof(int), &val);
+			operations.push_back(op);
 			operations.push_back(Operation(OperationType::WHILE, 0));
 		} else if (token == "while") {
 			operations.push_back(Operation(OperationType::WHILE, 0));
@@ -402,7 +420,7 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 					token += " " + tokens[++l];
 				}
 			}
-			operations.push_back(Operation(OperationType::PUSH, -1));
+			operations.push_back(Operation(OperationType::PUSHS, 0));
 			bool isBkslash = false;
 			for (int i = 1; i < token.size() - 1; i++) {
 				if (token[i] == '\\') {
@@ -439,7 +457,7 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 								throw std::runtime_error("invalid escape sequence error!");
 						}
 					}
-					operations.push_back(Operation(OperationType::PUSH, (int) token[i]));
+					operations.push_back(Operation(OperationType::PUSHS, (int) token[i]));
 				}
 			}
 		}

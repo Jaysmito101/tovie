@@ -11,6 +11,7 @@ class Stack
     void push(double value);
     void push(int value);
     void push(char value);
+    void push(bool value);
     void push(char* value);
     void push(unsigned int value);
     void push(long long value);
@@ -21,6 +22,7 @@ class Stack
     double pop_double();
     int pop_int();
     char pop_char();
+    bool pop_bool();
     char* pop_str();
     char* pop(int size = 1);
     unsigned int pop_uint();
@@ -28,6 +30,9 @@ class Stack
     unsigned long long pop_ullong();    
 
     void print(const char* end = "\n");
+    void print_int(const char* end = "\n");
+    int length();
+    void* get_data();
 
     private:
     void validate(int size);
