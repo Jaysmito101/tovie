@@ -60,93 +60,41 @@ An Advanced Programming Language (Compiler + Interpreter + Transpiler ).
 
 ### 1. Hello World
 
-    proc_0
-	    "Hello" 32 "World!"
-	    12
+    proc_main
+	    "Hello World!"
 	    puts
     proc_end
 
-### 2. English Like Hello World
+### 2. Factorial
 
-    Lets start with proc_0 as the main function. Then i push 2 into the stack to call procedure 2.
-    Lastly I end this proc by end_proc .
-    As far as proc_2 is concerned, first i push the string "Hello!" of size 6 in the stack. 
-    Then just puts in on screen! Lastly proc_end .
+    def<factorial 1>
+    proc_factorial
+	1 memset_0
+	true while
+		dup memget_0 * memset_0
+		1 -
+		dup > 0
+	while_end
+	memget_0
+    proc_end
 
 ### 3. Fibonacii Sequence
-
+	
     proc_0
-        1 call
         0 1
-        inputi for
+        30 for
             print
-            +
+	    memset_0
+	    memset_1
+	    memget_1
+	    memget_0
+	    memget_1
+	    memget_0
+    	    +
             32 prints pop // PRINTING THE SPACE
         for_end
     proc_end
-
-    proc_1
-        "Enter" 32 "N" 32 ":" 32
-        10 puts
-    proc_end
-
-### 4. Even/Odd Checker
-
-    proc_0
-    	"Enter" 32 "a" 32 "Number" 32 ":" 32
-    	17
-    	puts
-    	inputi
-    	2 % 0 == if
-    		"EVEN"
-    		4 puts
-    		6 proceed
-    	end_if
-    	"ODD"
-    	3 puts
-    proc_end
-
-### 5. Print 1 to N For Loop
-
-    proc_0
-        "Enter" 32 "N:" 8 puts
-        0
-        inputi for
-            1 +
-            println
-        for_end
-    proc_end
-
-### 6. Print 1 to N While Loop
-
-    proc_0
-    	1 call
-    	2 call
-    proc_end
     
-    
-    // PROC FOR TAKING INPUT
-    
-    proc_1
-    	"Enter" 32 "N:" 32
-    	9 puts
-    	inputi
-    proc_end
-    
-    // MAIN PRINTING PROC
-    
-    proc_2
-    	memset_0
-    	0 0
-    	true
-    	while
-    		pop
-    		1 +
-    		println
-    		memget_0 -
-    	end_while
-    proc_end
-
 # How to install and use tovie?
 
 Requirements:
