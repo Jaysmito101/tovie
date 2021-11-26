@@ -1,8 +1,13 @@
 #pragma once
 
 #define STACK_SIZE 4096 * 4096
-#define validate(x) revalidate(x)
 
+#ifndef TOVIE_SAFE
+#define validate(x) revalidate(x) 
+#else
+#define validate(x)
+#endif
+  
 class Stack
 {
     public:

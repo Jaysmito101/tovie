@@ -354,7 +354,7 @@ void inputs(Stack& s, Operation op, bool debug = false) {
 	std::string ss = "";
 	std::getline(std::cin, ss);
 	s.push(ss.c_str());
-	s.push(ss.size());
+	s.push((int)ss.size());
 }
 #endif
 
