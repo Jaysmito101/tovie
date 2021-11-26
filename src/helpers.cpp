@@ -1,6 +1,6 @@
 #include "helpers.hpp"
-
-
+#include <cstring>
+#include <algorithm>
 
 ProcAddr::ProcAddr() {
 	procId = -1;
