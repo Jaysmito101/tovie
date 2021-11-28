@@ -20,6 +20,9 @@
 
 An Advanced Programming Language (Compiler + Interpreter + Transpiler ).
 
+<a href="https://github.com/Jaysmito101/dynamic-badges/"><img src="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=dynamic-badges&show=true"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
+
+
 # Docs : 
 ### https://github.com/Jaysmito101/tovie/wiki
 
@@ -119,6 +122,7 @@ Your built `tovie` executable (or `tovie.exe` on windows) is in `bin`, run `tovi
 
 # Support
 
+
 Any support would be highly appretiated!
 
 For example you could add a feature and contribute via pull requests or you could even report any issues with the program!
@@ -126,6 +130,13 @@ For example you could add a feature and contribute via pull requests or you coul
 And the best thing you could do to support this project is spread word about this so that more people who might be interested in this may use this!
 
 Please considering tweeting about this! 
+
+
+<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=dynamic-badges&id=1"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
+<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=dynamic-badges&id=2"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
+<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=dynamic-badges&id=3"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
+<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=dynamic-badges&id=4"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
+<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=dynamic-badges&id=5"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
 
 
 <img alt="Visitors" src="https://visitor-badge.glitch.me/badge?page_id=Jaysmito101.tovie&left_color=gray&right_color=green&style=for-the-badge">
