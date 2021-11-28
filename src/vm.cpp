@@ -183,7 +183,7 @@ void push(Stack& s, Operation op, bool debug = false) {
 void pop(Stack& s, Operation op, bool debug = false) {
 	if (debug)
 		std::cout << " [DEBUG]\t pop " << std::endl;
-	s.pop_int();
+	delete[] s.pop(op.arg);
 }
 
 void andop(Stack& s, Operation op, bool debug = false) {
@@ -879,9 +879,9 @@ static void reverse(std::string& str) {
 	std::reverse(str.begin(), str.end());
 }
 
-static std::vector<ProcAddr>							   procAddresses;
-static std::unordered_map<int, Variable>							   gVars;
-static void*														   runtimeLib = nullptr;
+static std::vector<ProcAddr> procAddresses;
+static std::unordered_map<int, Variable> gVars;
+static void* runtimeLib = nullptr;
 static std::unordered_map<std::string, std::function<void(void*, int)>> libProcs;
 
 static ProcAddr get_proc_addr(int procId) {
@@ -1046,16 +1046,21 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 			printlns(progStack, op, debug);;
 			break;
 		case OperationType::DUP:
-			a = progStack.pop_int();
-			progStack.push(a);
-			progStack.push(a);
+		{
+			char* dt = progStack.pop(op.arg);
+			progStack.push(dt, op.arg);
+			progStack.push(dt, op.arg);
+			delete[] dt;
 			break;
+		}
 		case OperationType::SWAP:
-			a = progStack.pop_int();
-			b = progStack.pop_int();			
-			progStack.push(a);
-			progStack.push(b);
+		{
+			char* da = progStack.pop(op.arg);
+			char* db = progStack.pop(op.arg);			
+			progStack.push(da, op.arg);
+			progStack.push(db, op.arg);
 			break;
+		}
 		case OperationType::PRINTLNNS:
 			throw std::runtime_error("printlnns deperecated!");
 		case OperationType::PRINTLNN:

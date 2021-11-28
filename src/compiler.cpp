@@ -97,7 +97,7 @@ static std::string read_lib(const std::string& lib_name, std::vector<std::string
 }
 
 static std::unordered_map<std::string, int> vars;
-static int									varId;
+static int varId;
 
 static void push_number(Operation& op, int size, void* d)
 {
@@ -113,9 +113,9 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 		varId = 0;
 		vars.clear();
 	}
-	std::vector<Operation>&						  operations = ioperations;
-	std::unordered_map<std::string, std::string>& defs		 = idefs;
-	std::vector<std::string>					  tokens	 = lexpp::lex(input, " \t\r\n");
+	std::vector<Operation>&	operations = ioperations;
+	std::unordered_map<std::string, std::string>& defs = idefs;
+	std::vector<std::string> tokens	= lexpp::lex(input, " \t\r\n");
 	if (isInclude) {
 		defs	   = idefs;
 		operations = ioperations;
@@ -323,9 +323,9 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 		} else if (token == "println") {
 			operations.push_back(Operation(OperationType::PRINTLN));
 		} else if (token == "dup") {
-			operations.push_back(Operation(OperationType::DUP));
+			operations.push_back(Operation(OperationType::DUP, 4));
 		} else if (token == "swap") {
-			operations.push_back(Operation(OperationType::SWAP));
+			operations.push_back(Operation(OperationType::SWAP, 4));
 		} else if (token == "printlns") {
 			operations.push_back(Operation(OperationType::PRINTLNS));
 		} else if (token == "printlnns") {
@@ -361,7 +361,7 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 		} else if (token == "inputs") {
 			operations.push_back(Operation(OperationType::INPUTS));
 		} else if (token == "pop") {
-			operations.push_back(Operation(OperationType::POP));
+			operations.push_back(Operation(OperationType::POP, 4));
 		} else if (token == "loadlib") {
 			operations.push_back(Operation(OperationType::LOADLIB));
 		} else if (token == "^") {
@@ -399,10 +399,12 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 		} else if (starts_with(token, "for")) {
 			operations.push_back(Operation(OperationType::FOR, -2));
 		} else if (starts_with(token, "pop_")) {
-			operations.push_back(Operation(OperationType::FOR, std::stoi(token.substr(4))));
-			operations.push_back(Operation(OperationType::POP));
-			operations.push_back(Operation(OperationType::FOR, -1));
-		} else if (token == "do") {
+			operations.push_back(Operation(OperationType::POP, std::stoi(token.substr(4))));
+		} else if (starts_with(token, "dup_")) {
+			operations.push_back(Operation(OperationType::DUP, std::stoi(token.substr(4))));
+		} else if (starts_with(token, "swap_")) {
+			operations.push_back(Operation(OperationType::SWAP, std::stoi(token.substr(5))));
+		}  else if (token == "do") {
 			Operation op(OperationType::PUSH);
 			int val = true;
 			push_number(op, sizeof(int), &val);

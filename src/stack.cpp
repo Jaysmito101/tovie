@@ -126,7 +126,7 @@ void Stack::push(unsigned long long value)
 
 void Stack::push(char* value, int sizei)
 {
-    validate(size);
+    validate(sizei);
     memcpy(top, value, sizei);
     top += sizei;
     size += sizei;
