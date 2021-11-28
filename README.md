@@ -132,11 +132,11 @@ And the best thing you could do to support this project is spread word about thi
 Please considering tweeting about this! 
 
 
-<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=dynamic-badges&id=1"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
-<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=dynamic-badges&id=2"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
-<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=dynamic-badges&id=3"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
-<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=dynamic-badges&id=4"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
-<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=dynamic-badges&id=5"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
+<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=tovie&id=1"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
+<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=tovie&id=2"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
+<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=tovie&id=3"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
+<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=tovie&id=4"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
+<a href="https://dynamic-badges.maxalpha.repl.co/star?user=Jaysmito101&repo=tovie&id=5"><img src="https://dynamic-badges.maxalpha.repl.co/star?image=true"></a>
 
 
 <img alt="Visitors" src="https://visitor-badge.glitch.me/badge?page_id=Jaysmito101.tovie&left_color=gray&right_color=green&style=for-the-badge">
