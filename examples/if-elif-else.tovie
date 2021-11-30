@@ -1,0 +1,10 @@
+proc_main
+	if inputi dup do
+		println
+	elif inputi dup do
+		"2nd elif" putsln
+		println
+	else
+		"else" putsln
+	end_if
+proc_end 

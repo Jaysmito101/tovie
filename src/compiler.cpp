@@ -390,6 +390,10 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 			operations.push_back(Operation(OperationType::MEMGET, std::stoi(token.substr(7))));
 		} else if (token == "if") {
 			operations.push_back(Operation(OperationType::IF, 0));
+		} else if (token == "elif") {
+			operations.push_back(Operation(OperationType::IF, 2));
+		} else if (token == "else") {
+			operations.push_back(Operation(OperationType::IF, 3));
 		} else if (token == "end_if" || token == "if_end") {
 			operations.push_back(Operation(OperationType::IF, 1));
 		} else if (token == "end_for" || token == "for_end") {
@@ -418,11 +422,15 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 			op.ops[1] = toT;
 			operations.push_back(op);
 		}  else if (token == "do") {
-			Operation op(OperationType::PUSH);
-			int val = true;
-			push_number(op, sizeof(int), &val);
-			operations.push_back(op);
-			operations.push_back(Operation(OperationType::WHILE, 0));
+			int o=operations.size() - 1;
+			while(o >=0){
+				if(operations[o].op == OperationType::IF && (operations[o].ops[0] == 0 || operations[o].ops[0] == 2)){
+					operations[o].ops[1] = (operations.size() - o - 1);
+					break;
+				}
+				o--;
+			}
+			operations.push_back(Operation(OperationType::IF, 4));
 		} else if (token == "while") {
 			operations.push_back(Operation(OperationType::WHILE, 0));
 		} else if (token == "end_while" || token == "while_end" || token == "do_end" || token == "end_do") {

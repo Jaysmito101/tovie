@@ -10,19 +10,15 @@ proc_2
 	dup 3 % 0 == memset_0
 	println dup println 5 % 0 == memset_1
 	memget_0 memget_1 && memset_2
-	memget_2 if
+	if memget_2 do
 		5 call
-		ret
-	if_end
-	memget_1 if
+	elif memget_1 do
 		4 call
-		ret
-	if_end
-	memget_0 if
+	elif memget_0 do
 		3 call
-		ret
-	if_end
-	println
+	else
+		println
+	end_if
 proc_end
 
 proc_3

@@ -1515,7 +1515,7 @@ static void loadProcs(std::vector<Operation>& ops) {
 
 static void simulate_proc(Stack& progStack, std::vector<Operation>& ops, ProcAddr& pAddr, bool debug);
 
-static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* memory, std::vector<Operation>& ops, bool debug, std::unordered_map<int, Variable>& lVars) {
+static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* memory, std::vector<Operation>& ops, bool debug, std::unordered_map<int, Variable>& lVars, int* ifCount) {
 
 	if (debug && false)	   // TMP
 		std::cout << " [DEBUG]\t" << op.op << "\t\t" << op.arg << std::endl;
@@ -1841,29 +1841,80 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 		}
 		case OperationType::IF: {
 			if (op.arg == 0) {
+				for (unsigned long p = *i + 1; p <= *i + op.ops[1]; p++)
+					simulate_op(progStack, ops[p], &p, memory, ops, debug, lVars, ifCount);
+				*i += op.ops[1]+1;
 				int condition = progStack.pop_int();
 				if (debug)
 					std::cout << " [DEBUG]\t if " << condition << std::endl;
 				if (condition) {
-					// For future use
+					*ifCount += 1;
 				} else {
 					int tmp = 0;
 					for (int j = *i; j < ops.size(); j++) {
 						if (ops[j].op == OperationType::IF && ops[j].arg == 0)
 							tmp++;
-						else if (ops[j].op == OperationType::IF && ops[j].arg == 1) {
+						else if (ops[j].op == OperationType::IF && (ops[j].arg == 1 || ops[j].arg == 2 || ops[j].arg == 3)) {
 							tmp--;
-							if (tmp == 0) {
+							if (tmp < 0) {
+								*i = j - 1;
+								break;
+							}
+						}
+					}
+					if (debug)
+						std::cout << " [DEBUG]\t skipping to op " << std::to_string(*i + 1) << std::endl;
+				}
+			} 
+			else if (op.arg == 2) {
+				int condition = 0;
+				if(*ifCount <= 0) {
+					for (unsigned long p = *i + 1; p <= *i + op.ops[1]; p++)
+						simulate_op(progStack, ops[p], &p, memory, ops, debug, lVars, ifCount);
+					*i += op.ops[1];
+					condition = progStack.pop_int();
+					if(debug)
+						std::cout << " [DEBUG]\t elif " << condition << std::endl;
+				}
+				if (!condition) {
+					int tmp = 0;
+					for (int j = *i +1; j < ops.size(); j++) {
+						if (ops[j].op == OperationType::IF && ops[j].arg == 0)
+							tmp++;
+						else if (ops[j].op == OperationType::IF && (ops[j].arg == 1 || ops[j].arg == 2 || ops[j].arg == 3)) {
+							tmp--;
+							if (tmp < 0) {
+								*i = j - 1;
+								break;
+							}
+						}
+					}
+					if (debug)
+						std::cout << " [DEBUG]\t skipping to op " << std::to_string(*i + 1) << std::endl;
+				}
+				else
+					*ifCount += 1;
+			}
+			else if (op.arg == 3) {
+				if(*ifCount > 0){
+					int tmp = 0;
+					for (int j = *i; j < ops.size(); j++) {
+						if (ops[j].op == OperationType::IF && ops[j].arg == 0)
+							tmp++;
+						else if (ops[j].op == OperationType::IF && (ops[j].arg == 1)) {
+							tmp--;
+							if (tmp < 0) {
 								*i = j;
 								break;
 							}
 						}
 					}
 					if (debug)
-						std::cout << " [DEBUG]\t skipping to op " << (*i + 1) << std::endl;
+						std::cout << " [DEBUG]\t skipping to op " << std::to_string(*i + 1) << std::endl;
 				}
-			} else if (op.arg == 1) {
-				// For future use
+			}
+			else if (op.arg == 1) {
+				*ifCount -= 1;
 			}
 			break;
 		}
@@ -1935,7 +1986,7 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 					if (debug)
 						std::cout << " [DEBUG]\t for " << k + 1 << "/" << count << std::endl;
 					for (unsigned long p = *i + 1; p < end && p >= *i; p++)
-						simulate_op(progStack, ops[p], &p, memory, ops, debug, lVars);
+						simulate_op(progStack, ops[p], &p, memory, ops, debug, lVars, ifCount);
 				}
 				*i = end;
 			}
@@ -1963,6 +2014,7 @@ static void simulate_proc(Stack& progStack, std::vector<Operation>& ops, ProcAdd
 	int*							  memory	  = new int[1024];
 	int								  endIdToSkip = 0;
 	std::unordered_map<int, Variable> lVars;
+	int ifCount	= 0;
 	for (unsigned long i = pAddr.bAddr + 1; i < pAddr.eAddr; i++) {
 		Operation op = ops[i];
 		if (op.op == OperationType::RET) {
@@ -1973,7 +2025,7 @@ static void simulate_proc(Stack& progStack, std::vector<Operation>& ops, ProcAdd
 			clearVars(lVars);
 			return;
 		}
-		simulate_op(progStack, op, &i, memory, ops, debug, lVars);
+		simulate_op(progStack, op, &i, memory, ops, debug, lVars, &ifCount);
 	}
 	if (memory)
 		delete[] memory;
