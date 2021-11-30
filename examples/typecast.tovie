@@ -1,0 +1,21 @@
+proc_main
+	153
+	println
+	cast:int->double
+	dec vt:double
+	>vt &vt $println
+	"568"
+	dup_4
+	putsln
+	cast:string->ulong
+	dec vt2:ulong
+	>vt2 &vt2 $println
+	458
+	println
+	cast:int->bool
+	dec bl:bool
+	>bl &bl $println
+	<bl
+	cast:bool->string
+	putsln
+proc_end

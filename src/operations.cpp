@@ -30,6 +30,8 @@ std::string to_string(OperationType type) {
 			return "GE";
 		case LE:
 			return "LE";
+		case CAST:
+			return "CAST";
 		case GT:
 			return "GT";
 		case LT:

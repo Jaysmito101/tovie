@@ -340,6 +340,546 @@ void neq(Stack& s, Operation op, bool debug = false) {
 	s.push((int)(b != a));
 }
 
+void typecast(Stack& s, Operation op, bool debug = false) {
+	DataType from = (DataType)op.ops[0];
+	DataType to = (DataType)op.ops[1];
+	switch(from){
+		case INT:
+		{
+			switch(to){
+				case FLOAT:
+				{
+					int a = s.pop_int();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
+					s.push((float)a);
+					break;
+				}
+				case STRING:
+				{
+					int a = s.pop_int();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
+					s.push(std::to_string(a).c_str());
+					break;
+				}
+				case LONG:
+				{
+					int a = s.pop_int();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
+					s.push((long long)a);
+					break;
+				}
+				case UINT:
+				{
+					int a = s.pop_int();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
+					s.push((unsigned int)a);
+					break;
+				}
+				case ULONG:
+				{
+					int a = s.pop_int();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
+					s.push((unsigned long long)a);
+					break;
+				}
+				case DOUBLE:
+				{
+					int a = s.pop_int();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
+					s.push((double)a);
+					break;
+				}
+				case BOOL:
+				{
+					int a = s.pop_int();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> bool" << std::endl;
+					s.push((bool)a);
+					break;
+				}
+				default:
+					throw std::runtime_error("invalid typecast : " + to_string(from) + " -> " + to_string(to));
+			}
+			break;
+		}
+		case UINT:
+		{
+			switch(to){
+				case FLOAT:
+				{
+					unsigned int a = s.pop_uint();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
+					s.push((float)a);
+					break;
+				}
+				case STRING:
+				{
+					unsigned int a = s.pop_uint();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
+					s.push(std::to_string(a).c_str());
+					break;
+				}
+				case LONG:
+				{
+					unsigned int a = s.pop_uint();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
+					s.push((long long)a);
+					break;
+				}
+				case INT:
+				{
+					unsigned int a = s.pop_uint();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
+					s.push((int)a);
+					break;
+				}
+				case ULONG:
+				{
+					unsigned int a = s.pop_uint();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
+					s.push((unsigned long long)a);
+					break;
+				}
+				case DOUBLE:
+				{
+					unsigned int a = s.pop_uint();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
+					s.push((double)a);
+					break;
+				}
+				case BOOL:
+				{
+					unsigned int a = s.pop_uint();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> bool" << std::endl;
+					s.push((bool)a);
+					break;
+				}
+				default:
+					throw std::runtime_error("invalid typecast : " + to_string(from) + " -> " + to_string(to));
+			}
+			break;
+		}
+		case LONG:
+		{
+			switch(to){
+				case FLOAT:
+				{
+					long long a = s.pop_llong();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
+					s.push((float)a);
+					break;
+				}
+				case STRING:
+				{
+					long long a = s.pop_llong();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
+					s.push(std::to_string(a).c_str());
+					break;
+				}
+				case UINT:
+				{
+					long long a = s.pop_llong();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
+					s.push((unsigned int)a);
+					break;
+				}
+				case INT:
+				{
+					long long a = s.pop_llong();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
+					s.push((int)a);
+					break;
+				}
+				case ULONG:
+				{
+					long long a = s.pop_llong();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
+					s.push((unsigned long long)a);
+					break;
+				}
+				case DOUBLE:
+				{
+					long long a = s.pop_llong();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
+					s.push((double)a);
+					break;
+				}
+				case BOOL:
+				{
+					long long a = s.pop_llong();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> bool" << std::endl;
+					s.push((bool)a);
+					break;
+				}
+				default:
+					throw std::runtime_error("invalid typecast : " + to_string(from) + " -> " + to_string(to));
+			}
+			break;
+		}
+		case ULONG:
+		{
+			switch(to){
+				case FLOAT:
+				{
+					unsigned long long a = s.pop_ullong();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
+					s.push((float)a);
+					break;
+				}
+				case STRING:
+				{
+					unsigned long long a = s.pop_ullong();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
+					s.push(std::to_string(a).c_str());
+					break;
+				}
+				case UINT:
+				{
+					unsigned long long a = s.pop_ullong();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
+					s.push((unsigned int)a);
+					break;
+				}
+				case INT:
+				{
+					unsigned long long a = s.pop_ullong();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
+					s.push((int)a);
+					break;
+				}
+				case LONG:
+				{
+					unsigned long long a = s.pop_ullong();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
+					s.push((long long)a);
+					break;
+				}
+				case DOUBLE:
+				{
+					unsigned long long a = s.pop_ullong();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
+					s.push((double)a);
+					break;
+				}
+				case BOOL:
+				{
+					unsigned long long a = s.pop_ullong();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> bool" << std::endl;
+					s.push((bool)a);
+					break;
+				}
+				default:
+					throw std::runtime_error("invalid typecast : " + to_string(from) + " -> " + to_string(to));
+			}
+			break;
+		}
+		case FLOAT:
+		{
+			switch(to){
+				case ULONG:
+				{
+					float a = s.pop_float();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
+					s.push((unsigned long long)a);
+					break;
+				}
+				case STRING:
+				{
+					float a = s.pop_float();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
+					s.push(std::to_string(a).c_str());
+					break;
+				}
+				case UINT:
+				{
+					float a = s.pop_float();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
+					s.push((unsigned int)a);
+					break;
+				}
+				case INT:
+				{
+					float a = s.pop_float();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
+					s.push((int)a);
+					break;
+				}
+				case LONG:
+				{
+					float a = s.pop_float();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
+					s.push((long long)a);
+					break;
+				}
+				case DOUBLE:
+				{
+					float a = s.pop_float();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
+					s.push((double)a);
+					break;
+				}
+				case BOOL:
+				{
+					float a = s.pop_float();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> bool" << std::endl;
+					s.push((bool)a);
+					break;
+				}
+				default:
+					throw std::runtime_error("invalid typecast : " + to_string(from) + " -> " + to_string(to));
+			}
+			break;
+		}
+		case DOUBLE:
+		{
+			switch(to){
+				case ULONG:
+				{
+					double a = s.pop_double();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
+					s.push((unsigned long long)a);
+					break;
+				}
+				case STRING:
+				{
+					double a = s.pop_double();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
+					s.push(std::to_string(a).c_str());
+					break;
+				}
+				case UINT:
+				{
+					double a = s.pop_double();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
+					s.push((unsigned int)a);
+					break;
+				}
+				case INT:
+				{
+					double a = s.pop_double();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
+					s.push((int)a);
+					break;
+				}
+				case LONG:
+				{
+					double a = s.pop_double();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
+					s.push((long long)a);
+					break;
+				}
+				case FLOAT:
+				{
+					double a = s.pop_double();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
+					s.push((float)a);
+					break;
+				}
+				case BOOL:
+				{
+					double a = s.pop_double();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> bool" << std::endl;
+					s.push((bool)a);
+					break;
+				}
+				default:
+					throw std::runtime_error("invalid typecast : " + to_string(from) + " -> " + to_string(to));
+			}
+			break;
+		}
+		case BOOL:
+		{
+			switch(to){
+				case ULONG:
+				{
+					bool a = s.pop_bool();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
+					s.push((unsigned long long)a);
+					break;
+				}
+				case STRING:
+				{
+					bool a = s.pop_bool();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
+					s.push((char*)(a?"true":"false"));
+					break;
+				}
+				case UINT:
+				{
+					bool a = s.pop_bool();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
+					s.push((unsigned int)a);
+					break;
+				}
+				case INT:
+				{
+					bool a = s.pop_bool();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
+					s.push((int)a);
+					break;
+				}
+				case LONG:
+				{
+					bool a = s.pop_bool();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
+					s.push((long long)a);
+					break;
+				}
+				case FLOAT:
+				{
+					bool a = s.pop_bool();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
+					s.push((float)a);
+					break;
+				}
+				case DOUBLE:
+				{
+					bool a = s.pop_bool();
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
+					s.push((double)a);
+					break;
+				}
+				default:
+					throw std::runtime_error("invalid typecast : " + to_string(from) + " -> " + to_string(to));
+			}
+			break;
+		}
+		case STRING:
+		{
+			switch(to){
+				case ULONG:
+				{
+					char* st = s.pop_str();
+					std::string a(st, st + strlen(st));
+					delete[] st;
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
+					s.push(std::stoull(a));
+					break;
+				}
+				case BOOL:
+				{
+					char* st = s.pop_str();
+					std::string a(st, st + strlen(st));
+					delete[] st;
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
+					if (a == "true")
+						s.push(true);
+					else if (a == "false")
+						s.push(false);
+					else
+						throw std::runtime_error("invalid typecast : " + to_string(from) + "(" + a + ") -> " + to_string(to));
+					break;
+				}
+				case UINT:
+				{
+					char* st = s.pop_str();
+					std::string a(st, st + strlen(st));
+					delete[] st;
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
+					s.push((unsigned int)std::stoul(a));
+					break;
+				}
+				case INT:
+				{
+					char* st = s.pop_str();
+					std::string a(st, st + strlen(st));
+					delete[] st;
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
+					s.push(std::stoi(a));
+					break;
+				}
+				case LONG:
+				{
+					char* st = s.pop_str();
+					std::string a(st, st + strlen(st));
+					delete[] st;
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
+					s.push(std::stoll(a));
+					break;
+				}
+				case FLOAT:
+				{
+					char* st = s.pop_str();
+					std::string a(st, st + strlen(st));
+					delete[] st;
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
+					s.push(std::stof(a));
+					break;
+				}
+				case DOUBLE:
+				{
+					char* st = s.pop_str();
+					std::string a(st, st + strlen(st));
+					delete[] st;
+					if (debug)
+						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
+					s.push(std::stod(a));
+					break;
+				}
+				default:
+					throw std::runtime_error("invalid typecast : " + to_string(from) + " -> " + to_string(to));
+			}
+			break;
+		}
+		default:
+			throw std::runtime_error("invalid typecast : " + to_string(from) + " -> " + to_string(to));
+	}
+}
+
 void inputi(Stack& s, Operation op, bool debug = false) {
 	if (debug)
 		std::cout << " [DEBUG]\tinput integer" << std::endl;
@@ -1120,6 +1660,9 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 			break;
 		case OperationType::NEQ:
 			neq(progStack, op, debug);
+			break;
+		case OperationType::CAST:
+			typecast(progStack, op, debug);
 			break;
 		case OperationType::DECL: {
 			Variable v;

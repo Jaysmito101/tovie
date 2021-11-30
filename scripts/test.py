@@ -11,7 +11,8 @@ FILES = [
     os.path.join('examples', "fibonacii.tovie"),
     os.path.join('examples', "fizzbuzz.tovie"),
     os.path.join('examples', "1to10.tovie"),
-    os.path.join('examples', "using_variables_example.tovie")
+    os.path.join('examples', "using_variables_example.tovie"),
+    os.path.join('examples', "typecast.tovie")
 ]
 
 BIN_PATH =  os.path.join("bin", "tovie")

@@ -404,6 +404,19 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 			operations.push_back(Operation(OperationType::DUP, std::stoi(token.substr(4))));
 		} else if (starts_with(token, "swap_")) {
 			operations.push_back(Operation(OperationType::SWAP, std::stoi(token.substr(5))));
+		} else if (starts_with(token, "cast:")) {
+			token = token.substr(5);
+			auto pos = token.find("->");
+			if(pos == std::string::npos)
+				throw std::runtime_error("type cast incomplete error");
+			std::string from = token.substr(0, pos);
+			std::string to = token.substr(pos + 2);
+			DataType fromT = to_data_type(from);
+			DataType toT = to_data_type(to);
+			Operation op(OperationType::CAST);
+			op.ops[0] = fromT;
+			op.ops[1] = toT;
+			operations.push_back(op);
 		}  else if (token == "do") {
 			Operation op(OperationType::PUSH);
 			int val = true;

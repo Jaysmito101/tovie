@@ -11,6 +11,7 @@ enum OperationType {
 	AND,
 	OR,
 	EQ,
+	CAST,
 	NEQ,
 	GE,
 	LE,
