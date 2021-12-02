@@ -24,6 +24,7 @@ An Advanced Programming Language (Compiler + Interpreter + Transpiler ).
 
 
 # Docs : 
+### For Help join our discord server : https://discord.gg/3h5S2cSbm8
 ### https://github.com/Jaysmito101/tovie/wiki
 
 # What can it do?
