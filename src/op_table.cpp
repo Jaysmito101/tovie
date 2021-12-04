@@ -1,5 +1,7 @@
 #include "op_table.hpp"
 
+namespace tovie
+{
 std::string generate_op_table(std::vector<Operation> ops) {
 	std::string opt = "Operation Table : \n\n\n";
 	opt += "\tOP ID\t\tOP\t\t\tARG";
@@ -16,4 +18,5 @@ std::string generate_op_table(std::vector<Operation> ops) {
 		opt += "\n";
 	}
 	return opt;
+}
 }

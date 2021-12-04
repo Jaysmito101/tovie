@@ -1,5 +1,8 @@
 #pragma once
 
+namespace tovie
+{
+
 #define STACK_SIZE 4096 * 4096
 
 #ifndef TOVIE_SAFE
@@ -49,3 +52,5 @@ class Stack
     int size;
     int capacity;
 };
+
+}

@@ -1,5 +1,8 @@
 #include "info.hpp"
 
+namespace tovie
+{
+
 #ifdef _WIN32
 
 std::string get_name() {
@@ -15,3 +18,5 @@ std::string get_name() {
 }
 
 #endif
+
+}

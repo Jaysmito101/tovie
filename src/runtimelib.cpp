@@ -3,6 +3,9 @@
 #include <stdexcept>
 #include <string>
 
+namespace tovie
+{
+
 #ifdef _WIN32
 
 #	include <assert.h>
@@ -89,3 +92,5 @@ std::function<void(void*, int)> get_runtimelib_proc(void* runtimeLib, const char
 }
 
 #endif
+
+}

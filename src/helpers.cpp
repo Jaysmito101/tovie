@@ -2,6 +2,9 @@
 #include <cstring>
 #include <algorithm>
 
+namespace tovie
+{
+
 ProcAddr::ProcAddr() {
 	procId = -1;
 	bAddr = eAddr = 0;
@@ -81,4 +84,6 @@ std::string to_data_type_name(int size)
 	default:
 		return "string";
 	}
+}
+
 }

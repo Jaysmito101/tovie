@@ -20,6 +20,9 @@
 #include "stack.hpp"
 #include "helpers.hpp"
 
+namespace tovie
+{
+
 struct Variable {
 	DataType type;
 	int		 id;
@@ -2040,4 +2043,6 @@ void simulate(std::vector<Operation> ops, bool debug) {
 	progStack.push(0);
 	ProcAddr pAddr = get_proc_addr(0);
 	simulate_proc(progStack, ops, pAddr, debug);
+}
+
 }

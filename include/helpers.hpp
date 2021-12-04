@@ -2,6 +2,9 @@
 
 #include <string>
 
+namespace tovie
+{
+
 struct ProcAddr {
 	int			  procId;
 	unsigned long bAddr, eAddr;
@@ -16,3 +19,5 @@ struct ProcAddr {
 std::string to_data_type_name(int size);
 
 std::string get_value(int *data, int size);
+
+}

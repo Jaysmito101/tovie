@@ -7,6 +7,9 @@
 #include <stdexcept>
 #include <unordered_map>
 
+namespace tovie
+{
+
 // the `#if 1` is to use code folding in the IDE
 #if 1
 std::string cSack = R"(
@@ -694,4 +697,6 @@ std::string tovie2c(std::vector<Operation> ops) {
 	cm.end_block();
 	cm.add_line("}");
 	return cm.render();
+}
+
 }

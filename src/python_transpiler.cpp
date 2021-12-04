@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include <unordered_map>
 
+namespace tovie
+{
 
 struct Variable {
 	DataType type;
@@ -691,4 +693,5 @@ std::string tovie2py(std::vector<Operation> ops) {
 	cm.end_block();
 
 	return cm.render();
+}
 }

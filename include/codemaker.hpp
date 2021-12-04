@@ -1,6 +1,8 @@
 #include <string>
 #include <vector>
 
+namespace tovie
+{
 class CodeMaker {
   public:
 	void add_line(std::string line);
@@ -13,3 +15,5 @@ class CodeMaker {
 	std::string				 tab = "    ";
 	std::vector<std::string> lines;
 };
+
+}

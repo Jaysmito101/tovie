@@ -4,6 +4,9 @@
 #include <cstring>
 #include <cstdio>
 
+namespace tovie
+{
+
 Stack::Stack(float incFactori)
 {
     incFactor = incFactor;
@@ -243,4 +246,5 @@ int Stack::length()
 void* Stack::get_data()
 {
     return data;
+}
 }

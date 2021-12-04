@@ -1,6 +1,8 @@
 #include "operations.hpp"
-
 #include <string>
 #include <vector>
 
-std::string tovie2c(std::vector<Operation> ops);
+namespace tovie
+{
+    std::string tovie2c(std::vector<Operation> ops);
+}

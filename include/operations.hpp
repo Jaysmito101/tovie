@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
 
+namespace tovie
+{
+
 enum OperationType {
 	ADD = 0,
 	SUB,
@@ -92,3 +95,6 @@ struct Operation {
 	int			  arg;
 	int			  ops[64];
 };
+
+
+}

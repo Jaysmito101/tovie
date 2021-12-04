@@ -14,6 +14,8 @@
 #include <unordered_map>
 #include <vector>
 
+namespace tovie
+{
 
 #if defined(WIN32) || defined(_WIN32)
 #	define PATH_SEPARATOR "\\"
@@ -488,4 +490,6 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 	if (!isInclude)
 		operations.push_back(Operation(OperationType::END));
 	return operations;
+}
+
 }

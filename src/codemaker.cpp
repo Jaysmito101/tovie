@@ -2,6 +2,9 @@
 
 #include <stdexcept>
 
+namespace tovie
+{
+
 void CodeMaker::begin_block() {
 	bId++;
 }
@@ -28,4 +31,6 @@ std::string CodeMaker::render() {
 		result += line + "\n";
 	}
 	return result;
+}
+
 }

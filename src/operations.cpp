@@ -4,6 +4,8 @@
 #include <cstring>
 #include <iostream>
 
+namespace tovie
+{
 std::string to_string(OperationType type) {
 	switch (type) {
 		case ADD:
@@ -331,4 +333,6 @@ Operation::Operation(OperationType type, int value, int _ops[64])
 	: op(type)
 	, arg(value) {
 	memcpy(ops, _ops, sizeof(int) * 64);
+}
+
 }

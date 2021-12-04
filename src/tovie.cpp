@@ -1,5 +1,5 @@
 #include "info.hpp"
-#include "operations.hpp"
+#include "Operations.hpp"
 #include "compiler.hpp"
 #include "python_transpiler.hpp"
 #include "c_transpiler.hpp"
@@ -14,6 +14,7 @@
 #include <string.h>
 #include <string>
 #include <vector>
+
 
 std::string read_file(std::string filePath) {
 	std::ifstream	  file(filePath);
@@ -34,29 +35,29 @@ void print_usage(std::string arg0 = "tovie") {
 			  << "Options:" << std::endl
 			  << "  -h, --help ............ prints this message and exits" << std::endl
 			  << "  -v, --version ......... prints tovie's version and exits" << std::endl
-			  << "  -r, --run ............. runs <input> instead of compiling (`-f` will specify the backend; will also compile if `-o` is given)" << std::endl
-			  << "  -d, --debug ........... prints useful debug information" << std::endl
+			  << "  -r, --run ............. compile and run <input> (`-f` will specify the backend; will also compile if `-o` is given)" << std::endl
+			  << "  -d, --debug ........... enable debug mode" << std::endl
 			  << "  -o, --output <path> ... specifies the output-file" << std::endl
 			  << "  -f, --format <format> . specifies the output-format (bytecode,table,c,python; default: bytecode)" << std::endl
 			  << "  -i, --include <path> .. specifies include directories (can be used multiple times)" << std::endl
 			  << "  -I, --input <format> .. specifies the input-format (source,bytecode; default: extension)" << std::endl;
 }
 
-static void save(std::vector<Operation> ops, std::string filePath) {
+static void save(std::vector<tovie::Operation> ops, std::string filePath) {
 	std::ofstream fout(filePath, std::ios::out | std::ios::binary);
-	fout.write((char*) &ops[0], ops.size() * sizeof(Operation));
+	fout.write((char*) &ops[0], ops.size() * sizeof(tovie::Operation));
 	fout.close();
 }
 
-static std::vector<Operation> load(std::string filePath) {
+static std::vector<tovie::Operation> load(std::string filePath) {
 	std::ifstream	file(filePath, std::ios::binary | std::ios::ate);
 	std::streamsize size = file.tellg();
 	file.seekg(0, std::ios::beg);
 	std::vector<char>	   buffer(size);
-	std::vector<Operation> ops;
+	std::vector<tovie::Operation> ops;
 	if (file.read(buffer.data(), size)) {
-		int		   count = size / sizeof(Operation);
-		Operation* opsp	 = (Operation*) buffer.data();
+		int		   count = size / sizeof(tovie::Operation);
+		tovie::Operation* opsp	 = (tovie::Operation*) buffer.data();
 		for (int i = 0; i < count; i++) {
 			ops.push_back(*opsp);
 			opsp++;
@@ -117,7 +118,7 @@ int main(int argc, const char** argv) {
 			print_usage(argv[0]);
 			return 0;
 		} else if (arg == "-v" || arg == "--version") {
-			std::cout << get_name() << std::endl;
+			std::cout << tovie::get_name() << std::endl;
 			return 0;
 		} else if (arg == "-r" || arg == "--run") {
 			run = true;
@@ -207,15 +208,15 @@ int main(int argc, const char** argv) {
 	if (output_format == FORMAT_DEFAULT)
 		output_format = FORMAT_BYTECODE;
 
-	std::vector<Operation> input_ops;
+	std::vector<tovie::Operation> input_ops;
 	if (input_format == FORMAT_SOURCE) {
-		input_ops = parse(read_file(input_file), include_paths, debug);
+		input_ops = tovie::parse(read_file(input_file), include_paths, debug);
 	} else if (input_format == FORMAT_BYTECODE) {
 		input_ops = load(input_file);
 	}
 
 	if (run) {
-		simulate(input_ops, debug);
+		tovie::simulate(input_ops, debug);
 		return 0;
 	}
 
@@ -228,17 +229,17 @@ int main(int argc, const char** argv) {
 		case FORMAT_TABLE:
 			if (output_file == "")
 				output_file = "a.tovieopt";
-			write_file(generate_op_table(input_ops), output_file);
+			write_file(tovie::generate_op_table(input_ops), output_file);
 			break;
 		case FORMAT_C:
 			if (output_file == "")
 				output_file = "a.tovie.c";
-			write_file(tovie2c(input_ops), output_file);
+			write_file(tovie::tovie2c(input_ops), output_file);
 			break;
 		case FORMAT_PYTHON:
 			if (output_file == "")
 				output_file = "a.tovie.py";
-			write_file(tovie2py(input_ops), output_file);
+			write_file(tovie::tovie2py(input_ops), output_file);
 			break;
 		default:
 			break;
@@ -246,3 +247,4 @@ int main(int argc, const char** argv) {
 
 	std::cout << "compiled '" << input_file << "'(" << format_to_string(input_format) << ") -> '" << output_file << "'(" << format_to_string(output_format) << ")" << std::endl;
 }
+
