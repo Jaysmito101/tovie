@@ -8,5 +8,5 @@
 
 namespace tovie
 {
-
+    typedef std::vector<Operation> Program;
 }

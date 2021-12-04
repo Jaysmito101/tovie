@@ -6,6 +6,7 @@
 #include "runtimelib.hpp"
 #include "op_table.hpp"
 #include "vm.hpp"
+#include "debug.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -215,6 +216,7 @@ int main(int argc, const char** argv) {
 		input_ops = load(input_file);
 	}
 
+	
 	if (run) {
 		tovie::simulate(input_ops, debug);
 		return 0;

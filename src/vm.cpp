@@ -2035,14 +2035,21 @@ static void simulate_proc(Stack& progStack, std::vector<Operation>& ops, ProcAdd
 	clearVars(lVars);
 }
 
-void simulate(std::vector<Operation> ops, bool debug) {
+Stack simulate(std::vector<Operation> ops, int entryPoint, bool debug) {
 	loadProcs(ops);
 	loadGlobals(ops);
 	runtimeLib = nullptr;
 	Stack progStack;
 	progStack.push(0);
-	ProcAddr pAddr = get_proc_addr(0);
+	ProcAddr pAddr = get_proc_addr(entryPoint);
 	simulate_proc(progStack, ops, pAddr, debug);
+	procAddresses.clear();
+	gVars.clear();
+	return progStack;
+}
+
+Stack simulate(std::vector<Operation> ops, bool debug) {
+	return simulate(ops, 0, debug);
 }
 
 }
