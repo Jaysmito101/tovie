@@ -1,5 +1,5 @@
 #include "info.hpp"
-#include "Operations.hpp"
+#include "operations.hpp"
 #include "compiler.hpp"
 #include "python_transpiler.hpp"
 #include "c_transpiler.hpp"
