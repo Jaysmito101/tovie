@@ -7,6 +7,18 @@
 
 namespace tovie
 {
+
+struct Array{
+    bool isStruct;
+    int structId;
+    int count;
+    int size;
+
+    Array();
+    Array(int count, int size);
+    Array(int count, int size, int structId);
+};
+
 // These are temporary
 static std::vector<Operation>						_TMPDATA_;
 static std::unordered_map<std::string, std::string> _TMPDATA2_;

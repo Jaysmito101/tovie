@@ -116,6 +116,12 @@ std::string to_string(OperationType type) {
 			return "DECL";
 		case VAR:
 			return "VAR";
+		case VMALLOC:
+			return "VMALLOC";
+		case VMEMGET:
+			return "VMEMGET";
+		case VMEMSET:
+			return "VMEMSET";
 		default:
 			return "UNKNOWN";
 	}
@@ -144,6 +150,8 @@ std::string to_string(DataType type) {
 			return "STRING";
 		case BOOL:
 			return "BOOL";
+		case PTR:
+			return "PTR";
 		default:
 			return "UNKNOWN";
 	}
@@ -180,6 +188,8 @@ DataType to_data_type(std::string token) {
 		return STRING;
 	} else if (token == "BOOL") {
 		return BOOL;
+	} else if (token == "PTR") {
+		return PTR;
 	} else {
 		return UNKNOWN;
 	}
@@ -203,6 +213,8 @@ DataType to_data_type(int type) {
 			return STRING;
 		case BOOL:
 			return BOOL;
+		case PTR:
+			return PTR;
 		default:
 			return UNKNOWN;
 	}
@@ -235,34 +247,7 @@ void* allocate_data_type(DataType type, int max_str_size) {
 }
 
 void deallocate_data_type(void* data, DataType type) {
-	switch (type) {
-		case INT:
-			delete (int*)data;
-			break;
-		case FLOAT:
-			delete (float*)data;
-			break;
-		case LONG:
-			delete (long*)data;
-			break;
-		case UINT:
-			delete (unsigned int*)data;
-			break;
-		case ULONG:
-			delete (unsigned long*)data;
-			break;
-		case DOUBLE:
-			delete (double*)data;
-			break;
-		case STRING:
-			delete[] (char*)data;
-			break;
-		case BOOL:
-			delete (bool*)data;
-			break;
-		default:
-			break;
-	}
+	free(data);
 }
 
 int get_data_type_size(DataType type) {
@@ -318,6 +303,8 @@ std::string get_data_value(void* data, DataType type) {
 			return std::string((char*)data);
 		case BOOL:
 			return std::to_string(*(bool*)data);
+		case PTR:
+			return "pointer";
 		default:
 			return "";
 	}	

@@ -26,13 +26,14 @@ namespace tovie
 struct Variable {
 	DataType type;
 	int		 id;
+	int size = 0;
 	void*	 value;
 };
 
 std::ostream& operator<<(std::ostream& os, std::unordered_map<int, Variable>& vt) {
 	os << "[ ";
 	for (auto it = vt.begin(); it != vt.end(); ++it) {
-		os << "(" << it->second.id << " " << it->second.type << " " << get_data_value(it->second.value, it->second.type) << ") ";
+		os << "(" << it->second.id << " " << it->second.type << "(" << it->second.size << ") " << get_data_value(it->second.value, it->second.type) << ") ";
 	}
 	os << "]";
 	return os;
@@ -1464,7 +1465,14 @@ static void loadGlobals(std::vector<Operation>& ops) {
 				Variable v;
 				v.id	= ops[i].arg;
 				v.type	= to_data_type(ops[i].ops[0]);
-				v.value = allocate_data_type(v.type);
+				if(v.type == DataType::PTR){
+					v.value = malloc(sizeof(char) * ops[i].ops[1]);
+					v.size = ops[i].ops[1];
+				}
+				else{
+					v.value = allocate_data_type(v.type);
+					v.size = get_data_type_size(v.type);
+				}
 				memset(v.value, 0, get_data_type_size(v.type));
 				gVars[v.id] = v;
 			}
@@ -1525,9 +1533,9 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 	if (debug) {
 		std::cout << " [DEBUG] STACK (" << progStack.length() <<  ") : ";
 		progStack.print();
-		//std::cout << " [DEBUG] GVARS : " << gVars << std::endl;
-		//std::cout << " [DEBUG] LVARS : " << lVars << std::endl;
-		//std::cout << " [DEBUG] OP ID : " << *i << " [ " << op.op << " " << op.arg << " ]" << std::endl;
+		std::cout << " [DEBUG] GVARS : " << gVars << std::endl;
+		std::cout << " [DEBUG] LVARS : " << lVars << std::endl;
+		std::cout << " [DEBUG] OP ID : " << *i << " [ " << op.op << " " << op.arg << " ]" << std::endl;
 	}
 	int a, b;
 	switch (op.op) {
@@ -1671,7 +1679,14 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 			Variable v;
 			v.id	= ops[*i].arg;
 			v.type	= to_data_type(ops[*i].ops[0]);
-			v.value = allocate_data_type(v.type);
+			if(v.type == DataType::PTR){
+				v.value = malloc(sizeof(char) * op.ops[1]);
+				v.size = op.ops[1];
+			}
+			else{
+				v.value = allocate_data_type(v.type);
+				v.size = get_data_type_size(v.type);
+			}
 			memset(v.value, 0, get_data_type_size(v.type));
 			lVars[v.id] = v;
 			break;
@@ -1840,6 +1855,81 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 					std::cout << " [DEBUG]\t memset " << addr << std::endl;
 				memory[addr] = progStack.pop_int();
 			}
+			break;
+		}
+		case OperationType::VMALLOC: {
+			Variable v;
+			int vid = progStack.pop_int();
+			bool	 tp = false;
+			if (gVars.find(vid) != gVars.end()) {
+				v  = gVars[vid];
+				tp = true;
+			} else if (lVars.find(vid) != lVars.end()) {
+				v  = lVars[vid];
+				tp = true;
+			}
+			if (!tp)
+				throw std::runtime_error("variable not found error");
+			if(v.type != DataType::PTR)
+				throw std::runtime_error("variable not pointer error");
+			int size = progStack.pop_int();
+			if (debug)
+				std::cout << " [DEBUG]\t memget (v" << v.id << ")" << size << std::endl;
+			if(v.value)
+				free(v.value);
+			v.value = malloc(size);
+			if(!v.value)
+				throw std::runtime_error("malloc failed error");
+			break;
+		}
+		case OperationType::VMEMGET: {
+			Variable v;
+			int vid = progStack.pop_int();
+			bool	 tp = false;
+			if (gVars.find(vid) != gVars.end()) {
+				v  = gVars[vid];
+				tp = true;
+			} else if (lVars.find(vid) != lVars.end()) {
+				v  = lVars[vid];
+				tp = true;
+			}
+			if (!tp)
+				throw std::runtime_error("variable not found error");
+			if(v.type != DataType::PTR)
+				throw std::runtime_error("variable not pointer error");
+			int size = progStack.pop_int();
+			int offset = progStack.pop_int();
+			if (debug)
+				std::cout << " [DEBUG]\t memget (v" << v.id << ")" << size  << " from " << offset << std::endl;
+			if(!v.value)
+				throw std::runtime_error("null pointer error");
+			progStack.push(((char*)v.value + offset), size);
+			break;
+		}
+		case OperationType::VMEMSET: {
+			Variable v;
+			int vid = progStack.pop_int();
+			bool	 tp = false;
+			if (gVars.find(vid) != gVars.end()) {
+				v  = gVars[vid];
+				tp = true;
+			} else if (lVars.find(vid) != lVars.end()) {
+				v  = lVars[vid];
+				tp = true;
+			}
+			if (!tp)
+				throw std::runtime_error("variable not found error");
+			if(v.type != DataType::PTR)
+				throw std::runtime_error("variable not pointer error");
+			int size = progStack.pop_int();
+			int offset = progStack.pop_int();
+			if (debug)
+				std::cout << " [DEBUG]\t memset (v" << v.id << ")" << size  << " from " << offset << std::endl;
+			if(!v.value)
+				throw std::runtime_error("null pointer error");
+			char* data = progStack.pop(size);
+			memcpy(((char*)v.value + offset), data, size);
+			free(data);
 			break;
 		}
 		case OperationType::IF: {

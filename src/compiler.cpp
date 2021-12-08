@@ -66,6 +66,15 @@ static std::ostream& operator<<(std::ostream& os, const std::vector<std::string>
 	return os;
 }
 
+static std::ostream& operator<<(std::ostream& os, const std::unordered_map<std::string, int> map) {
+	os << "{";
+	for (auto& pair : map) {
+		os << pair.first << ": " << pair.second << ", ";
+	}
+	os << "}";
+	return os;
+}
+
 static void process_defs(std::string& token, std::unordered_map<std::string, std::string>& defs, std::vector<std::string>& toks, int* index) {
 	// iterate over the keys of defs
 	for (auto& kv : defs) {
@@ -99,6 +108,8 @@ static std::string read_lib(const std::string& lib_name, std::vector<std::string
 }
 
 static std::unordered_map<std::string, int> vars;
+static std::unordered_map<int, Array> arrays;
+
 static int varId;
 
 static void push_number(Operation& op, int size, void* d)
@@ -110,11 +121,22 @@ static void push_number(Operation& op, int size, void* d)
 	}
 }
 
+Array::Array()
+:isStruct(false)
+{
+}
+
+Array::Array(int count, int size)
+:isStruct(false), count(count), size(size)
+{
+}
+
+Array::Array(int count, int size, int structId)
+:isStruct(true), count(count), size(size), structId(structId)
+{
+}
+
 std::vector<Operation> parse(std::string input, std::vector<std::string> includePaths, bool debug, std::vector<Operation>& ioperations, std::unordered_map<std::string, std::string>& idefs, bool isInclude) {
-	if (!isInclude) {
-		varId = 0;
-		vars.clear();
-	}
 	std::vector<Operation>&	operations = ioperations;
 	std::unordered_map<std::string, std::string>& defs = idefs;
 	std::vector<std::string> tokens	= lexpp::lex(input, " \t\r\n");
@@ -122,6 +144,9 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 		defs	   = idefs;
 		operations = ioperations;
 	} else {
+		varId = 0;
+		arrays.clear();
+		vars.clear();
 		defs.clear();
 		operations.clear();
 		defs["main"] = "0";
@@ -163,6 +188,7 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 
 		if(debug) {
 			std::cout << "token: " << token << std::endl;
+			std::cout << "vars: " << vars << std::endl;
 		}
 
 		// Operation tokens
@@ -216,13 +242,33 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 			std::string name = token.substr(0, token.find(":"));
 			DataType	type = to_data_type(token.substr(token.find(":") + 1));
 			if (type == DataType::UNKNOWN) {
-				throw std::runtime_error("unknown data type : " + token.substr(token.find(":") + 1));
+				if(token[token.size() - 1] == ']' && token.find("[") != std::string::npos) {
+					std::string typeName = token.substr(token.find(":") + 1, token.find("[") - token.find(":") - 1);
+					type = to_data_type(typeName);
+					if (type == DataType::UNKNOWN) {
+						throw std::runtime_error("unknown data type: " + typeName);
+					}
+					std::string size = token.substr(token.find("[") + 1, token.find("]") - token.find("[") - 1);
+					Array array(stoi(size), get_data_type_size(type));
+					Operation op(OperationType::DECL);
+					op.arg	  = varId++;
+					op.ops[0] = DataType::PTR;
+					op.ops[1] = array.count * array.size;
+					operations.push_back(op);					
+					vars[name] = op.arg;
+					arrays[op.arg] = array;
+				}
+				else{
+					throw std::runtime_error("unknown data type : " + token.substr(token.find(":") + 1));
+				}
 			}
-			Operation op(OperationType::DECL);
-			op.arg	  = varId++;
-			op.ops[0] = type;
-			operations.push_back(op);
-			vars[name] = op.arg;
+			else{
+				Operation op(OperationType::DECL);
+				op.arg	  = varId++;
+				op.ops[0] = type;
+				operations.push_back(op);
+				vars[name] = op.arg;
+			}
 		} else if (vars.find(token) != vars.end()) {
 			Operation op(OperationType::PUSH);
 			int val = vars[token];
@@ -309,19 +355,119 @@ std::vector<Operation> parse(std::string input, std::vector<std::string> include
 		} else if (token[0] == '<') {
 			token = token.substr(1);
 			if (vars.find(token) == vars.end()) {
-				throw std::runtime_error("undefined variable : " + token);
+				auto tp1 = token.find("[");
+				auto tp2 = token.find("]");
+				if(tp1 != std::string::npos && tp2 != std::string::npos){
+					std::string name = token.substr(0, tp1);
+					std::string index = (token.substr(tp1 + 1, tp2 - tp1 - 1));
+					if(vars.find(name) == vars.end()){
+						throw std::runtime_error("unknown variable : " + name);
+					}
+					int vid = vars[name];
+					Array arr = arrays[vid];
+					if(!arr.isStruct){
+						if(vars.find(index) != vars.end()){
+							Operation op(OperationType::VAR, vars[index]);
+							op.ops[0] = -1;
+							operations.push_back(op);
+							op = Operation(OperationType::PUSH);
+							push_number(op, sizeof(int), &arr.size);
+							operations.push_back(op);
+							operations.push_back(Operation(OperationType::MUL));
+						}
+						else{
+							int indexV;
+							try{
+								indexV = stoi(index) * arr.size;
+							}
+							catch(std::exception& e){
+								throw std::runtime_error("unparsable value : " + index);
+							}
+							if(indexV > arr.size * arr.count){
+								throw std::runtime_error("array index out of range");
+							}
+							Operation op(OperationType::PUSH);
+							push_number(op, sizeof(int), &indexV);
+							operations.push_back(op);
+						}
+						Operation op(OperationType::PUSH);
+						push_number(op, sizeof(int), &arr.size);
+						operations.push_back(op);
+						op = Operation(OperationType::PUSH);
+						push_number(op, sizeof(int), &vid);
+						operations.push_back(op);
+						operations.push_back(Operation(OperationType::VMEMGET));
+					}else{
+						throw std::runtime_error("structs not implemented");
+					}
+				}
+				else{
+					throw std::runtime_error("undefined variable : " + token);
+				}
 			}
-			Operation op(OperationType::VAR, vars[token]);
-			op.ops[0] = -1;
-			operations.push_back(op);
+			else{
+				Operation op(OperationType::VAR, vars[token]);
+				op.ops[0] = -1;
+				operations.push_back(op);
+			}
 		} else if (token[0] == '>') {
 			token = token.substr(1);
 			if (vars.find(token) == vars.end()) {
-				throw std::runtime_error("undefined variable : " + token);
+				auto tp1 = token.find("[");
+				auto tp2 = token.find("]");
+				if(tp1 != std::string::npos && tp2 != std::string::npos){
+					std::string name = token.substr(0, tp1);
+					std::string index = (token.substr(tp1 + 1, tp2 - tp1 - 1));
+					if(vars.find(name) == vars.end()){
+						throw std::runtime_error("unknown variable : " + name);
+					}
+					int vid = vars[name];
+					Array arr = arrays[vid];
+					if(!arr.isStruct){
+						if(vars.find(index) != vars.end()){
+							Operation op(OperationType::VAR, vars[index]);
+							op.ops[0] = -1;
+							operations.push_back(op);
+							op = Operation(OperationType::PUSH);
+							push_number(op, sizeof(int), &arr.size);
+							operations.push_back(op);
+							operations.push_back(Operation(OperationType::MUL));
+						}
+						else{
+							int indexV;
+							try{
+								indexV = stoi(index) * arr.size;
+							}
+							catch(std::exception& e){
+								throw std::runtime_error("unparsable value : " + index);
+							}
+							if(indexV > arr.size * arr.count){
+								throw std::runtime_error("array index out of range");
+							}
+							Operation op(OperationType::PUSH);
+							push_number(op, sizeof(int), &indexV);
+							operations.push_back(op);
+						}
+						Operation op(OperationType::PUSH);
+						push_number(op, sizeof(int), &arr.size);
+						operations.push_back(op);
+						op = Operation(OperationType::PUSH);
+						push_number(op, sizeof(int), &vid);
+						operations.push_back(op);
+						operations.push_back(Operation(OperationType::VMEMSET));
+					}else{
+						throw std::runtime_error("structs not implemented");
+					}
+				}
+				else{
+					throw std::runtime_error("undefined variable : " + token);
+				}
 			}
-			Operation op(OperationType::VAR, vars[token]);
-			op.ops[0] = -2;
-			operations.push_back(op);
+			else{
+				Operation op(OperationType::VAR, vars[token]);
+				op.ops[0] = -2;
+				operations.push_back(op);
+			}
 		} else if (token == "println") {
 			operations.push_back(Operation(OperationType::PRINTLN));
 		} else if (token == "dup") {

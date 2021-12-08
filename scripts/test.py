@@ -12,7 +12,8 @@ FILES = [
     os.path.join('examples', "fizzbuzz.tovie"),
     os.path.join('examples', "1to10.tovie"),
     os.path.join('examples', "using_variables_example.tovie"),
-    os.path.join('examples', "typecast.tovie")
+    os.path.join('examples', "typecast.tovie"),
+    os.path.join('examples', "array_basic.tovie")
 ]
 
 BIN_PATH =  os.path.join("bin", "tovie")
@@ -40,13 +41,13 @@ def test():
     print("Testing interpreter ...")
     test_op("-r")
 
-    print("\n\n")
-    print("Testing python transpiler ...")
-    test_op("-f python")
+    #print("\n\n")
+    #print("Testing python transpiler ...")
+    #test_op("-f python")
 
-    print("\n\n")
-    print("Testing c transpiler ...")
-    test_op("-f c")
+    #print("\n\n")
+    #print("Testing c transpiler ...")
+    #test_op("-f c")
 
 if __name__ == "__main__":
     print("Starting tests ...")

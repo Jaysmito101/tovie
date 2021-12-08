@@ -59,6 +59,9 @@ enum OperationType {
 	LOADLIB,
 	DECL,
 	VAR,
+	VMALLOC,
+	VMEMGET,
+	VMEMSET,
 	OPERATION_COUNT
 };
 
@@ -75,6 +78,7 @@ enum DataType {
 	DOUBLE,
 	STRING,
 	BOOL,
+	PTR,
 	DATA_TYPE_COUNT
 };
 
