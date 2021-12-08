@@ -99,6 +99,25 @@ An Advanced Programming Language (Compiler + Interpreter + Transpiler ).
         for_end
     proc_end
     
+### 4. Using Arrays
+
+    dec data:int[35]
+    proc_main
+	dec i:int
+	0 >i
+	1
+	for_15
+		dup >data[i]
+		1 +
+		<i 1 + >i
+	for_end
+
+	for_15
+		<i 1 - >i
+		<data[i] println
+	for_end
+    proc_end
+ 
 # How to install and use tovie?
 
 Requirements:
