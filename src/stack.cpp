@@ -9,7 +9,7 @@ namespace tovie
 
 Stack::Stack(float incFactori)
 {
-    incFactor = incFactor;
+    incFactor = incFactori;
     capacity = STACK_SIZE;
     size = 0;
     data = (char*)malloc(capacity);
@@ -54,46 +54,6 @@ void Stack::revalidate(int sizei)
     }
 }
 
-void Stack::push(float value)
-{
-    validate(sizeof(float));
-    memcpy(top, &value, sizeof(float));
-    top += sizeof(float);
-    size += sizeof(float);
-}
-
-void Stack::push(double value)
-{
-    validate(sizeof(double));
-    memcpy(top, &value, sizeof(double));
-    top += sizeof(double);
-    size += sizeof(double);
-}
-
-void Stack::push(int value)
-{
-    validate(sizeof(int));
-    memcpy(top, &value, sizeof(int));
-    top += sizeof(int);
-    size += sizeof(int);
-}
-
-void Stack::push(char value)
-{
-    validate(sizeof(char));
-    memcpy(top, &value, sizeof(char));
-    top += sizeof(char);
-    size += sizeof(char);
-}
-
-void Stack::push(bool value)
-{
-    validate(sizeof(bool));
-    memcpy(top, &value, sizeof(bool));
-    top += sizeof(bool);
-    size += sizeof(bool);
-}
-
 void Stack::push(char* value)
 {
     validate(strlen(value) + 1);
@@ -103,81 +63,12 @@ void Stack::push(char* value)
     size += strlen(value) + 1;
 }
 
-void Stack::push(unsigned int value)
-{
-    validate(sizeof(unsigned int));
-    memcpy(top, &value, sizeof(unsigned int));
-    top += sizeof(unsigned int);
-    size += sizeof(unsigned int);
-}
-
-void Stack::push(long long value)
-{
-    validate(sizeof(long long));
-    memcpy(top, &value, sizeof(long long));
-    top += sizeof(long long);
-    size += sizeof(long long);
-}
-
-void Stack::push(unsigned long long value)
-{
-    validate(sizeof(unsigned long long));
-    memcpy(top, &value, sizeof(unsigned long long));
-    top += sizeof(unsigned long long);
-    size += sizeof(unsigned long long);
-}
-
 void Stack::push(char* value, int sizei)
 {
     validate(sizei);
     memcpy(top, value, sizei);
     top += sizei;
     size += sizei;
-}
-
-float Stack::pop_float()
-{
-    float value;
-    memcpy(&value, top - sizeof(float), sizeof(float));
-    top -= sizeof(float);
-    size -= sizeof(float);
-    return value;   
-}
-
-double Stack::pop_double()
-{
-    double value;
-    memcpy(&value, top - sizeof(double), sizeof(double));
-    top -= sizeof(double);
-    size -= sizeof(double);
-    return value;   
-}
-
-int Stack::pop_int()
-{
-    int value;
-    memcpy(&value, top - sizeof(int), sizeof(int));
-    top -= sizeof(int);
-    size -= sizeof(int);
-    return value;   
-}
-
-bool Stack::pop_bool()
-{
-    bool value;
-    memcpy(&value, top - sizeof(bool), sizeof(bool));
-    top -= sizeof(bool);
-    size -= sizeof(bool);
-    return value;   
-}
-
-char Stack::pop_char()
-{
-    char value;
-    memcpy(&value, top - sizeof(char), sizeof(char));
-    top -= sizeof(char);
-    size -= sizeof(char);
-    return value;   
 }
 
 char* Stack::pop_str()
@@ -208,34 +99,6 @@ char* Stack::pop(int sizei)
     top -= sizei;
     size -= sizei;
     return outStr;   
-}
-
-
-unsigned int Stack::pop_uint()
-{
-    unsigned int value;
-    memcpy(&value, top - sizeof(unsigned int), sizeof(unsigned int));
-    top -= sizeof(unsigned int);
-    size -= sizeof(unsigned int);
-    return value;   
-}
-
-long long Stack::pop_llong()
-{
-    long long value;
-    memcpy(&value, top - sizeof(long long), sizeof(long long));
-    top -= sizeof(long long);
-    size -= sizeof(long long);
-    return value;   
-}
-
-unsigned long long Stack::pop_ullong()
-{
-    unsigned long long value;
-    memcpy(&value, top - sizeof(unsigned long long), sizeof(unsigned long long));
-    top -= sizeof(unsigned long long);
-    size -= sizeof(unsigned long long);
-    return value;      
 }
 
 int Stack::length()

@@ -116,43 +116,43 @@ static void pop_variable(Stack& progStack, Variable& v, bool debug = false) {
 	{
 		case INT:
 		{
-			int tmp = progStack.pop_int();
+			int tmp = progStack.pop<int>();
 			memcpy(v.value, &tmp, sizeof(int));
 			break;
 		}		
 		case UINT:
 		{
-			unsigned int tmp = progStack.pop_uint();
+			unsigned int tmp = progStack.pop<unsigned int>();
 			memcpy(v.value, &tmp, sizeof(unsigned int));
 			break;
 		}
 		case LONG:
 		{
-			long long tmp = progStack.pop_llong();
+			long long tmp = progStack.pop<long long>();
 			memcpy(v.value, &tmp, sizeof(long long));
 			break;
 		}
 		case ULONG:
 		{
-			unsigned long long tmp = progStack.pop_ullong();
+			unsigned long long tmp = progStack.pop<unsigned long long>();
 			memcpy(v.value, &tmp, sizeof(unsigned long long));
 			break;
 		}
 		case FLOAT:
 		{
-			float tmp = progStack.pop_float();
+			float tmp = progStack.pop<float>();
 			memcpy(v.value, &tmp, sizeof(float));
 			break;
 		}
 		case DOUBLE:
 		{
-			double tmp = progStack.pop_double();
+			double tmp = progStack.pop<double>();
 			memcpy(v.value, &tmp, sizeof(double));
 			break;
 		}
 		case BOOL:
 		{
-			bool tmp = progStack.pop_bool();
+			bool tmp = progStack.pop<bool>();
 			memcpy(v.value, &tmp, sizeof(bool));
 			break;
 		}
@@ -191,76 +191,76 @@ void pop(Stack& s, Operation op, bool debug = false) {
 }
 
 void andop(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
-	int b = s.pop_int();
+	int a = s.pop<int>();
+	int b = s.pop<int>();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " && " << a << std::endl;
 	s.push((int)(b && a));
 }
 
 void orop(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
-	int b = s.pop_int();
+	int a = s.pop<int>();
+	int b = s.pop<int>();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " || " << a << std::endl;
 	s.push((int)(b || a));
 }
 
 void add(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
-	int b = s.pop_int();
+	int a = s.pop<int>();
+	int b = s.pop<int>();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " + " << a << std::endl;
 	s.push(b + a);
 }
 
 void sub(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
-	int b = s.pop_int();
+	int a = s.pop<int>();
+	int b = s.pop<int>();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " - " << a << std::endl;
 	s.push(b - a);
 }
 
 void mul(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
-	int b = s.pop_int();
+	int a = s.pop<int>();
+	int b = s.pop<int>();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " * " << a << std::endl;
 	s.push(b * a);
 }
 
 void div(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
-	int b = s.pop_int();
+	int a = s.pop<int>();
+	int b = s.pop<int>();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " / " << a << std::endl;
 	s.push(b / a);
 }
 
 void mod(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
-	int b = s.pop_int();
+	int a = s.pop<int>();
+	int b = s.pop<int>();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " % " << a << std::endl;
 	s.push(b % a);
 }
 
 void println(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
+	int a = s.pop<int>();
 	s.push(a);
 	std::cout << a << std::endl;
 }
 
 void printlns(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
+	int a = s.pop<int>();
 	s.push(a);
 	std::cout << (char)a << std::endl;
 }
 
 void pow(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
-	int b = s.pop_int();
+	int a = s.pop<int>();
+	int b = s.pop<int>();
 	int r = 1;
 	for (int i = 0; i < a; i++) {
 		r *= b;
@@ -271,13 +271,13 @@ void pow(Stack& s, Operation op, bool debug = false) {
 }
 
 void print(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
+	int a = s.pop<int>();
 	s.push(a);
 	std::cout << a;
 }
 
 void prints(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
+	int a = s.pop<int>();
 	s.push(a);
 	std::cout << (char)a;
 }
@@ -297,48 +297,48 @@ void putsln(Stack& s, Operation op, bool debug = false) {
 }
 
 void gt(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
-	int b = s.pop_int();
+	int a = s.pop<int>();
+	int b = s.pop<int>();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " > " << a << std::endl;
 	s.push((int)(b > a));
 }
 
 void lt(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
-	int b = s.pop_int();
+	int a = s.pop<int>();
+	int b = s.pop<int>();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " < " << a << std::endl;
 	s.push((int)(b < a));
 }
 
 void ge(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
-	int b = s.pop_int();
+	int a = s.pop<int>();
+	int b = s.pop<int>();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " >= " << a << std::endl;
 	s.push((int)(b >= a));
 }
 
 void le(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
-	int b = s.pop_int();
+	int a = s.pop<int>();
+	int b = s.pop<int>();
 	if (debug)
 		std::cout << " [DEBUG]\t" << b << " <= " << a << std::endl;
 	s.push((int)(b <= a));
 }
 
 void eq(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
-	int b = s.pop_int();
+	int a = s.pop<int>();
+	int b = s.pop<int>();
 	if (debug)
 		std::cout << " [DEBUG]\t" << a << " == " << b << std::endl;
 	s.push((int)(b == a));
 }
 
 void neq(Stack& s, Operation op, bool debug = false) {
-	int a = s.pop_int();
-	int b = s.pop_int();
+	int a = s.pop<int>();
+	int b = s.pop<int>();
 	if (debug)
 		std::cout << " [DEBUG]\t" << a << " != " << b << std::endl;
 	s.push((int)(b != a));
@@ -353,7 +353,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 			switch(to){
 				case FLOAT:
 				{
-					int a = s.pop_int();
+					int a = s.pop<int>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
 					s.push((float)a);
@@ -361,7 +361,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case STRING:
 				{
-					int a = s.pop_int();
+					int a = s.pop<int>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
 					s.push(std::to_string(a).c_str());
@@ -369,7 +369,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case LONG:
 				{
-					int a = s.pop_int();
+					int a = s.pop<int>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
 					s.push((long long)a);
@@ -377,7 +377,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case UINT:
 				{
-					int a = s.pop_int();
+					int a = s.pop<int>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
 					s.push((unsigned int)a);
@@ -385,7 +385,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case ULONG:
 				{
-					int a = s.pop_int();
+					int a = s.pop<int>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
 					s.push((unsigned long long)a);
@@ -393,7 +393,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case DOUBLE:
 				{
-					int a = s.pop_int();
+					int a = s.pop<int>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
 					s.push((double)a);
@@ -401,7 +401,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case BOOL:
 				{
-					int a = s.pop_int();
+					int a = s.pop<int>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> bool" << std::endl;
 					s.push((bool)a);
@@ -417,7 +417,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 			switch(to){
 				case FLOAT:
 				{
-					unsigned int a = s.pop_uint();
+					unsigned int a = s.pop<unsigned int>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
 					s.push((float)a);
@@ -425,7 +425,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case STRING:
 				{
-					unsigned int a = s.pop_uint();
+					unsigned int a = s.pop<unsigned int>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
 					s.push(std::to_string(a).c_str());
@@ -433,7 +433,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case LONG:
 				{
-					unsigned int a = s.pop_uint();
+					unsigned int a = s.pop<unsigned int>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
 					s.push((long long)a);
@@ -441,7 +441,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case INT:
 				{
-					unsigned int a = s.pop_uint();
+					unsigned int a = s.pop<unsigned int>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
 					s.push((int)a);
@@ -449,7 +449,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case ULONG:
 				{
-					unsigned int a = s.pop_uint();
+					unsigned int a = s.pop<unsigned int>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
 					s.push((unsigned long long)a);
@@ -457,7 +457,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case DOUBLE:
 				{
-					unsigned int a = s.pop_uint();
+					unsigned int a = s.pop<unsigned int>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
 					s.push((double)a);
@@ -465,7 +465,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case BOOL:
 				{
-					unsigned int a = s.pop_uint();
+					unsigned int a = s.pop<unsigned int>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> bool" << std::endl;
 					s.push((bool)a);
@@ -481,7 +481,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 			switch(to){
 				case FLOAT:
 				{
-					long long a = s.pop_llong();
+					long long a = s.pop<long long>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
 					s.push((float)a);
@@ -489,7 +489,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case STRING:
 				{
-					long long a = s.pop_llong();
+					long long a = s.pop<long long>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
 					s.push(std::to_string(a).c_str());
@@ -497,7 +497,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case UINT:
 				{
-					long long a = s.pop_llong();
+					long long a = s.pop<long long>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
 					s.push((unsigned int)a);
@@ -505,7 +505,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case INT:
 				{
-					long long a = s.pop_llong();
+					long long a = s.pop<long long>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
 					s.push((int)a);
@@ -513,7 +513,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case ULONG:
 				{
-					long long a = s.pop_llong();
+					long long a = s.pop<long long>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
 					s.push((unsigned long long)a);
@@ -521,7 +521,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case DOUBLE:
 				{
-					long long a = s.pop_llong();
+					long long a = s.pop<long long>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
 					s.push((double)a);
@@ -529,7 +529,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case BOOL:
 				{
-					long long a = s.pop_llong();
+					long long a = s.pop<long long>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> bool" << std::endl;
 					s.push((bool)a);
@@ -545,7 +545,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 			switch(to){
 				case FLOAT:
 				{
-					unsigned long long a = s.pop_ullong();
+					unsigned long long a = s.pop<unsigned long long>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
 					s.push((float)a);
@@ -553,7 +553,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case STRING:
 				{
-					unsigned long long a = s.pop_ullong();
+					unsigned long long a = s.pop<unsigned long long>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
 					s.push(std::to_string(a).c_str());
@@ -561,7 +561,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case UINT:
 				{
-					unsigned long long a = s.pop_ullong();
+					unsigned long long a = s.pop<unsigned long long>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
 					s.push((unsigned int)a);
@@ -569,7 +569,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case INT:
 				{
-					unsigned long long a = s.pop_ullong();
+					unsigned long long a = s.pop<unsigned long long>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
 					s.push((int)a);
@@ -577,7 +577,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case LONG:
 				{
-					unsigned long long a = s.pop_ullong();
+					unsigned long long a = s.pop<unsigned long long>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
 					s.push((long long)a);
@@ -585,7 +585,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case DOUBLE:
 				{
-					unsigned long long a = s.pop_ullong();
+					unsigned long long a = s.pop<unsigned long long>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
 					s.push((double)a);
@@ -593,7 +593,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case BOOL:
 				{
-					unsigned long long a = s.pop_ullong();
+					unsigned long long a = s.pop<unsigned long long>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> bool" << std::endl;
 					s.push((bool)a);
@@ -609,7 +609,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 			switch(to){
 				case ULONG:
 				{
-					float a = s.pop_float();
+					float a = s.pop<float>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
 					s.push((unsigned long long)a);
@@ -617,7 +617,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case STRING:
 				{
-					float a = s.pop_float();
+					float a = s.pop<float>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
 					s.push(std::to_string(a).c_str());
@@ -625,7 +625,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case UINT:
 				{
-					float a = s.pop_float();
+					float a = s.pop<float>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
 					s.push((unsigned int)a);
@@ -633,7 +633,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case INT:
 				{
-					float a = s.pop_float();
+					float a = s.pop<float>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
 					s.push((int)a);
@@ -641,7 +641,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case LONG:
 				{
-					float a = s.pop_float();
+					float a = s.pop<float>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
 					s.push((long long)a);
@@ -649,7 +649,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case DOUBLE:
 				{
-					float a = s.pop_float();
+					float a = s.pop<float>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
 					s.push((double)a);
@@ -657,7 +657,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case BOOL:
 				{
-					float a = s.pop_float();
+					float a = s.pop<float>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> bool" << std::endl;
 					s.push((bool)a);
@@ -673,7 +673,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 			switch(to){
 				case ULONG:
 				{
-					double a = s.pop_double();
+					double a = s.pop<double>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
 					s.push((unsigned long long)a);
@@ -681,7 +681,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case STRING:
 				{
-					double a = s.pop_double();
+					double a = s.pop<double>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
 					s.push(std::to_string(a).c_str());
@@ -689,7 +689,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case UINT:
 				{
-					double a = s.pop_double();
+					double a = s.pop<double>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
 					s.push((unsigned int)a);
@@ -697,7 +697,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case INT:
 				{
-					double a = s.pop_double();
+					double a = s.pop<double>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
 					s.push((int)a);
@@ -705,7 +705,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case LONG:
 				{
-					double a = s.pop_double();
+					double a = s.pop<double>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
 					s.push((long long)a);
@@ -713,7 +713,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case FLOAT:
 				{
-					double a = s.pop_double();
+					double a = s.pop<double>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
 					s.push((float)a);
@@ -721,7 +721,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case BOOL:
 				{
-					double a = s.pop_double();
+					double a = s.pop<double>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> bool" << std::endl;
 					s.push((bool)a);
@@ -737,7 +737,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 			switch(to){
 				case ULONG:
 				{
-					bool a = s.pop_bool();
+					bool a = s.pop<bool>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> float" << std::endl;
 					s.push((unsigned long long)a);
@@ -745,7 +745,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case STRING:
 				{
-					bool a = s.pop_bool();
+					bool a = s.pop<bool>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> string" << std::endl;
 					s.push((char*)(a?"true":"false"));
@@ -753,7 +753,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case UINT:
 				{
-					bool a = s.pop_bool();
+					bool a = s.pop<bool>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> long" << std::endl;
 					s.push((unsigned int)a);
@@ -761,7 +761,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case INT:
 				{
-					bool a = s.pop_bool();
+					bool a = s.pop<bool>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> uint" << std::endl;
 					s.push((int)a);
@@ -769,7 +769,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case LONG:
 				{
-					bool a = s.pop_bool();
+					bool a = s.pop<bool>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> ulong" << std::endl;
 					s.push((long long)a);
@@ -777,7 +777,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case FLOAT:
 				{
-					bool a = s.pop_bool();
+					bool a = s.pop<bool>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
 					s.push((float)a);
@@ -785,7 +785,7 @@ void typecast(Stack& s, Operation op, bool debug = false) {
 				}
 				case DOUBLE:
 				{
-					bool a = s.pop_bool();
+					bool a = s.pop<bool>();
 					if (debug)
 						std::cout << " [DEBUG]\t" << a << " -> double" << std::endl;
 					s.push((double)a);
@@ -912,8 +912,8 @@ static Variable get_variable(int id, std::unordered_map<int, Variable>& gV, std:
 }
 
 static void addVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.pop_int(), gV, lV);
-	Variable b = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
+	Variable b = get_variable(s.pop<int>(), gV, lV);
 
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
@@ -955,8 +955,8 @@ static void addVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unorder
 }
 
 static void subVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.pop_int(), gV, lV);
-	Variable b = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
+	Variable b = get_variable(s.pop<int>(), gV, lV);
 
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
@@ -997,8 +997,8 @@ static void subVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unorder
 }
 
 static void mulVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.pop_int(), gV, lV);
-	Variable b = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
+	Variable b = get_variable(s.pop<int>(), gV, lV);
 
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
@@ -1036,8 +1036,8 @@ static void mulVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unorder
 }
 
 static void divVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.pop_int(), gV, lV);
-	Variable b = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
+	Variable b = get_variable(s.pop<int>(), gV, lV);
 
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
@@ -1075,8 +1075,8 @@ static void divVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unorder
 }
 
 static void modVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.pop_int(), gV, lV);
-	Variable b = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
+	Variable b = get_variable(s.pop<int>(), gV, lV);
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -1107,8 +1107,8 @@ static void modVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unorder
 }
 
 static void gtVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.pop_int(), gV, lV);
-	Variable b = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
+	Variable b = get_variable(s.pop<int>(), gV, lV);
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -1145,8 +1145,8 @@ static void gtVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordere
 }
 
 static void ltVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.pop_int(), gV, lV);
-	Variable b = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
+	Variable b = get_variable(s.pop<int>(), gV, lV);
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -1183,8 +1183,8 @@ static void ltVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordere
 }
 
 static void geVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.pop_int(), gV, lV);
-	Variable b = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
+	Variable b = get_variable(s.pop<int>(), gV, lV);
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -1221,8 +1221,8 @@ static void geVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordere
 }
 
 static void leVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.pop_int(), gV, lV);
-	Variable b = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
+	Variable b = get_variable(s.pop<int>(), gV, lV);
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -1259,8 +1259,8 @@ static void leVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordere
 }
 
 static void eqVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.pop_int(), gV, lV);
-	Variable b = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
+	Variable b = get_variable(s.pop<int>(), gV, lV);
 	if (a.type != b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -1298,13 +1298,13 @@ static void eqVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordere
 
 static void neqVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
 	eqVOP(s, gV, lV, debug);
-	bool flag = !s.pop_bool();
+	bool flag = !s.pop<bool>();
 	s.push((int)flag);
 }
 
 static void andVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.pop_int(), gV, lV);
-	Variable b = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
+	Variable b = get_variable(s.pop<int>(), gV, lV);
 	if (a.type && b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -1339,8 +1339,8 @@ static void andVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unorder
 }
 
 static void orVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
-	Variable a = get_variable(s.pop_int(), gV, lV);
-	Variable b = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
+	Variable b = get_variable(s.pop<int>(), gV, lV);
 	if (a.type || b.type)
 		throw std::runtime_error("type mismatch");
 	if (debug)
@@ -1376,19 +1376,19 @@ static void orVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordere
 static void printVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
 	if(debug)
 		std::cout << " [DEBUG]\t printvop" << std::endl;
-	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
 	std::cout << get_data_value(a.value, a.type);
 }
 static void printlnVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
 	if(debug)
 		std::cout << " [DEBUG]\t printlnvop" << std::endl;
-	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
 	std::cout << get_data_value(a.value, a.type) << std::endl;
 }
 static void inputVOP(Stack& s, std::unordered_map<int, Variable>& gV, std::unordered_map<int, Variable>& lV, bool debug = false) {
 	if(debug)
 		std::cout << " [DEBUG]\t inputvop" << std::endl;
-	Variable a = get_variable(s.pop_int(), gV, lV);
+	Variable a = get_variable(s.pop<int>(), gV, lV);
 	switch (a.type) {
 	case INT:
 		std::cin >> *(int*) a.value;
@@ -1798,7 +1798,7 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 			break;
 		}
 		case OperationType::CALL: {
-			int procId = progStack.pop_int();
+			int procId = progStack.pop<int>();
 			if (debug)
 				std::cout << " [DEBUG]\tcall proc_" << procId << std::endl;
 			ProcAddr pAddr = get_proc_addr(procId);
@@ -1816,7 +1816,7 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 			throw std::runtime_error("PROCEED operation deprecated!");
 		}
 		case OperationType::MALLOC: {
-			int count = progStack.pop_int();
+			int count = progStack.pop<int>();
 			if (debug)
 				std::cout << " [DEBUG]\t malloc " << count << std::endl;
 			if (memory != nullptr)
@@ -1826,8 +1826,8 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 		}
 		case OperationType::MEMGET: {
 			if (op.arg == -1) {
-				int addr = progStack.pop_int();
-				int size = progStack.pop_int();
+				int addr = progStack.pop<int>();
+				int size = progStack.pop<int>();
 				if (debug)
 					std::cout << " [DEBUG]\t memget " << addr << size << std::endl;
 				for (int k = addr + size - 1; k >= addr; k--)
@@ -1842,24 +1842,24 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 		}
 		case OperationType::MEMSET: {
 			if (op.arg == -1) {
-				int addr = progStack.pop_int();
-				int size = progStack.pop_int();
+				int addr = progStack.pop<int>();
+				int size = progStack.pop<int>();
 				if (debug)
 					std::cout << " [DEBUG]\t memset " << addr << size << std::endl;
 				for (int k = addr; k < addr + size; k++) {
-					memory[k] = progStack.pop_int();
+					memory[k] = progStack.pop<int>();
 				}
 			} else {
 				int addr = op.arg;
 				if (debug)
 					std::cout << " [DEBUG]\t memset " << addr << std::endl;
-				memory[addr] = progStack.pop_int();
+				memory[addr] = progStack.pop<int>();
 			}
 			break;
 		}
 		case OperationType::VMALLOC: {
 			Variable v;
-			int vid = progStack.pop_int();
+			int vid = progStack.pop<int>();
 			bool	 tp = false;
 			if (gVars.find(vid) != gVars.end()) {
 				v  = gVars[vid];
@@ -1872,7 +1872,7 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 				throw std::runtime_error("variable not found error");
 			if(v.type != DataType::PTR)
 				throw std::runtime_error("variable not pointer error");
-			int size = progStack.pop_int();
+			int size = progStack.pop<int>();
 			if (debug)
 				std::cout << " [DEBUG]\t memget (v" << v.id << ")" << size << std::endl;
 			if(v.value)
@@ -1884,7 +1884,7 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 		}
 		case OperationType::VMEMGET: {
 			Variable v;
-			int vid = progStack.pop_int();
+			int vid = progStack.pop<int>();
 			bool	 tp = false;
 			if (gVars.find(vid) != gVars.end()) {
 				v  = gVars[vid];
@@ -1897,8 +1897,8 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 				throw std::runtime_error("variable not found error");
 			if(v.type != DataType::PTR)
 				throw std::runtime_error("variable not pointer error");
-			int size = progStack.pop_int();
-			int offset = progStack.pop_int();
+			int size = progStack.pop<int>();
+			int offset = progStack.pop<int>();
 			if (debug)
 				std::cout << " [DEBUG]\t memget (v" << v.id << ")" << size  << " from " << offset << std::endl;
 			if(!v.value)
@@ -1908,7 +1908,7 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 		}
 		case OperationType::VMEMSET: {
 			Variable v;
-			int vid = progStack.pop_int();
+			int vid = progStack.pop<int>();
 			bool	 tp = false;
 			if (gVars.find(vid) != gVars.end()) {
 				v  = gVars[vid];
@@ -1921,8 +1921,8 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 				throw std::runtime_error("variable not found error");
 			if(v.type != DataType::PTR)
 				throw std::runtime_error("variable not pointer error");
-			int size = progStack.pop_int();
-			int offset = progStack.pop_int();
+			int size = progStack.pop<int>();
+			int offset = progStack.pop<int>();
 			if (debug)
 				std::cout << " [DEBUG]\t memset (v" << v.id << ")" << size  << " from " << offset << std::endl;
 			if(!v.value)
@@ -1937,7 +1937,7 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 				for (unsigned long p = *i + 1; p <= *i + op.ops[1]; p++)
 					simulate_op(progStack, ops[p], &p, memory, ops, debug, lVars, ifCount);
 				*i += op.ops[1]+1;
-				int condition = progStack.pop_int();
+				int condition = progStack.pop<int>();
 				if (debug)
 					std::cout << " [DEBUG]\t if " << condition << std::endl;
 				if (condition) {
@@ -1965,7 +1965,7 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 					for (unsigned long p = *i + 1; p <= *i + op.ops[1]; p++)
 						simulate_op(progStack, ops[p], &p, memory, ops, debug, lVars, ifCount);
 					*i += op.ops[1];
-					condition = progStack.pop_int();
+					condition = progStack.pop<int>();
 					if(debug)
 						std::cout << " [DEBUG]\t elif " << condition << std::endl;
 				}
@@ -2013,7 +2013,7 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 		}
 		case OperationType::WHILE: {
 			if (op.arg == 0) {
-				int condition = progStack.pop_int();
+				int condition = progStack.pop<int>();
 				if (condition) {
 					// For future use
 					if (debug)
@@ -2070,7 +2070,7 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 				}
 				int count = op.arg;
 				if (op.arg == -2) {
-					count = progStack.pop_int();
+					count = progStack.pop<int>();
 				}
 				if (debug) {
 					std::cout << " [DEBUG]\t for " << count << " times from " << *i << " to " << end << std::endl;
@@ -2087,7 +2087,7 @@ static void simulate_op(Stack& progStack, Operation op, unsigned long* i, int* m
 			break;
 		}
 		case OperationType::EXIT: {
-			int code = progStack.pop_int();
+			int code = progStack.pop<int>();
 			if (debug)
 				std::cout << " [DEBUG]\texit " << code << std::endl;
 			if (memory != nullptr)

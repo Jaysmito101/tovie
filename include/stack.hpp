@@ -5,7 +5,7 @@ namespace tovie
 
 #define STACK_SIZE 4096 * 4096
 
-#ifndef TOVIE_SAFE
+#ifdef TOVIE_SAFE
 #define validate(x) revalidate(x) 
 #else
 #define validate(x)
@@ -16,30 +16,34 @@ class Stack
     public:
     Stack(float incFactor = 1.5f);
     ~Stack();
-    void push(float value);
-    void push(double value);
-    void push(int value);
-    void push(char value);
-    void push(bool value);
+
+    template<typename T>
+    inline void push(T value)
+    {
+        validate(sizeof(T));
+        *(reinterpret_cast<T*>(top)) = value;
+        top += sizeof(T);
+        size += sizeof(T);
+    }
+
     void push(char* value);
-    void push(unsigned int value);
-    void push(long long value);
-    void push(unsigned long long value);
     void push(char* value, int size);
 
-    float pop_float();
-    double pop_double();
-    int pop_int();
-    char pop_char();
-    bool pop_bool();
+    template<typename T>
+    inline T pop()
+    {
+        validate(sizeof(T));
+        top -= sizeof(T);
+        size -= sizeof(T);
+        return *(reinterpret_cast<T*>(top));
+    }
+
     char* pop_str();
     char* pop(int size = 1);
-    unsigned int pop_uint();
-    long long pop_llong();
-    unsigned long long pop_ullong();    
 
     void print(const char* end = "\n");
     void print_int(const char* end = "\n");
+    
     int length();
     void* get_data();
     void revalidate(int size);
